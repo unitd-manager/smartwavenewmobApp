@@ -206,6 +206,7 @@ const styles = StyleSheet.create({
 	container: {
 		flex: 1,
 		backgroundColor: "#FFFFFF",
+    fontFamily: 'Outfit-Regular'
 	},
 	button: {
 		alignItems: "center",
@@ -214,10 +215,12 @@ const styles = StyleSheet.create({
 		paddingVertical: 17,
 		marginBottom: 20,
 		marginHorizontal: 30,
+    fontFamily: 'Outfit-Regular',
 	},
 	column: {
 		marginBottom: 75,
 		marginHorizontal: 34,
+    fontFamily: 'Outfit-Regular',
 	},
 	image: {
 		width: 143,
@@ -244,6 +247,7 @@ const styles = StyleSheet.create({
 		paddingVertical: 16,
 		paddingLeft: 12,
 		paddingRight: 24,
+    fontFamily: 'Outfit-Regular',
 	},
 	input2: {
 		color: "#9CA7B7",
@@ -257,6 +261,7 @@ const styles = StyleSheet.create({
 		paddingVertical: 16,
 		paddingLeft: 12,
 		paddingRight: 24,
+    fontFamily: 'Outfit-Regular',
 	},
 	input3: {
 		color: "#9CA7B7",
@@ -270,10 +275,12 @@ const styles = StyleSheet.create({
 		paddingVertical: 16,
 		paddingLeft: 12,
 		paddingRight: 24,
+    fontFamily: 'Outfit-Regular',
 	},
 	row: {
 		flexDirection: "row",
 		marginBottom: 66,
+    fontFamily: 'Outfit-Regular',
 	},
 	row2: {
 		flexDirection: "row",
@@ -288,10 +295,12 @@ const styles = StyleSheet.create({
 		paddingRight: 26,
 		marginBottom: 20,
 		marginHorizontal: 30,
+    fontFamily: 'Outfit-Regular',
 	},
 	scrollView: {
 		flex: 1,
 		backgroundColor: "#FFFFFF",
+    fontFamily: 'Outfit-Regular',
 	},
 	text: {
 		color: "#373737",
@@ -300,6 +309,7 @@ const styles = StyleSheet.create({
 		marginVertical: 18,
 		marginLeft: 47,
 		marginRight: 59,
+    fontFamily: 'Outfit-Regular',
 	},
 	text2: {
 		color: "#000000",
@@ -307,44 +317,53 @@ const styles = StyleSheet.create({
 		fontWeight: "bold",
 		textAlign: "center",
 		marginBottom: 15,
+    fontFamily: 'Outfit-Regular',
 	},
 	text3: {
 		color: "#9CA7B7",
 		fontSize: 16,
 		textAlign: "center",
+    fontFamily: 'Outfit-Regular',
 	},
 	text4: {
 		color: "#595D64",
 		fontSize: 16,
 		marginBottom: 5,
 		marginLeft: 30,
+    fontFamily: 'Outfit-Regular',
 	},
 	text5: {
 		color: "#595D64",
 		fontSize: 16,
 		marginBottom: 5,
 		marginLeft: 33,
+    fontFamily: 'Outfit-Regular',
 	},
 	text6: {
 		color: "#595E64",
 		fontSize: 14,
 		marginLeft: 12,
+    fontFamily: 'Outfit-Regular',
 	},
 	text7: {
 		color: "#595D64",
 		marginBottom: 5,
 		marginLeft: 30,
+    fontFamily: 'Outfit-Regular',
 	},
 	text8: {
 		color: "#595E64",
+    fontFamily: 'Outfit-Regular',
 	},
 	text9: {
 		color: "#FFFFFF",
 		fontSize: 18,
+    fontFamily: 'Outfit-Regular',
 	},
 	text10: {
 		color: "#595D64",
 		fontSize: 14,
+    fontFamily: 'Outfit-Regular',
 	},
 	view: {
 		backgroundColor: "#FFFFFF",
@@ -355,20 +374,24 @@ const styles = StyleSheet.create({
 		paddingBottom: 41,
 		marginBottom: 20,
 		marginHorizontal: 30,
+    fontFamily: 'Outfit-Regular',
 	},
 	view2: {
 		alignItems: "center",
 		marginBottom: 51,
+    fontFamily: 'Outfit-Regular',
 	},
 	view3: {
 		height: 18,
 		alignItems: "center",
 		marginBottom: 18,
+    fontFamily: 'Outfit-Regular',
 	},
 	passtext: {
         color: "#595D64",
         marginBottom: 5,
         marginLeft: 30,
+        fontFamily: 'Outfit-Regular',
     },
     passrow: {
         flexDirection: "row",
@@ -382,6 +405,7 @@ const styles = StyleSheet.create({
         paddingRight: 10,
         marginBottom: 20,
         marginHorizontal: 30,
+        fontFamily: 'Outfit-Regular',
     },
     passinput: {
         color: "#595E64",
@@ -390,10 +414,12 @@ const styles = StyleSheet.create({
         flex: 1,
         paddingVertical: 12,
         paddingLeft: 10,
+        fontFamily: 'Outfit-Regular',
     },
     passimage: {
         width: 24,
         height: 24,
         tintColor: "#595D64", // Adjust icon color if needed
+        fontFamily: 'Outfit-Regular',
     },
 });

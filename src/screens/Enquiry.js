@@ -60,6 +60,7 @@ const styles = StyleSheet.create({
 	container: {
 		flex: 1,
 		backgroundColor: "#FFFFFF",
+		fontFamily: 'Outfit-Regular',
 	},
 	button: {
 		alignItems: "center",
@@ -68,6 +69,7 @@ const styles = StyleSheet.create({
 		paddingVertical: 11,
 		marginBottom: 10,
 		marginHorizontal: 34,
+		fontFamily: 'Outfit-Regular',
 	},
 	button2: {
 		alignItems: "center",
@@ -75,9 +77,11 @@ const styles = StyleSheet.create({
 		borderRadius: 10,
 		paddingVertical: 11,
 		marginHorizontal: 34,
+		fontFamily: 'Outfit-Regular',
 	},
 	column: {
 		alignItems: "center",
+		fontFamily: 'Outfit-Regular',
 	},
 	column2: {
 		backgroundColor: "#FFFFFF",
@@ -88,6 +92,7 @@ const styles = StyleSheet.create({
 		paddingVertical: 25,
 		shadowColor: "#959DA533",
 		shadowOpacity: 0.2,
+		fontFamily: 'Outfit-Regular',
 		shadowOffset: {
 		    width: 8,
 		    height: 0
@@ -111,54 +116,65 @@ const styles = StyleSheet.create({
 	row: {
 		flexDirection: "row",
 		marginBottom: 8,
+		fontFamily: 'Outfit-Regular',
 	},
 	row2: {
 		flexDirection: "row",
 		alignItems: "center",
 		marginBottom: 145,
 		marginLeft: 30,
+		fontFamily: 'Outfit-Regular',
 	},
 	scrollView: {
 		flex: 1,
 		backgroundColor: "#FFFFFF",
+		fontFamily: 'Outfit-Regular',
 	},
 	text: {
 		color: "#000000",
-		fontSize: 17,
-		fontWeight: "bold",
+		fontSize: 20,
+		//fontWeight: "bold",
 		marginVertical: 18,
 		marginLeft: 31,
 		marginRight: 12,
+		fontFamily: 'Outfit-Regular',
 	},
 	text2: {
 		color: "#000000",
 		fontSize: 20,
 		margin: 10,
+		fontFamily: 'Outfit-Regular',
 	},
 	text3: {
 		color: "#000000",
 		fontSize: 26,
-		fontWeight: "bold",
+		//fontWeight: "bold",
 		marginBottom: 10,
+		fontFamily: 'Outfit-Regular',
 	},
 	text4: {
 		color: "#9CA7B7",
 		fontSize: 16,
+		fontFamily: 'Outfit-Regular',
 	},
 	text5: {
 		color: "#FFFFFF",
 		fontSize: 16,
+		fontFamily: 'Outfit-Regular',
 	},
 	text6: {
 		color: "#1EB1C5",
 		fontSize: 16,
+		fontFamily: 'Outfit-Regular',
 	},
 	view: {
 		alignItems: "center",
 		marginBottom: 30,
+		fontFamily: 'Outfit-Regular',
 	},
 	view2: {
 		alignItems: "center",
 		marginBottom: 202,
+		fontFamily: 'Outfit-Regular',
 	},
 });
