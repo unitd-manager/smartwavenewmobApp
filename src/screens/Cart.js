@@ -1,43 +1,244 @@
 
-import React, { useEffect, useState } from "react";
-import { SafeAreaView, View, ScrollView, Text, Image, TouchableOpacity, StyleSheet, ActivityIndicator, ImageBackground } from "react-native";
+import React, { useEffect, useState,useCallback } from "react";
+import { SafeAreaView, View, ScrollView, Text, Image, TouchableOpacity, StyleSheet, ActivityIndicator, ImageBackground, Alert } from "react-native";
 import api from '../constants/api';
 import imageBase from "../constants/imageBase";
+import { useSelector, useDispatch } from 'react-redux';
+import { fetchCartItems, deleteCartItem, addToCart,clearCart,updateCart } from '../redux/slices/cartSlice';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
  const CartScreen = ({navigation}) => {
   const [cartItems, setCartItems] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [user, setUser] = useState();
 
+  const dispatch = useDispatch();
+  const { items, status } = useSelector((state) => state.cart);
   
-console.log('cartpage')
-  const fetchCartItems = () => {
-	console.log('cartpagefunction called')
-	api.post('/contact/getCartProductsByContactId',{contact_id:468})
-	.then((res) => {
-	  res.data.data.forEach(element => {
-		element.images=String(element.images).split(',')
-	  });
-	  console.log('respcart',res.data.data)
-	  setCartItems(res.data.data)
-	  setLoading(false);
-	  })
-	.catch((error) => {console.log('error',error)});
+  const [mailId, setmailId] = useState("");
+  const getEmail = () => {
+    api.get("/setting/getMailId").then((res) => {
+      setmailId(res.data.data[0]);
+    });
+  };
+  useEffect(() => {
+    dispatch(fetchCartItems(user));
+  }, []);
+
+const clearCartItems=()=>{
+	dispatch(clearCart(user)).then(()=>{
+		Alert.alert('Cart cleared')
+	 dispatch(fetchCartItems(user));
+				 })
+				 .catch((error) => {
+				   console.error('Failed to clear cart:', error);
+				 });
+}
+
+  const handleDelete = (item) => {
+    dispatch(deleteCartItem(item)).then(()=>{
+		Alert.alert('Item deleted')
+	 dispatch(fetchCartItems(user));
+				 })
+				 .catch((error) => {
+				   console.error('Failed to remove from cart:', error);
+				 });
   };
 
+//const cartItems = useSelector(state => state.cart.cartItems);
+console.log('cartpage',items)
+//   const fetchCartItems = () => {
+// 	console.log('cartpagefunction called')
+// 	api.post('/contact/getCartProductsByContactId',{contact_id:468})
+// 	.then((res) => {
+// 	  res.data.data.forEach(element => {
+// 		element.images=String(element.images).split(',')
+// 	  });
+// 	  console.log('respcart',res.data.data)
+// 	  setCartItems(res.data.data)
+// 	  setLoading(false);
+// 	  })
+// 	.catch((error) => {console.log('error',error)});
+//   };
+
+//   useEffect(() => {
+// 	console.log('useeffect running')
+// 	api.post('/contact/getCartProductsByContactId',{contact_id:468})
+// 	.then((res) => {
+// 	  res.data.data.forEach(element => {
+// 		element.images=String(element.images).split(',')
+// 	  });
+// 	  console.log('respcart',res.data.data)
+// 	  setCartItems(res.data.data)
+// 	  setLoading(false);
+// 	  })
+// 	.catch((error) => {});
+//     //fetchCartItems();
+//   }, []);
+const handleIncreaseQuantity = useCallback(
+    (item) => {
+      const updatedItem = { ...item, qty: item.qty + 1 };
+      dispatch(updateCart(updatedItem));
+    },
+    [dispatch]
+  );
+
+  const handleDecreaseQuantity = useCallback(
+    (item) => {
+      if (item.qty > 1) {
+        const updatedItem = { ...item, qty: item.qty - 1 };
+        dispatch(updateCart(updatedItem));
+      }
+    },
+    [dispatch]
+  );
+const generateCode = () => {
+    api
+      .post('/commonApi/getCodeValues', { type: 'enquiry' })
+      .then((res) => {
+        placeEnquiry(res.data.data);
+      })
+      .catch(() => {
+        placeEnquiry('');
+      });
+  };
+
+  const placeEnquiry = (code) => {     
+    if (user) {
+      const enquiryDetails = {
+        contact_id : user.contact_id,
+        enquiry_date : new Date().toISOString().split('T')[0],
+        enquiry_type : 'Enquiry and order for Retail products.',
+        status : 'New',
+        title : 'Enquiry from ' + user.first_name,      
+        enquiry_code: code,
+        creation_date : new Date().toISOString().split('T')[0],
+        created_by: user.first_name,
+      };
+      api
+        .post("/enquiry/insertEnquiry", enquiryDetails)
+        .then((res) => {
+          const insertedId = res.data.data.insertId;
+          items.forEach((item) => {
+            item.enquiry_id = insertedId;
+            item.quantity = item.qty;
+            item.product_id = item.product_id;
+            item.category_id = item.category_id;
+            item.created_by = user.first_name;
+            api
+              .post("/enquiry/insertQuoteItems", item)
+              .then(() => {
+                console.log("order placed");
+              })
+              .catch((err) => console.log(err));
+          });
+        }).then(() => {
+          console.log("cart user",user)
+          dispatch(clearCart(user));
+            // Make the API call
+      api
+      .post("/contact/clearCartItems", { contact_id: user.contact_id })
+       
+        })
+        .then(() => {
+          //alert("Enquiry Submitted Successfully");
+          navigation.navigate('Enquiry')
+        })
+        .catch((err) => console.log(err));
+    } else {
+      console.log("please login");
+    }
+    const orderDate = new Date();
+    const deliveryDate = new Date();
+    deliveryDate.setDate(orderDate.getDate() + 7);
+
+    const formatDate = (date) => {
+      const day = String(date.getDate()).padStart(2, '0');
+      const month = String(date.getMonth() + 1).padStart(2, '0'); // Month is zero-based
+      const year = date.getFullYear();
+      return `${day}-${month}-${year}`;
+    };
+
+  
+    const to = mailId.email;
+    const toCustomer = user.email; // Customer's Email
+    const subject = "Smartwave Product Details";
+    
+    // Group all products into an array
+    const dynamic_template_data = {
+      first_name: items[0]?.first_name,
+      phone: items[0]?.phone, // Assuming same user for all products
+      address: items[0]?.address, // Assuming same user for all products
+      email: items[0]?.email, // Assuming same user for all products
+      // Assuming same user for all products
+      products: items.map((item) => ({
+        title: item.title,
+        qty: item.qty,
+      })),
+    };
+    // Send a single API request with all products
+    api
+      .post("/commonApi/sendProductAdmin", { to, subject, dynamic_template_data })
+      .then((res) => {
+        console.log("Product admin email sent successfully.");
+      })
+      .catch((err) => {
+        console.error("Error sending product admin email:", err);
+      });
+      
+  // Send Email to Customer (Customer Dynamic Template)
+api
+.post("/commonApi/sendProduct",{ toCustomer, subject, dynamic_template_data })
+.then((res) => {
+  console.log("Customer email sent successfully.");
+})
+.catch((err) => {
+  console.error("Error sending customer email:", err);
+});
+
+    {
+      
+      const to = user.email;
+      const dynamic_template_data= 
+      {
+     first_name:user.first_name,
+     order_date:formatDate(orderDate),
+     delivery_date:formatDate(deliveryDate),
+     order_status: "Paid"
+    };
+    api
+      .post('/commonApi/sendgmail',{to,dynamic_template_data})
+      .then(() => {
+        //Alert.alert("Send Mail Successfully")
+      })
+      .catch(() => {
+      //  Alert.alert("Mail not sent")
+      });
+    
+    };
+
+  };
+
+  
   useEffect(() => {
-	console.log('useeffect running')
-	api.post('/contact/getCartProductsByContactId',{contact_id:468})
-	.then((res) => {
-	  res.data.data.forEach(element => {
-		element.images=String(element.images).split(',')
-	  });
-	  console.log('respcart',res.data.data)
-	  setCartItems(res.data.data)
-	  setLoading(false);
-	  })
-	.catch((error) => {});
-    //fetchCartItems();
+	const initialize = async () => {
+	  try {
+		const jsonValue = await AsyncStorage.getItem('user');
+		const user = jsonValue != null ? JSON.parse(jsonValue) : null;
+		setUser(user);
+		if (user) {
+		  dispatch(fetchCartItems(user));
+		}
+		getEmail();
+	  } catch (e) {
+		console.error('Error reading user from AsyncStorage:', e);
+	  }
+	};
+  
+	initialize();
   }, []);
+  
+
 
 	return (
 		<SafeAreaView style={styles.container}>
@@ -56,7 +257,14 @@ console.log('cartpage')
 			
           {loading ? (
 			        <ActivityIndicator size="large" color="#1EB1C5" />
-     ) : (cartItems.map((item, index) => (
+     ): items.length === 0 ? (
+		<View style={styles.emptyContainer}>
+    <Text style={styles.emptyText}>Your cart is empty</Text>
+    <TouchableOpacity style={styles.homeButton} onPress={() => navigation.navigate("Home")}>
+      <Text style={styles.homeButtonText}>Go to Home</Text>
+    </TouchableOpacity>
+  </View>
+	  )  : (items.map((item, index) => (
 				<View style={styles.row3}>
 					<Image
 						source = {{uri: `${imageBase}${item.images[0]}`}} 
@@ -78,35 +286,53 @@ console.log('cartpage')
 							</View>
 							</TouchableOpacity>
 							<View style={styles.row4}>
+							<TouchableOpacity
+      onPress={() => handleDecreaseQuantity(item)}
+    >
+							
 								<Image
 									source = {{uri: "https://storage.googleapis.com/tagjs-prod.appspot.com/pNd58t8xI9/gqohjonn.png"}} 
 									resizeMode = {"stretch"}
 									style={styles.image4}
 								/>
+								</TouchableOpacity>
 								<TouchableOpacity style={styles.button} onPress={()=>alert('Pressed!')}>
 									<Text style={styles.text5}>
-										{"1"}
+										{item?.qty}
 									</Text>
 								</TouchableOpacity>
+								<TouchableOpacity
+      onPress={() => handleIncreaseQuantity(item)}
+    >
 								<Image
 									source = {{uri: "https://storage.googleapis.com/tagjs-prod.appspot.com/pNd58t8xI9/i2awl8ik.png"}} 
 									resizeMode = {"stretch"}
 									style={styles.image5}
 								/>
+								</TouchableOpacity>
 							</View>
 						</View>
 					</View>
+					<TouchableOpacity
+      onPress={() => handleDelete(item)}
+    >
 					<Image
 						source = {{uri: "https://storage.googleapis.com/tagjs-prod.appspot.com/pNd58t8xI9/pxx4gsu5.png"}} 
 						resizeMode = {"stretch"}
 						style={styles.image6}
-					/>
+					/></TouchableOpacity>
 				</View>
 				
 				)))}
 
-				
-				<View style={styles.row8}>
+{items.length>0 &&<View style={styles.view4}>
+					<TouchableOpacity style={styles.button4} onPress={()=>clearCartItems()}>
+						<Text style={styles.text9}>
+							{"Clear Cart"}
+						</Text>
+					</TouchableOpacity>
+				</View>}
+				{/* <View style={styles.row8}>
 					<View style={styles.column5}>
 						<ImageBackground
 							source={{uri: "https://storage.googleapis.com/tagjs-prod.appspot.com/pNd58t8xI9/hm42p68t.png"}} 
@@ -125,8 +351,8 @@ console.log('cartpage')
 					<Text style={styles.text7}>
 						{"Remarks"}
 					</Text>
-				</View>
-				<View style={styles.column6}>
+				</View> */}
+				{/* <View style={styles.column6}>
 					<Text style={styles.text8}>
 						{"Enter here to add some remarks"}
 					</Text>
@@ -137,14 +363,14 @@ console.log('cartpage')
 							style={styles.image11}
 						/>
 					</View>
-				</View>
-				<View style={styles.view4}>
-					<TouchableOpacity style={styles.button4} onPress={()=>alert('Pressed!')}>
+				</View> */}
+				{items.length>0 &&<View style={styles.view4}>
+					<TouchableOpacity style={styles.button4} onPress={()=>generateCode()}>
 						<Text style={styles.text9}>
 							{"Enquire Now"}
 						</Text>
 					</TouchableOpacity>
-				</View>
+				</View>}
 			</ScrollView>
 		</SafeAreaView>
 	)
@@ -328,39 +554,46 @@ const styles = StyleSheet.create({
 	text: {
 		color: "#000000",
 		fontSize: 17,
-		fontWeight: "bold",
+		//fontWeight: "bold",
 		marginVertical: 18,
 		marginLeft: 31,
 		marginRight: 12,
+		fontFamily: 'Outfit-Regular',
 	},
 	text2: {
 		color: "#000000",
 		fontSize: 20,
 		margin: 10,
+		fontFamily: 'Outfit-Regular',
 	},
 	text3: {
 		color: "#000000",
 		fontSize: 14,
 		marginBottom: 8,
+		fontFamily: 'Outfit-Regular',
 	},
 	text4: {
 		color: "#9CA7B7",
 		fontSize: 12,
 		marginBottom: 1,
+		fontFamily: 'Outfit-Regular',
 	},
 	text5: {
 		color: "#000000",
 		fontSize: 16,
-		fontWeight: "bold",
+		//fontWeight: "bold",
+		fontFamily: 'Outfit-Regular',
 	},
 	text6: {
 		color: "#9CA7B7",
 		fontSize: 12,
 		marginBottom: 9,
+		fontFamily: 'Outfit-Regular',
 	},
 	text7: {
 		color: "#000000",
 		fontSize: 14,
+		fontFamily: 'Outfit-Regular',
 	},
 	text8: {
 		color: "#9CA7B7",
@@ -368,10 +601,12 @@ const styles = StyleSheet.create({
 		marginBottom: 75,
 		marginLeft: 16,
 		width: 163,
+		fontFamily: 'Outfit-Regular',
 	},
 	text9: {
 		color: "#FFFFFF",
 		fontSize: 16,
+		fontFamily: 'Outfit-Regular',
 	},
 	view: {
 		flex: 1,
@@ -402,6 +637,29 @@ const styles = StyleSheet.create({
 		shadowRadius: 24,
 		elevation: 24,
 	},
+	emptyContainer: {
+		flex: 1,
+		justifyContent: 'center',
+		alignItems: 'center',
+		marginTop: 50,
+	  },
+	  emptyText: {
+		fontSize: 18,
+		color: '#777',
+		marginBottom: 20,
+	  },
+	  homeButton: {
+		backgroundColor: '#1EB1C5',
+		paddingVertical: 10,
+		paddingHorizontal: 20,
+		borderRadius: 8,
+	  },
+	  homeButtonText: {
+		color: 'white',
+		fontSize: 16,
+		fontWeight: 'bold',
+	  },
+	  
 });
 
 export default CartScreen;

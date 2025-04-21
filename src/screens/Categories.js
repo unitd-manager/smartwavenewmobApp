@@ -1,13 +1,15 @@
 import React,{useState,useEffect, useLayoutEffect} from 'react';
 import { View, Text, ScrollView, Image, StyleSheet, TouchableOpacity } from 'react-native';
 import api from '../constants/api';
-import imageBase from '../constants/imageBase';
+import imagebaseurl from '../constants/imageBase';
 
 const Categories = ({navigation}) => {
 	const[categoryData,setCategoryData]=useState([]);
 	const[categories,setCategories]=useState([]);
 	const[subCategories,setSubCategories]=useState([]);
 	const[subCategoryTypes,setSubCategoryTypes]=useState([]);
+
+  //const imagebaseurl='https://smartwaveadmin.unitdtechnologies.com/storage/uploads/';
 
 	const formatCategoryData = (categories, subcategories) => {
     return categories.map(category => ({
@@ -60,18 +62,36 @@ const Categories = ({navigation}) => {
 
       {categoryData?.map((category, index) => (
         <View key={index}>
-          <TouchableOpacity onPress={() => navigation.navigate('ProductList',{categoryId:category.category_id})}>
-          <Text style={styles.categoryTitle} >{category.title}</Text>
-          </TouchableOpacity>
-          <View style={styles.divider} />
+         <View style={styles.categoryRow}>
+  <TouchableOpacity
+    onPress={() =>
+      navigation.navigate('ProductList', {
+        categoryId: category.category_id,
+        categoryName: category.title,
+      })
+    }>
+    <Text style={styles.categoryTitle}>{category.title}</Text>
+  </TouchableOpacity>
+  <View style={styles.flexDivider} />
+</View>
+
 
           <View style={styles.subCategoryWrapper}>
             {category?.subcategories?.map((item, subIndex) => (
               <View key={subIndex} style={styles.subCategoryItem}>
-                <Image
-  source={{ uri: item.images[0] ? `${imageBase}${item.images[0]}` : `${imageBase}placeholder.png` }}
+            <Image
+  source={{
+    uri: item.images[0]
+      ? `${imagebaseurl}${item.images[0]}`
+      : `${imagebaseurl}placeholder.png`,
+  }}
   style={styles.image}
+  onError={() => {
+    // Fallback to another base URL if first fails
+    item.images[0] = 'http://smartwaveadmin.unitdtechnologies.com/storage/uploads/' + item.images[0];
+  }}
 />
+
 
                 <Text style={styles.subCategoryText}>{item.name}</Text>
               </View>
@@ -85,8 +105,15 @@ const Categories = ({navigation}) => {
 
 const styles = StyleSheet.create({
   container: { flex: 1, paddingHorizontal: 20, backgroundColor: '#fff' },
-  header: { fontSize: 22, fontWeight: 'bold', textAlign: 'center', marginVertical: 20 },
-  categoryTitle: { fontSize: 18, fontWeight: '600', marginTop: 10 },
+  header: { fontSize: 22, textAlign: 'center', marginVertical: 20,fontFamily: 'Outfit-Regular' },
+  categoryTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    marginTop: 10,
+    textDecorationLine: 'underline',
+    fontFamily: 'Outfit-Regular',
+    color: '#007bff', // Makes it look more like a link
+  },  
   divider: {
     height: 1,
     backgroundColor: '#ccc',
@@ -104,6 +131,7 @@ const styles = StyleSheet.create({
     width: '22%',
     alignItems: 'center',
     marginBottom: 20,
+    fontFamily: 'Outfit-Regular',
   },
   image: {
     width: 60,
@@ -114,7 +142,24 @@ const styles = StyleSheet.create({
   subCategoryText: {
     fontSize: 12,
     textAlign: 'center',
+    fontFamily: 'Outfit-Regular',
   },
+  categoryRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 20,
+    marginBottom: 20,
+    fontFamily: 'Outfit-Regular',
+  },
+  
+  flexDivider: {
+    height: 1,
+    backgroundColor: '#ccc',
+    flex: 1,
+    marginLeft: 10,
+    marginTop: 4, // align with text baseline
+  },
+  
 });
 
 export default Categories;

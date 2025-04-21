@@ -1,38 +1,16 @@
-import React,{useEffect,useState} from 'react';
-import { View, Text, ScrollView, Image, FlatList, StyleSheet, TouchableOpacity, Dimensions } from 'react-native';
+import React,{useEffect,useState,useCallback} from 'react';
+import { View, Text, ScrollView, Image, FlatList, StyleSheet, TouchableOpacity, Dimensions, Alert } from 'react-native';
 import BannerCarousel from '../components/BannerCarousel';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation,useFocusEffect } from '@react-navigation/native';
 import api from '../constants/api';
 import imageBase from '../constants/imageBase';
+import { useSelector, useDispatch } from 'react-redux';
+import { addToCart, fetchCartItems } from '../redux/slices/cartSlice';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 
 const { width } = Dimensions.get('window');
 
-const banners = [
-  { id: 1, image: 'https://via.placeholder.com/350x150.png?text=Fashion+Banner+1' },
-  { id: 2, image: 'https://via.placeholder.com/350x150.png?text=Fashion+Banner+2' },
-];
-
-const categories = [
-  { id: '1', name: 'Fashion', icon: 'https://cdn-icons-png.flaticon.com/512/892/892458.png' },
-  { id: '2', name: 'Electronics', icon: 'https://cdn-icons-png.flaticon.com/512/1041/1041916.png' },
-  { id: '3', name: 'Shoes', icon: 'https://cdn-icons-png.flaticon.com/512/678/678479.png' },
-  { id: '4', name: 'Watch', icon: 'https://cdn-icons-png.flaticon.com/512/3159/3159310.png' },
-];
-
-const flashSale = [
-  {
-    id: '1',
-    name: 'Monitor',
-    discount: '55%',
-    image: 'https://m.media-amazon.com/images/I/71kr3WAj1FL._AC_SL1500_.jpg',
-  },
-  {
-    id: '2',
-    name: 'iMac',
-    discount: '45%',
-    image: 'https://m.media-amazon.com/images/I/71LZxRZ7anL._AC_SL1500_.jpg',
-  },
-];
 
 const Home = () => {
   const navigation = useNavigation();
@@ -43,12 +21,13 @@ const[categories,setCategories]=useState([]);
   const [newProducts, setNewProducts] = useState([]);
   const [bestSellingProducts, setBestSellingProducts] = useState([]);
   const [mostPopularProducts, setMostPopularProducts] = useState([]);
+  const [user, setUser] = useState({});
 
-
+  const dispatch = useDispatch();
 
   const getOfferProducts = () => {
     api
-      .get("/product/getAllProducts")
+      .get("/product/getTopOfferProducts")
       .then((res) => {
         res.data.data.forEach((element) => {
           element.images = String(element.images).split(",");
@@ -60,6 +39,36 @@ const[categories,setCategories]=useState([]);
       });
   };
 
+
+
+  const getBestSellingProducts = () => {
+    api
+      .get("/product/getBestSellingProducts")
+      .then((res) => {
+        res.data.data.forEach((element) => {
+          element.images = String(element.images).split(",");
+        });
+        setBestSellingProducts(res.data.data);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
+
+  const getMostPopularProducts = () => {
+    api
+      .get("/product/getMostPopularProducts")
+      .then((res) => {
+        res.data.data.forEach((element) => {
+          element.images = String(element.images).split(",");
+        });
+        setMostPopularProducts(res.data.data);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
 
   const getBanner = () => {
     api
@@ -85,15 +94,82 @@ const[categories,setCategories]=useState([]);
   };
   
 
+  const addCart = (data) => {
+ console.log('user in home',user);
+    if(user && user?.contact_id){
+      if(data.price){
+    data.contact_id=user?.contact_id
+  
+     dispatch(addToCart(data)) 
+             .then(() => { Alert.alert("Item added to cart")
+               dispatch(fetchCartItems(user));
+             })
+             .catch((error) => {
+               console.error('Failed to add to cart:', error);
+             });
+  }
+    }
+    else{
+      Alert.alert("Please Login")
+     
+    }
+   
+  };
+  const getUserData = async () => {
+    try {
+      const jsonValue = await AsyncStorage.getItem('user');
+      const user = jsonValue != null ? JSON.parse(jsonValue) : null;
+
+      if (user?.contact_id) {
+        
+        // Get full user data from API
+        const res = await api.post("/contact/getContactsById", {
+          contact_id: user.contact_id,
+        });
+        console.log('user',user);
+        setUser(res.data.data[0]);
+      } else {
+        
+      }
+    } catch (e) {
+      console.error('Error fetching user:', e);
+      
+    }
+  };
+
+  useFocusEffect(
+    useCallback(() => {
+      const fetchUser = async () => {
+        const userData = await AsyncStorage.getItem('user');
+        if (userData) {
+          setUser(JSON.parse(userData)); // update context or redux here
+        } else {
+          setUser(null);
+        }
+      };
+  
+      fetchUser();
+    }, [])
+  );
+
   useEffect(() => {
+    getUserData();
+  }, []);
+
+
+  useEffect(() => {
+
     getBanner();
 	getOfferProducts();
+  getBestSellingProducts();
+  getMostPopularProducts();
 	api
 	.get("/category/getAllCategory")
 	.then((res) => {
     res.data.data.forEach((element) => {
       element.images = String(element.images).split(",");
     });
+    console.log("categories", res.data.data);
 	  setCategories(res.data.data);
 	})
 	.catch(() => {
@@ -138,7 +214,7 @@ const[categories,setCategories]=useState([]);
       </View>
 
       {/* Flash Sale */}
-      <View style={styles.section}>
+      {offerProducts.length >0 &&<View style={styles.section}>
   <View style={styles.sectionHeader}>
     <Text style={styles.sectionTitle}>Flash Sale</Text>
     <TouchableOpacity>
@@ -155,20 +231,27 @@ const[categories,setCategories]=useState([]);
     showsVerticalScrollIndicator={false}
     renderItem={({ item }) => (
       <View style={styles.flashItem}>
+        <TouchableOpacity
+          onPress={() => navigation.navigate("ProductDetails", { productId: item.product_id })}
+        >
   <View style={styles.imageContainer}>
-    <View style={styles.discountTag}>
+    {/* <View style={styles.discountTag}>
       <Text style={styles.discountText}>{item.discount} OFF</Text>
-    </View>
+    </View> */}
     <Image
       source={{ uri: `${imageBase}${item.images[0]}` }}
       style={styles.flashImage}
     />
   </View>
+  </TouchableOpacity>
 
   <View style={styles.detailsContainer}>
+    <TouchableOpacity
+          onPress={() => navigation.navigate("ProductDetails", { productId: item.product_id })}
+        >
     <Text style={styles.flashName} numberOfLines={1}>{item.title}</Text>
-
-    <TouchableOpacity style={styles.addToCartButton}>
+    </TouchableOpacity>
+    <TouchableOpacity style={styles.addToCartButton}  onPress={() => addCart(item)}>
       <Text style={styles.addToCartText}>Add to Cart</Text>
     </TouchableOpacity>
   </View>
@@ -177,7 +260,105 @@ const[categories,setCategories]=useState([]);
     )}
     
   />
+</View>}
+
+  {/* Most Popular Products */}
+  {mostPopularProducts.length > 0 && <View style={styles.section}>
+  <View style={styles.sectionHeader}>
+    <Text style={styles.sectionTitle}>Most Popular Products</Text>
+    <TouchableOpacity>
+      <Text style={styles.seeAll}>See All</Text>
+    </TouchableOpacity>
+  </View>
+
+  <FlatList
+    data={mostPopularProducts}
+    keyExtractor={(item) => item.title}
+    numColumns={2}
+    contentContainerStyle={styles.verticalList}
+    columnWrapperStyle={styles.row}
+    showsVerticalScrollIndicator={false}
+    renderItem={({ item }) => (
+      <View style={styles.flashItem}>
+        <TouchableOpacity
+          onPress={() => navigation.navigate("ProductDetails", { productId: item.product_id })}
+        >
+  <View style={styles.imageContainer}>
+    {/* <View style={styles.discountTag}>
+      <Text style={styles.discountText}>{item.discount} OFF</Text>
+    </View> */}
+    <Image
+      source={{ uri: `${imageBase}${item.images[0]}` }}
+      style={styles.flashImage}
+    />
+  </View>
+  </TouchableOpacity>
+
+  <View style={styles.detailsContainer}>
+    <TouchableOpacity
+          onPress={() => navigation.navigate("ProductDetails", { productId: item.product_id })}
+        >
+    <Text style={styles.flashName} numberOfLines={1}>{item.title}</Text>
+    </TouchableOpacity>
+    <TouchableOpacity style={styles.addToCartButton}  onPress={() => addCart(item)}>
+      <Text style={styles.addToCartText}>Add to Cart</Text>
+    </TouchableOpacity>
+  </View>
 </View>
+
+    )}
+    
+  />
+</View>}
+
+  {/* Best Selling Products */}
+  {bestSellingProducts.length >0 && <View style={styles.section}>
+  <View style={styles.sectionHeader}>
+    <Text style={styles.sectionTitle}>Best Selling Products</Text>
+    <TouchableOpacity>
+      <Text style={styles.seeAll}>See All</Text>
+    </TouchableOpacity>
+  </View>
+
+  <FlatList
+    data={bestSellingProducts}
+    keyExtractor={(item) => item.title}
+    numColumns={2}
+    contentContainerStyle={styles.verticalList}
+    columnWrapperStyle={styles.row}
+    showsVerticalScrollIndicator={false}
+    renderItem={({ item }) => (
+      <View style={styles.flashItem}>
+        <TouchableOpacity
+          onPress={() => navigation.navigate("ProductDetails", { productId: item.product_id })}
+        >
+  <View style={styles.imageContainer}>
+    {/* <View style={styles.discountTag}>
+      <Text style={styles.discountText}>{item.discount} OFF</Text>
+    </View> */}
+    <Image
+      source={{ uri: `${imageBase}${item.images[0]}` }}
+      style={styles.flashImage}
+    />
+  </View>
+  </TouchableOpacity>
+
+  <View style={styles.detailsContainer}>
+    <TouchableOpacity
+          onPress={() => navigation.navigate("ProductDetails", { productId: item.product_id })}
+        >
+    <Text style={styles.flashName} numberOfLines={1}>{item.title}</Text>
+    </TouchableOpacity>
+    <TouchableOpacity style={styles.addToCartButton}  onPress={() => addCart(item)}>
+      <Text style={styles.addToCartText}>Add to Cart</Text>
+    </TouchableOpacity>
+  </View>
+</View>
+
+    )}
+    
+  />
+</View>}
 
     </ScrollView>
   );
@@ -189,6 +370,7 @@ const styles = StyleSheet.create({
   section: {
     paddingHorizontal: 15,
     marginBottom: 20,
+    fontFamily: 'Outfit-Regular',
   },
   
   sectionHeader: {
@@ -196,19 +378,23 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: 10,
+    fontFamily: 'Outfit-Regular',
   },
   
   sectionTitle: {
     fontSize: 18,
-    fontWeight: 'bold',
+    //fontWeight: 'bold',
+    fontFamily: 'Outfit-Regular',
   },
   
   seeAll: {
     color: '#1E90FF',
     fontWeight: '600',
+    fontFamily: 'Outfit-Regular',
   },
   
   verticalList: {
+    fontFamily: 'Outfit-Regular',
     paddingBottom: 50,
   },
   
@@ -217,8 +403,8 @@ const styles = StyleSheet.create({
     marginBottom: 15,
   },
   
-  seeAll: { color: '#1EB1C5' },
-  horizontalList: { paddingLeft: 10 },
+  seeAll: { color: '#1EB1C5',fontFamily: 'Outfit-Regular' },
+  horizontalList: { paddingLeft: 10 ,fontFamily: 'Outfit-Regular',},
   categoryItem: { alignItems: 'center', marginRight: 20 },
   categoryIcon: {
     width: 60,
@@ -227,12 +413,13 @@ const styles = StyleSheet.create({
     backgroundColor: '#E6F8FA',
     borderRadius: 15,
   },
-  categoryText: { fontSize: 12 },
+  categoryText: { fontSize: 12, fontFamily: 'Outfit-Regular', },
 
 rowBottom: {
   flexDirection: 'row',
   justifyContent: 'space-between',
   alignItems: 'center',
+  fontFamily: 'Outfit-Regular',
 },
 
 flashItem: {
@@ -249,6 +436,8 @@ imageContainer: {
   padding: 10,
   position: 'relative',
   alignItems: 'center',
+  borderBottomLeftRadius:10,
+  borderBottomRightRadius:10
 },
 
 flashImage: {
@@ -272,6 +461,7 @@ discountText: {
   color: '#fff',
   fontSize: 10,
   fontWeight: 'bold',
+  fontFamily: 'Outfit-Regular',
 },
 
 detailsContainer: {
@@ -284,6 +474,7 @@ flashName: {
   fontWeight: '500',
   color: '#333',
   marginBottom: 10,
+  fontFamily: 'Outfit-Regular',
 },
 
 addToCartButton: {
@@ -299,6 +490,7 @@ addToCartText: {
   color: '#00BFFF',
   fontSize: 13,
   fontWeight: '600',
+  fontFamily: 'Outfit-Regular',
 },
 
   

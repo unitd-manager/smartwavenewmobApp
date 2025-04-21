@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, Image, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
+import { View, Text, Image, TouchableOpacity, StyleSheet, ScrollView, Alert } from 'react-native';
 import Icon from 'react-native-vector-icons/Feather';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import api from '../constants/api'; // your API setup
@@ -10,6 +10,7 @@ const AccountScreen = ({ navigation }) => {
 
   const handleLogout = async () => {
     try {
+      await AsyncStorage.removeItem('user');
       await AsyncStorage.clear();
       setIsLoggedIn(false);
       setUserData(null);
@@ -29,6 +30,7 @@ const AccountScreen = ({ navigation }) => {
         const res = await api.post("/contact/getContactsById", {
           contact_id: user.contact_id,
         });
+        console.log('user',user);
         setUserData(res.data.data[0]);
       } else {
         setIsLoggedIn(false);
@@ -53,16 +55,28 @@ const AccountScreen = ({ navigation }) => {
 
   if (!isLoggedIn) {
     return (
+      <ScrollView style={styles.container}>
+      {/* <TouchableOpacity style={styles.backBtn} onPress={() => navigation.goBack()}>
+        <Icon name="arrow-left" size={24} />
+      </TouchableOpacity> */}
+
+      <View style={styles.profileSection}>
+        <Image
+          source={{ uri: userData?.image || 'https://via.placeholder.com/100' }}
+          style={styles.avatar}
+        />
+        <Text style={styles.name}>{userData?.name || 'No User'}</Text>
+      </View>
       <View style={styles.menu}>
   <TouchableOpacity
     style={styles.menuItem}
     onPress={() => navigation.navigate('LoginPage')}
   >
     <View style={styles.menuIconText}>
-      <Icon name="sign-in" size={20} color="#00BCD4" />
+      <Icon name="log-in" size={20} color="#00BCD4" />
       <Text style={styles.menuText}>Login</Text>
     </View>
-    <Icon name="chevron-right" size={20} color="#888" />
+    {/* <Icon name="chevron-right" size={20} color="#888" /> */}
   </TouchableOpacity>
 
   <TouchableOpacity
@@ -73,17 +87,18 @@ const AccountScreen = ({ navigation }) => {
       <Icon name="user-plus" size={20} color="#00BCD4" />
       <Text style={styles.menuText}>Signup</Text>
     </View>
-    <Icon name="chevron-right" size={20} color="#888" />
+    {/* <Icon name="chevron-right" size={20} color="#888" /> */}
   </TouchableOpacity>
 </View>
+    </ScrollView>
     );
   }
 
   return (
     <ScrollView style={styles.container}>
-      <TouchableOpacity style={styles.backBtn} onPress={() => navigation.goBack()}>
+      {/* <TouchableOpacity style={styles.backBtn} onPress={() => navigation.goBack()}>
         <Icon name="arrow-left" size={24} />
-      </TouchableOpacity>
+      </TouchableOpacity> */}
 
       <View style={styles.profileSection}>
         <Image
@@ -94,25 +109,34 @@ const AccountScreen = ({ navigation }) => {
       </View>
 
       <View style={styles.menu}>
-        {menuItems.map((item, idx) => (
-          <TouchableOpacity
-            key={idx}
-            style={styles.menuItem}
-            onPress={() => {
-              if (item.label === 'Logout') {
-                handleLogout();
-              } else {
-                navigation.navigate(item.screen);
-              }
-            }}
-          >
-            <View style={styles.menuIconText}>
-              <Icon name={item.icon} size={20} color="#00BCD4" />
-              <Text style={styles.menuText}>{item.label}</Text>
-            </View>
-            <Icon name="chevron-right" size={20} color="#888" />
-          </TouchableOpacity>
-        ))}
+      {menuItems.map((item, idx) => (
+  <TouchableOpacity
+    key={idx}
+    style={styles.menuItem}
+    onPress={() => {
+      if (item.label === 'Logout') {
+        Alert.alert(
+          'Confirm Logout',
+          'Are you sure you want to logout?',
+          [
+            { text: 'Cancel', style: 'cancel' },
+            { text: 'Logout', onPress: handleLogout, style: 'destructive' },
+          ],
+          { cancelable: true }
+        );
+      } else {
+        navigation.navigate(item.screen);
+      }
+    }}
+  >
+    <View style={styles.menuIconText}>
+      <Icon name={item.icon} size={20} color="#00BCD4" />
+      <Text style={styles.menuText}>{item.label}</Text>
+    </View>
+    <Icon name="chevron-right" size={20} color="#888" />
+  </TouchableOpacity>
+))}
+
       </View>
     </ScrollView>
   );
@@ -135,6 +159,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '600',
     marginTop: 10,
+    fontFamily: 'Outfit-Regular',
   },
   menu: {
     paddingHorizontal: 20,
@@ -151,9 +176,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 15,
+    fontFamily: 'Outfit-Regular',
   },
   menuText: {
     fontSize: 16,
+    fontFamily: 'Outfit-Regular',
   },
   centered: {
     flex: 1,
@@ -179,10 +206,12 @@ const styles = StyleSheet.create({
   loginText: {
     color: '#fff',
     fontWeight: 'bold',
+    fontFamily: 'Outfit-Regular',
   },
   signupText: {
     color: '#00BCD4',
     fontWeight: 'bold',
+    fontFamily: 'Outfit-Regular',
   },
 });
 

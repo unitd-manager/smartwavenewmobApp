@@ -60,20 +60,20 @@ export default function SignInScreen({ navigation }) {
 				
 
 				{/* Logo */}
-				<Image
+				{/* <Image
 					source={{ uri: "https://storage.googleapis.com/tagjs-prod.appspot.com/pNd58t8xI9/grso2jue.png" }}
 					resizeMode="stretch"
 					style={styles.image2}
-				/>
+				/> */}
 
 				{/* Icon */}
-				<View style={styles.view}>
+				{/* <View style={styles.view}>
 					<Image
 						source={{ uri: "https://storage.googleapis.com/tagjs-prod.appspot.com/pNd58t8xI9/uxnnbz22.png" }}
 						resizeMode="stretch"
 						style={styles.image3}
 					/>
-				</View>
+				</View> */}
 
 				{/* Sign-in Heading */}
 				<View style={styles.column}>

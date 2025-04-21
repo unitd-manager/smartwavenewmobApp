@@ -4,25 +4,16 @@ export default (props) => {
 	return (
 		<SafeAreaView style={styles.container}>
 			<ScrollView  style={styles.scrollView}>
-				<View style={styles.row}>
-					<Text style={styles.text}>
-						{"9:41"}
-					</Text>
-					<Image
-						source = {{uri: "https://storage.googleapis.com/tagjs-prod.appspot.com/pNd58t8xI9/g1iy6nbd.png"}} 
-						resizeMode = {"stretch"}
-						style={styles.image}
-					/>
-				</View>
+				
 				<View style={styles.row2}>
-					<Image
+					{/* <Image
 						source = {{uri: "https://storage.googleapis.com/tagjs-prod.appspot.com/pNd58t8xI9/u4xcvyyi.png"}} 
 						resizeMode = {"stretch"}
 						style={styles.image2}
 					/>
 					<Text style={styles.text2}>
 						{"Enquiry"}
-					</Text>
+					</Text> */}
 				</View>
 				<View style={styles.view}>
 					<Image
@@ -41,7 +32,7 @@ export default (props) => {
 						</Text>
 					</View>
 				</View>
-				<View style={styles.column2}>
+				{/* <View style={styles.column2}>
 					<TouchableOpacity style={styles.button} onPress={()=>alert('Pressed!')}>
 						<Text style={styles.text5}>
 							{"View Enquiries"}
@@ -52,6 +43,14 @@ export default (props) => {
 							{"View -E- Receipt"}
 						</Text>
 					</TouchableOpacity>
+				</View> */}
+				<View style={styles.column2}>
+					<TouchableOpacity style={styles.button} onPress={()=>navigation.navigate("home")}>
+						<Text style={styles.text5}>
+							{"Go To Home"}
+						</Text>
+					</TouchableOpacity>
+					
 				</View>
 			</ScrollView>
 		</SafeAreaView>

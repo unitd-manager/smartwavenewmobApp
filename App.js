@@ -134,12 +134,23 @@
 
 import React from 'react';
 import Navigation from './src/Navigation';
+import { Provider } from 'react-redux';
+import store from './src/redux/store';
 import { NavigationContainer } from "@react-navigation/native";
+import { Text } from 'react-native';
+
+// Set default font globally
+Text.defaultProps = Text.defaultProps || {};
+Text.defaultProps.style = { fontFamily: 'Outfit-Regular' };
+
 
 export default function App() {
   return (
+     <Provider store={store}>
     <NavigationContainer>
       <Navigation />
     </NavigationContainer>
+     </Provider>
   );
 }
+

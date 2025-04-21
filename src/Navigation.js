@@ -24,12 +24,34 @@ import ShippingAddress from "./screens/ShippingAddress";
 import NewPasswordPopup from "./screens/NewPasswordPopup";
 import Frame from "./screens/Frame";
 import TabNavigator from './TabNavigation';
+import { useDispatch } from "react-redux";
+import { fetchCartItems } from "./redux/slices/cartSlice";
 
 const Stack = createStackNavigator();
 
 const Navigation = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(null);
-
+   const [user, setUser] = useState();
+const dispatch=useDispatch();
+ 
+useEffect(() => {
+	const initialize = async () => {
+	  try {
+		const jsonValue = await AsyncStorage.getItem('user');
+		const user = jsonValue != null ? JSON.parse(jsonValue) : null;
+		setUser(user);
+		if (user) {
+		  dispatch(fetchCartItems(user));
+		}
+		
+	  } catch (e) {
+		console.error('Error reading user from AsyncStorage:', e);
+	  }
+	};
+  
+	initialize();
+  }, []);
+  
   useEffect(() => {
     // Check if user is logged in
     const checkLoginStatus = async () => {
@@ -40,13 +62,27 @@ const Navigation = () => {
     checkLoginStatus();
   }, []);
 
+   useEffect(() => {
+      dispatch(fetchCartItems(user));
+    }, []);
+
   if (isLoggedIn === null) {
     return null; // Show nothing while checking auth status
   }
 
   return (
     
-      <Stack.Navigator  initialRouteName= " ">
+      <Stack.Navigator  initialRouteName= " "  screenOptions={{
+        headerTitleStyle: {
+          fontFamily: 'Outfit-Regular',
+          fontSize: 20,
+        },
+        headerStyle: {
+          backgroundColor: "#1EB1C5",
+        },
+        headerTintColor: "#fff",
+        headerTitleAlign: "center",
+      }}>
       {/* <Stack.Navigator initialRouteName={isLoggedIn ? "Home" : "LoginPage"}>
         {isLoggedIn ? (
           <> */}
@@ -57,6 +93,7 @@ const Navigation = () => {
     title: route.params?.categoryName || "Products",
     headerStyle: {
       backgroundColor: "#1EB1C5",
+      fontFamily: 'Outfit-Regular',
     },
     headerTintColor: "#fff",
     headerTitleAlign: "center",
