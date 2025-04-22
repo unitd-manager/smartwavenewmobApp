@@ -105,7 +105,7 @@ const AccountScreen = ({ navigation }) => {
           source={{ uri: userData?.image || 'https://via.placeholder.com/100' }}
           style={styles.avatar}
         />
-        <Text style={styles.name}>{userData?.name || 'Loading...'}</Text>
+        <Text style={styles.name}>{userData?.first_name || ''}</Text>
       </View>
 
       <View style={styles.menu}>
@@ -125,7 +125,7 @@ const AccountScreen = ({ navigation }) => {
           { cancelable: true }
         );
       } else {
-        navigation.navigate(item.screen);
+        // navigation.navigate(item.screen);
       }
     }}
   >

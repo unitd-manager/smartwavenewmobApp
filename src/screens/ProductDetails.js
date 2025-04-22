@@ -16,7 +16,8 @@ import imageBase from "../constants/imageBase";
 import { useDispatch } from "react-redux";
 import { useFocusEffect } from '@react-navigation/native';
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import BackButton from "../components/BackButton";
+import Icon from 'react-native-vector-icons/Ionicons';
+//import BackButton from "../components/BackButton";
 //import GradeSelector from "../components/GradePicker";
 
 export default ({ route }) => {
@@ -40,7 +41,7 @@ export default ({ route }) => {
   const addCart = (data) => {
  
     if(user){
-      if(data.price){
+     
     data.contact_id=user.contact_id
   
      dispatch(addToCart(data)) 
@@ -50,7 +51,7 @@ export default ({ route }) => {
              .catch((error) => {
                console.error('Failed to add to cart:', error);
              });
-  }
+  
     }
     else{
       Alert.alert("Please Login")
@@ -128,7 +129,7 @@ export default ({ route }) => {
           style={styles.column}
         >
           <View style={styles.row2}>
-          <BackButton/>
+          {/* <BackButton/> */}
             <Text style={styles.text2}>{""}</Text>
            <TouchableOpacity onPress={() => addCart(product)}>
             <Image
@@ -158,6 +159,7 @@ export default ({ route }) => {
           <Text style={styles.text5}>{product?.title}</Text>
           
           <View style={styles.row4}>
+            
             {/* <GradeSelector product={product} selectedProductGrade={selectedProductGrade} setSelectedProductGrade={setSelectedProductGrade} setProductStock={setProductStock} setQuantityCount={setQuantityCount}  /> */}
             {/* <Image
               source={{
@@ -179,6 +181,13 @@ export default ({ route }) => {
               resizeMode={"stretch"}
               style={styles.image7}
             /> */}
+             <TouchableOpacity
+  style={styles.cartbuttonRow}
+  onPress={() => addCart(product)}
+>
+  <Icon name="cart-outline" size={20} color="#1EB1C5" style={styles.cartIcon} />
+  {/* <Text style={styles.carttext9}>{"Add to Cart"}</Text> */}
+</TouchableOpacity>
           </View>
         </View>
 
@@ -203,7 +212,7 @@ export default ({ route }) => {
 
         <Text style={styles.text8}>{product?.description}</Text>
 
-        <View style={styles.view}>
+        {/* <View style={styles.view}>
           <TouchableOpacity
             style={styles.buttonRow}
             onPress={() => addCart(product)}
@@ -215,9 +224,9 @@ export default ({ route }) => {
               resizeMode={"stretch"}
               style={styles.image10}
             />
-            <Text style={styles.text9}>{"Add to bag"}</Text>
+            <Text style={styles.text9}>{"Add to Cart"}</Text>
           </TouchableOpacity>
-        </View>
+        </View> */}
       </ScrollView>
     </SafeAreaView>
   );
@@ -394,4 +403,34 @@ const styles = StyleSheet.create({
     shadowRadius: 24,
     elevation: 24,
   },
+  cartbuttonRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#fff", // Button background
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: 25,
+    elevation: 3,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+    marginTop: 10, // Add some space between buttons
+    maxWidth: "90%", // Prevent overflow by limiting the width
+    overflow: "hidden", // Ensure content doesn't overflow
+    flexShrink: 1, // Allow the button to shrink if necessary
+    marginRight: 16,
+  },
+  
+  cartIcon: {
+    marginRight: 8,
+  },
+  
+  carttext9: {
+    fontSize: 14,
+    fontWeight: "500",
+    color: "#1EB1C5",
+    flexShrink: 1, // Allow the text to shrink if necessary
+  },
+  
 });

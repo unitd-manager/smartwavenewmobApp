@@ -25,6 +25,20 @@ const[categories,setCategories]=useState([]);
 
   const dispatch = useDispatch();
 
+  const getNewProducts = () => {
+    api
+      .get("/product/getNewProducts")
+      .then((res) => {
+        res.data.data.forEach((element) => {
+          element.images = String(element.images).split(",");
+        });
+        setNewProducts(res.data.data);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
   const getOfferProducts = () => {
     api
       .get("/product/getTopOfferProducts")
@@ -97,7 +111,7 @@ const[categories,setCategories]=useState([]);
   const addCart = (data) => {
  console.log('user in home',user);
     if(user && user?.contact_id){
-      if(data.price){
+     
     data.contact_id=user?.contact_id
   
      dispatch(addToCart(data)) 
@@ -107,7 +121,7 @@ const[categories,setCategories]=useState([]);
              .catch((error) => {
                console.error('Failed to add to cart:', error);
              });
-  }
+  
     }
     else{
       Alert.alert("Please Login")
@@ -163,6 +177,7 @@ const[categories,setCategories]=useState([]);
 	getOfferProducts();
   getBestSellingProducts();
   getMostPopularProducts();
+  getNewProducts();
 	api
 	.get("/category/getAllCategory")
 	.then((res) => {
@@ -218,7 +233,7 @@ const[categories,setCategories]=useState([]);
   <View style={styles.sectionHeader}>
     <Text style={styles.sectionTitle}>Flash Sale</Text>
     <TouchableOpacity>
-      <Text style={styles.seeAll}>See All</Text>
+      <Text style={styles.seeAll}></Text>
     </TouchableOpacity>
   </View>
 
@@ -262,12 +277,61 @@ const[categories,setCategories]=useState([]);
   />
 </View>}
 
+{/* New Products */}
+{newProducts.length > 0 && <View style={styles.section}>
+  <View style={styles.sectionHeader}>
+    <Text style={styles.sectionTitle}>New Products</Text>
+    <TouchableOpacity>
+      <Text style={styles.seeAll}></Text>
+    </TouchableOpacity>
+  </View>
+
+  <FlatList
+    data={newProducts}
+    keyExtractor={(item) => item.title}
+    numColumns={2}
+    contentContainerStyle={styles.verticalList}
+    columnWrapperStyle={styles.row}
+    showsVerticalScrollIndicator={false}
+    renderItem={({ item }) => (
+      <View style={styles.flashItem}>
+        <TouchableOpacity
+          onPress={() => navigation.navigate("ProductDetails", { productId: item.product_id })}
+        >
+  <View style={styles.imageContainer}>
+    {/* <View style={styles.discountTag}>
+      <Text style={styles.discountText}>{item.discount} OFF</Text>
+    </View> */}
+    <Image
+      source={{ uri: `${imageBase}${item.images[0]}` }}
+      style={styles.flashImage}
+    />
+  </View>
+  </TouchableOpacity>
+
+  <View style={styles.detailsContainer}>
+    <TouchableOpacity
+          onPress={() => navigation.navigate("ProductDetails", { productId: item.product_id })}
+        >
+    <Text style={styles.flashName} numberOfLines={1}>{item.title}</Text>
+    </TouchableOpacity>
+    <TouchableOpacity style={styles.addToCartButton}  onPress={() => addCart(item)}>
+      <Text style={styles.addToCartText}>Add to Cart</Text>
+    </TouchableOpacity>
+  </View>
+</View>
+
+    )}
+    
+  />
+</View>}
+
   {/* Most Popular Products */}
   {mostPopularProducts.length > 0 && <View style={styles.section}>
   <View style={styles.sectionHeader}>
     <Text style={styles.sectionTitle}>Most Popular Products</Text>
     <TouchableOpacity>
-      <Text style={styles.seeAll}>See All</Text>
+      <Text style={styles.seeAll}></Text>
     </TouchableOpacity>
   </View>
 
@@ -316,7 +380,7 @@ const[categories,setCategories]=useState([]);
   <View style={styles.sectionHeader}>
     <Text style={styles.sectionTitle}>Best Selling Products</Text>
     <TouchableOpacity>
-      <Text style={styles.seeAll}>See All</Text>
+      <Text style={styles.seeAll}></Text>
     </TouchableOpacity>
   </View>
 

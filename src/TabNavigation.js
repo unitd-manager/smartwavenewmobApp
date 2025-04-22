@@ -15,36 +15,87 @@ import ProductDetails from "./screens/ProductDetails";
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
 
+// 🔹 Common header styles
+const commonHeaderOptions = {
+  headerStyle: {
+    backgroundColor: "#1EB1C5",
+    borderBottomLeftRadius: 20,
+    borderBottomRightRadius: 20,
+  },
+  headerTintColor: "#fff",
+  headerTitleAlign: "center",
+  headerTitleStyle: {
+    fontFamily: "Outfit-Regular",
+    fontSize: 18,
+  },
+};
+
 // 💡 Home Stack
 const HomeStack = () => (
-  <Stack.Navigator screenOptions={{ headerShown: false }}>
-    <Stack.Screen name="HomeMain" component={Home} />
-    <Stack.Screen name="ProductList" component={ProductList} options={{ title: "Products" }}  />
-    <Stack.Screen name="ProductDetails" component={ProductDetails} options={{ title: "Product Details" }}  />
+  <Stack.Navigator screenOptions={commonHeaderOptions}>
+    <Stack.Screen
+      name="HomeMain"
+      component={Home}
+      options={{ title: "Smart Wave" }}
+    />
+    <Stack.Screen
+      name="ProductList"
+      component={ProductList}
+      options={{ title: "Products" }}
+    />
+    <Stack.Screen
+      name="ProductDetails"
+      component={ProductDetails}
+      options={{ title: "Product Details" }}
+    />
   </Stack.Navigator>
 );
 
 // 💡 Categories Stack
 const CategoriesStack = () => (
-  <Stack.Navigator screenOptions={{ headerShown: false }} >
-    <Stack.Screen name="CategoriesMain" component={Categories} />
-    <Stack.Screen name="ProductList" component={ProductList} options={{ title: "Products" }}  />
-    <Stack.Screen name="ProductDetails" component={ProductDetails} options={{ title: "Product Details" }}/>
+  <Stack.Navigator screenOptions={commonHeaderOptions}>
+    <Stack.Screen
+      name="CategoriesMain"
+      component={Categories}
+      options={{ title: "Categories" }}
+    />
+    <Stack.Screen
+      name="ProductList"
+      component={ProductList}
+      options={{ title: "Products" }}
+    />
+    <Stack.Screen
+      name="ProductDetails"
+      component={ProductDetails}
+      options={{ title: "Product Details" }}
+    />
   </Stack.Navigator>
 );
 
 // 💡 Cart Stack
 const CartStack = () => (
-  <Stack.Navigator screenOptions={{ headerShown: false }}>
-    <Stack.Screen name="CartMain" component={Cart} />
-    <Stack.Screen name="ProductDetails" component={ProductDetails} options={{ title: "Product Details" }}  />
+  <Stack.Navigator screenOptions={commonHeaderOptions}>
+    <Stack.Screen
+      name="CartMain"
+      component={Cart}
+      options={{ title: "Your Cart" }}
+    />
+    <Stack.Screen
+      name="ProductDetails"
+      component={ProductDetails}
+      options={{ title: "Product Details" }}
+    />
   </Stack.Navigator>
 );
 
 // 💡 Account Stack
 const AccountStack = () => (
-  <Stack.Navigator screenOptions={{ headerShown: false }}>
-    <Stack.Screen name="AccountMain" component={Account} />
+  <Stack.Navigator screenOptions={commonHeaderOptions}>
+    <Stack.Screen
+      name="AccountMain"
+      component={Account}
+      options={{ title: "My Account" }}
+    />
   </Stack.Navigator>
 );
 
@@ -56,7 +107,6 @@ export default function TabNavigator() {
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
-        headerShown: true,
         tabBarIcon: ({ color, size }) => {
           let iconName;
           if (route.name === "Home") iconName = "home-outline";
@@ -67,19 +117,10 @@ export default function TabNavigator() {
         },
         tabBarActiveTintColor: "#1EB1C5",
         tabBarInactiveTintColor: "gray",
-        headerTitleAlign: "center",
-        headerStyle: {
-          backgroundColor: "#1EB1C5",
-          borderBottomLeftRadius: 20,
-          borderBottomRightRadius: 20,
-        },
-        headerTintColor: "#fff",
-        headerTitleStyle: {
-          fontFamily: "Outfit-Regular",
-        },
+        headerShown: false, // stack handles the headers
       })}
     >
-      <Tab.Screen name="Home" component={HomeStack} options={{ title: "Smart Wave" }} />
+      <Tab.Screen name="Home" component={HomeStack} />
       <Tab.Screen name="Categories" component={CategoriesStack} />
       <Tab.Screen
         name="Cart"

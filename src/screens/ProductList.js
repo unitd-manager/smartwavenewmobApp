@@ -17,7 +17,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { addToCart, fetchCartItems } from '../redux/slices/cartSlice';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFocusEffect } from '@react-navigation/native';
-import BackButton from '../components/BackButton';
+//import BackButton from '../components/BackButton';
 
 const ProductListScreen = ({ route, navigation }) => {
   const { categoryId,categoryName } = route.params || {};
@@ -54,9 +54,9 @@ const ProductListScreen = ({ route, navigation }) => {
   
  
   const addCart = (data) => {
- 
+ console.log('data',data);
     if(user){
-      if(data.price){
+      
     data.contact_id=user.contact_id
   
      dispatch(addToCart(data)) 
@@ -66,7 +66,7 @@ const ProductListScreen = ({ route, navigation }) => {
              .catch((error) => {
                console.error('Failed to add to cart:', error);
              });
-  }
+  
     }
     else{
       Alert.alert("Please Login")
@@ -203,7 +203,8 @@ useEffect(()=>{
     <View style={styles.container}>
       {/* Header with Category name and search icon */}
       <View style={styles.headerRow}>
-        <BackButton />
+        {/* <BackButton /> */}
+        <View></View>
         <Text style={styles.headerText}>{categoryName}</Text>
         <TouchableOpacity onPress={() => setShowSearch(prev => !prev)}>
           <Ionicons name="search" size={24} color="#333" />

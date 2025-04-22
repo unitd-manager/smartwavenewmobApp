@@ -6,6 +6,9 @@ import imageBase from "../constants/imageBase";
 import { useSelector, useDispatch } from 'react-redux';
 import { fetchCartItems, deleteCartItem, addToCart,clearCart,updateCart } from '../redux/slices/cartSlice';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import Icon from 'react-native-vector-icons/Ionicons';
+//import BackButton from "../components/BackButton";
+
 
  const CartScreen = ({navigation}) => {
   const [cartItems, setCartItems] = useState([]);
@@ -244,14 +247,10 @@ api
 		<SafeAreaView style={styles.container}>
 			<ScrollView  style={styles.scrollView}>
 				<View style={styles.row2}>
-					<Image
-						source = {{uri: "https://storage.googleapis.com/tagjs-prod.appspot.com/pNd58t8xI9/yrrne75k.png"}} 
-						resizeMode = {"stretch"}
-						style={styles.image2}
-					/>
+					{/* <BackButton/>
 					<Text style={styles.text2}>
 						{"My Cart"}
-					</Text>
+					</Text> */}
 				</View>
 
 			
@@ -259,11 +258,19 @@ api
 			        <ActivityIndicator size="large" color="#1EB1C5" />
      ): items.length === 0 ? (
 		<View style={styles.emptyContainer}>
-    <Text style={styles.emptyText}>Your cart is empty</Text>
-    <TouchableOpacity style={styles.homeButton} onPress={() => navigation.navigate("Home")}>
-      <Text style={styles.homeButtonText}>Go to Home</Text>
-    </TouchableOpacity>
+		<Icon name="cart-outline" size={100} color="#1EB1C5" style={{ marginBottom: 20 }} />
+		<Text style={styles.emptyText}>Your cart is empty</Text>
+		<TouchableOpacity
+  style={styles.homeButton}
+  onPress={() => navigation.navigate("Home")}
+>
+  <View style={styles.homeButtonContent}>
+    <Icon name="home-outline" size={20} color="#fff" style={{ marginRight: 8 }} />
+    <Text style={styles.homeButtonText}>Go Home</Text>
   </View>
+</TouchableOpacity>
+
+	  </View>
 	  )  : (items.map((item, index) => (
 				<View style={styles.row3}>
 					<Image
@@ -285,42 +292,28 @@ api
 								</Text>
 							</View>
 							</TouchableOpacity>
-							<View style={styles.row4}>
-							<TouchableOpacity
-      onPress={() => handleDecreaseQuantity(item)}
-    >
 							
-								<Image
-									source = {{uri: "https://storage.googleapis.com/tagjs-prod.appspot.com/pNd58t8xI9/gqohjonn.png"}} 
-									resizeMode = {"stretch"}
-									style={styles.image4}
-								/>
-								</TouchableOpacity>
-								<TouchableOpacity style={styles.button} onPress={()=>alert('Pressed!')}>
-									<Text style={styles.text5}>
-										{item?.qty}
-									</Text>
-								</TouchableOpacity>
-								<TouchableOpacity
-      onPress={() => handleIncreaseQuantity(item)}
-    >
-								<Image
-									source = {{uri: "https://storage.googleapis.com/tagjs-prod.appspot.com/pNd58t8xI9/i2awl8ik.png"}} 
-									resizeMode = {"stretch"}
-									style={styles.image5}
-								/>
-								</TouchableOpacity>
-							</View>
+<View style={styles.row4}>
+  <TouchableOpacity onPress={() => handleDecreaseQuantity(item)}>
+    <Icon name="remove-circle-outline" size={18} color="#1EB1C5" />
+  </TouchableOpacity>
+
+  <TouchableOpacity style={styles.button}>
+    <Text style={styles.text5}>
+      {item?.qty}
+    </Text>
+  </TouchableOpacity>
+
+  <TouchableOpacity onPress={() => handleIncreaseQuantity(item)}>
+    <Icon name="add-circle-outline" size={18} color="#1EB1C5" />
+  </TouchableOpacity>
+</View>
 						</View>
 					</View>
-					<TouchableOpacity
-      onPress={() => handleDelete(item)}
-    >
-					<Image
-						source = {{uri: "https://storage.googleapis.com/tagjs-prod.appspot.com/pNd58t8xI9/pxx4gsu5.png"}} 
-						resizeMode = {"stretch"}
-						style={styles.image6}
-					/></TouchableOpacity>
+					<TouchableOpacity onPress={() => handleDelete(item)}>
+  <Icon name="trash" size={24} color="red" style={{ marginLeft: 10 }} />
+</TouchableOpacity>
+
 				</View>
 				
 				)))}
@@ -649,16 +642,29 @@ const styles = StyleSheet.create({
 		marginBottom: 20,
 	  },
 	  homeButton: {
-		backgroundColor: '#1EB1C5',
-		paddingVertical: 10,
-		paddingHorizontal: 20,
-		borderRadius: 8,
+		backgroundColor: "#1EB1C5",
+		paddingVertical: 12,
+		paddingHorizontal: 24,
+		borderRadius: 30,
+		elevation: 3,
+		shadowColor: "#000",
+		shadowOffset: { width: 0, height: 2 },
+		shadowOpacity: 0.2,
+		shadowRadius: 3,
 	  },
+	  
+	  homeButtonContent: {
+		flexDirection: "row",
+		alignItems: "center",
+		justifyContent: "center",
+	  },
+	  
 	  homeButtonText: {
-		color: 'white',
+		color: "#fff",
 		fontSize: 16,
-		fontWeight: 'bold',
+		fontWeight: "bold",
 	  },
+	  
 	  
 });
 
