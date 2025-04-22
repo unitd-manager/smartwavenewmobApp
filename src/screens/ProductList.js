@@ -173,11 +173,13 @@ useEffect(()=>{
           )}
         </View>
       </TouchableOpacity>
-
+      <TouchableOpacity
+        onPress={() => navigation.navigate("ProductDetails", { productId: item.product_id })}
+      >
       <Text numberOfLines={1} style={styles.name}>
         {item.title}
       </Text>
-
+</TouchableOpacity>
       {item.inCart ? (
         <View style={styles.qtyRow}>
           <TouchableOpacity onPress={() => updateQuantity(item.id, -1)}>

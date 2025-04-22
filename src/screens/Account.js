@@ -46,10 +46,10 @@ const AccountScreen = ({ navigation }) => {
   }, []);
 
   const menuItems = [
-    { icon: 'user', label: 'Your Profile', screen: 'Profile' },
-    { icon: 'file-text', label: 'Enquiry History', screen: 'EnquiryHistory' },
-    { icon: 'lock', label: 'Change password', screen: 'ChangePassword' },
-    { icon: 'truck', label: 'Shipping Address', screen: 'ShippingAddress' },
+    // { icon: 'user', label: 'Your Profile', screen: 'Profile' },
+    // { icon: 'file-text', label: 'Enquiry History', screen: 'EnquiryHistory' },
+    // { icon: 'lock', label: 'Change password', screen: 'ChangePassword' },
+    // { icon: 'truck', label: 'Shipping Address', screen: 'ShippingAddress' },
     { icon: 'log-out', label: 'Logout', screen: 'Logout' },
   ];
 

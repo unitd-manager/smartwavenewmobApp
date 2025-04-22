@@ -154,42 +154,18 @@ export default ({ route }) => {
           <Text style={styles.text3}>{product?.product_type}</Text>
          
         </View>
-
         <View style={styles.row5}>
-          <Text style={styles.text5}>{product?.title}</Text>
-          
-          <View style={styles.row4}>
-            
-            {/* <GradeSelector product={product} selectedProductGrade={selectedProductGrade} setSelectedProductGrade={setSelectedProductGrade} setProductStock={setProductStock} setQuantityCount={setQuantityCount}  /> */}
-            {/* <Image
-              source={{
-                uri: "https://storage.googleapis.com/tagjs-prod.appspot.com/pNd58t8xI9/74exovt6.png",
-              }}
-              resizeMode={"stretch"}
-              style={styles.image6}
-            /> */}
-            {/* <TouchableOpacity
-              style={styles.button}
-              onPress={() => alert("Pressed!")}
-            >
-              <Text style={styles.text6}>{"1"}</Text>
-            </TouchableOpacity> */}
-            {/* <Image
-              source={{
-                uri: "https://storage.googleapis.com/tagjs-prod.appspot.com/pNd58t8xI9/h20mzbsi.png",
-              }}
-              resizeMode={"stretch"}
-              style={styles.image7}
-            /> */}
-             <TouchableOpacity
-  style={styles.cartbuttonRow}
-  onPress={() => addCart(product)}
->
-  <Icon name="cart-outline" size={20} color="#1EB1C5" style={styles.cartIcon} />
-  {/* <Text style={styles.carttext9}>{"Add to Cart"}</Text> */}
-</TouchableOpacity>
-          </View>
-        </View>
+  <Text style={styles.text5}>{product?.title}</Text>
+
+  <TouchableOpacity
+    style={styles.cartbuttonRow}
+    onPress={() => addCart(product)}
+  >
+    <Icon name="cart-outline" size={20} color="#1EB1C5" style={styles.cartIcon} />
+    <Text style={styles.carttext9}>{"Add to Cart"}</Text>
+  </TouchableOpacity>
+</View>
+
 
         <Image
           source={{
@@ -315,15 +291,19 @@ const styles = StyleSheet.create({
     marginHorizontal: 32,
   },
   row4: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 4, // reduce this
   },
+  
   row5: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 20,
-    marginLeft: 32,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 10,
   },
+  
+  
   row6: {
     flexDirection: "row",
     alignItems: "center",
@@ -356,12 +336,13 @@ const styles = StyleSheet.create({
     fontFamily: 'Outfit-Regular',
   },
   text5: {
-    color: "#000000",
-    fontSize: 18,
-    marginRight: 25,
-    width: 216,
+    flex: 1,
+    fontSize: 16,
+    //fontWeight: 'bold',
+    marginRight: 10, // spacing from cart button
     fontFamily: 'Outfit-Regular',
-  },
+  },  
+  
   text6: {
     color: "#000000",
     fontSize: 14,
@@ -406,7 +387,7 @@ const styles = StyleSheet.create({
   cartbuttonRow: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#fff", // Button background
+    backgroundColor: "#fff",
     paddingVertical: 8,
     paddingHorizontal: 16,
     borderRadius: 25,
@@ -415,22 +396,25 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 3,
-    marginTop: 10, // Add some space between buttons
-    maxWidth: "90%", // Prevent overflow by limiting the width
-    overflow: "hidden", // Ensure content doesn't overflow
-    flexShrink: 1, // Allow the button to shrink if necessary
-    marginRight: 16,
+    marginTop: 10,
+  
+    alignSelf: 'flex-start',     // This keeps it from expanding fully to the right
+    marginRight: 0,              // Remove extra right margin
+    marginLeft: 10,              // Add left margin to move left
+    maxWidth: "85%",             // Reduce width a bit more
   },
+  
   
   cartIcon: {
     marginRight: 8,
   },
   
   carttext9: {
-    fontSize: 14,
+    fontSize: 12,
     fontWeight: "500",
     color: "#1EB1C5",
     flexShrink: 1, // Allow the text to shrink if necessary
+  marginRight:10,
   },
   
 });

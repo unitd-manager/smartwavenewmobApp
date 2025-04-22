@@ -295,7 +295,7 @@ api
 							
 <View style={styles.row4}>
   <TouchableOpacity onPress={() => handleDecreaseQuantity(item)}>
-    <Icon name="remove-circle-outline" size={18} color="#1EB1C5" />
+    <Icon name="remove-circle-outline" size={15} color="#1EB1C5" />
   </TouchableOpacity>
 
   <TouchableOpacity style={styles.button}>
@@ -305,7 +305,7 @@ api
   </TouchableOpacity>
 
   <TouchableOpacity onPress={() => handleIncreaseQuantity(item)}>
-    <Icon name="add-circle-outline" size={18} color="#1EB1C5" />
+    <Icon name="add-circle-outline" size={15} color="#1EB1C5" />
   </TouchableOpacity>
 </View>
 						</View>
@@ -368,305 +368,417 @@ api
 		</SafeAreaView>
 	)
 }
+// const styles = StyleSheet.create({
+// 	container: {
+// 		flex: 1,
+// 		backgroundColor: "#FFFFFF",
+// 	},
+// 	box: {
+// 		width: 4,
+// 		height: 4,
+// 		backgroundColor: "#1EB1C5",
+// 	},
+// 	button: {
+// 		backgroundColor: "#FFFFFF",
+// 		borderColor: "#EEEFEE",
+// 		borderRadius: 10,
+// 		borderWidth: 1,
+// 		paddingVertical: 14,
+// 		paddingHorizontal: 18,
+// 		marginRight: 9,
+// 	},
+// 	button2: {
+// 		backgroundColor: "#FFFFFF",
+// 		borderColor: "#EEEFEE",
+// 		borderRadius: 10,
+// 		borderWidth: 1,
+// 		paddingVertical: 8,
+// 		paddingHorizontal: 15,
+// 		marginRight: 9,
+// 	},
+// 	button3: {
+// 		backgroundColor: "#FFFFFF",
+// 		borderColor: "#EEEFEE",
+// 		borderRadius: 10,
+// 		borderWidth: 1,
+// 		paddingVertical: 8,
+// 		paddingHorizontal: 17,
+// 		marginRight: 9,
+// 	},
+// 	button4: {
+// 		alignItems: "center",
+// 		backgroundColor: "#1EB1C5",
+// 		borderRadius: 10,
+// 		paddingVertical: 11,
+// 		marginHorizontal: 34,
+// 	},
+// 	column: {
+// 		alignItems: "flex-start",
+// 		marginRight: 21,
+// 	},
+// 	column2: {
+// 		alignItems: "center",
+// 		marginBottom: 8,
+// 	},
+// 	column3: {
+// 		alignItems: "flex-start",
+// 		marginRight: 43,
+// 	},
+// 	column4: {
+// 		alignItems: "flex-start",
+// 		marginRight: 48,
+// 	},
+// 	column5: {
+// 		alignItems: "center",
+// 		paddingVertical: 3,
+// 		paddingHorizontal: 4,
+// 		marginRight: 5,
+// 	},
+// 	column6: {
+// 		backgroundColor: "#FFFFFF",
+// 		borderColor: "#9CA7B7",
+// 		borderRadius: 10,
+// 		borderWidth: 1,
+// 		paddingVertical: 13,
+// 		marginBottom: 127,
+// 		marginHorizontal: 30,
+// 	},
+// 	image: {
+// 		width: 143,
+// 		height: 54,
+// 	},
+// 	image2: {
+// 		width: 24,
+// 		height: 24,
+// 		marginRight: 101,
+// 	},
+// 	image3: {
+// 		width: 80,
+// 		height: 80,
+// 		marginRight: 20,
+// 	},
+// 	image4: {
+// 		width: 12,
+// 		height: 1,
+// 		marginRight: 12,
+// 	},
+// 	image5: {
+// 		width: 12,
+// 		height: 12,
+// 	},
+// 	image6: {
+// 		width: 21,
+// 		height: 21,
+// 	},
+// 	image7: {
+// 		width: 80,
+// 		height: 80,
+// 		marginRight: 19,
+// 	},
+// 	image8: {
+// 		width: 12,
+// 		height: 8,
+// 		marginRight: 12,
+// 	},
+// 	image9: {
+// 		width: 80,
+// 		height: 80,
+// 		marginRight: 15,
+// 	},
+// 	image10: {
+// 		width: 8,
+// 		height: 1,
+// 	},
+// 	image11: {
+// 		width: 10,
+// 		height: 8,
+// 		marginRight: 4,
+// 	},
+// 	row: {
+// 		flexDirection: "row",
+// 		marginBottom: 8,
+// 	},
+// 	row2: {
+// 		flexDirection: "row",
+// 		alignItems: "center",
+// 		marginBottom: 18,
+// 		marginLeft: 30,
+// 	},
+// 	row3: {
+// 		flexDirection: "row",
+// 		alignItems: "center",
+// 		backgroundColor: "#FFFFFF",
+// 		paddingVertical: 15,
+// 		paddingHorizontal: 30,
+// 	},
+// 	row4: {
+// 		flexDirection: "row",
+// 		alignItems: "center",
+// 		paddingRight: 85,
+// 	},
+// 	row5: {
+// 		flexDirection: "row",
+// 		alignItems: "center",
+// 		paddingRight: 64,
+// 	},
+// 	row6: {
+// 		flexDirection: "row",
+// 		alignItems: "center",
+// 		backgroundColor: "#FFFFFF",
+// 		paddingVertical: 14,
+// 		paddingHorizontal: 30,
+// 		marginBottom: 57,
+// 	},
+// 	row7: {
+// 		flexDirection: "row",
+// 		alignItems: "center",
+// 		paddingRight: 67,
+// 	},
+// 	row8: {
+// 		flexDirection: "row",
+// 		alignItems: "center",
+// 		marginBottom: 12,
+// 		marginLeft: 31,
+// 	},
+// 	scrollView: {
+// 		flex: 1,
+// 		backgroundColor: "#FFFFFF",
+// 	},
+// 	text: {
+// 		color: "#000000",
+// 		fontSize: 17,
+// 		//fontWeight: "bold",
+// 		marginVertical: 18,
+// 		marginLeft: 31,
+// 		marginRight: 12,
+// 		fontFamily: 'Outfit-Regular',
+// 	},
+// 	text2: {
+// 		color: "#000000",
+// 		fontSize: 20,
+// 		margin: 10,
+// 		fontFamily: 'Outfit-Regular',
+// 	},
+// 	text3: {
+// 		color: "#000000",
+// 		fontSize: 14,
+// 		marginBottom: 8,
+// 		fontFamily: 'Outfit-Regular',
+// 	},
+// 	text4: {
+// 		color: "#9CA7B7",
+// 		fontSize: 12,
+// 		marginBottom: 1,
+// 		fontFamily: 'Outfit-Regular',
+// 	},
+// 	text5: {
+// 		color: "#000000",
+// 		fontSize: 16,
+// 		//fontWeight: "bold",
+// 		fontFamily: 'Outfit-Regular',
+// 	},
+// 	text6: {
+// 		color: "#9CA7B7",
+// 		fontSize: 12,
+// 		marginBottom: 9,
+// 		fontFamily: 'Outfit-Regular',
+// 	},
+// 	text7: {
+// 		color: "#000000",
+// 		fontSize: 14,
+// 		fontFamily: 'Outfit-Regular',
+// 	},
+// 	text8: {
+// 		color: "#9CA7B7",
+// 		fontSize: 11,
+// 		marginBottom: 75,
+// 		marginLeft: 16,
+// 		width: 163,
+// 		fontFamily: 'Outfit-Regular',
+// 	},
+// 	text9: {
+// 		color: "#FFFFFF",
+// 		fontSize: 16,
+// 		fontFamily: 'Outfit-Regular',
+// 	},
+// 	view: {
+// 		flex: 1,
+// 		alignItems: "flex-end",
+// 		marginRight: 12,
+// 	},
+// 	view2: {
+// 		alignItems: "flex-start",
+// 		paddingBottom: 11,
+// 		paddingHorizontal: 10,
+// 	},
+// 	view3: {
+// 		alignItems: "flex-end",
+// 	},
+// 	view4: {
+// 		backgroundColor: "#FFFFFF",
+// 		borderColor: "#DFF6FB",
+// 		borderTopLeftRadius: 15,
+// 		borderTopRightRadius: 15,
+// 		borderWidth: 1,
+// 		paddingVertical: 19,
+// 		shadowColor: "#959DA533",
+// 		shadowOpacity: 0.2,
+// 		shadowOffset: {
+// 		    width: 8,
+// 		    height: 0
+// 		},
+// 		shadowRadius: 24,
+// 		elevation: 24,
+// 	},
+// 	emptyContainer: {
+// 		flex: 1,
+// 		justifyContent: 'center',
+// 		alignItems: 'center',
+// 		marginTop: 50,
+// 	  },
+// 	  emptyText: {
+// 		fontSize: 18,
+// 		color: '#777',
+// 		marginBottom: 20,
+// 	  },
+// 	  homeButton: {
+// 		backgroundColor: "#1EB1C5",
+// 		paddingVertical: 12,
+// 		paddingHorizontal: 24,
+// 		borderRadius: 30,
+// 		elevation: 3,
+// 		shadowColor: "#000",
+// 		shadowOffset: { width: 0, height: 2 },
+// 		shadowOpacity: 0.2,
+// 		shadowRadius: 3,
+// 	  },
+	  
+// 	  homeButtonContent: {
+// 		flexDirection: "row",
+// 		alignItems: "center",
+// 		justifyContent: "center",
+// 	  },
+	  
+// 	  homeButtonText: {
+// 		color: "#fff",
+// 		fontSize: 16,
+// 		fontWeight: "bold",
+// 	  },
+	  
+	  
+// });
 const styles = StyleSheet.create({
 	container: {
-		flex: 1,
-		backgroundColor: "#FFFFFF",
-	},
-	box: {
-		width: 4,
-		height: 4,
-		backgroundColor: "#1EB1C5",
-	},
-	button: {
-		backgroundColor: "#FFFFFF",
-		borderColor: "#EEEFEE",
-		borderRadius: 10,
-		borderWidth: 1,
-		paddingVertical: 14,
-		paddingHorizontal: 18,
-		marginRight: 9,
-	},
-	button2: {
-		backgroundColor: "#FFFFFF",
-		borderColor: "#EEEFEE",
-		borderRadius: 10,
-		borderWidth: 1,
-		paddingVertical: 8,
-		paddingHorizontal: 15,
-		marginRight: 9,
-	},
-	button3: {
-		backgroundColor: "#FFFFFF",
-		borderColor: "#EEEFEE",
-		borderRadius: 10,
-		borderWidth: 1,
-		paddingVertical: 8,
-		paddingHorizontal: 17,
-		marginRight: 9,
-	},
-	button4: {
-		alignItems: "center",
-		backgroundColor: "#1EB1C5",
-		borderRadius: 10,
-		paddingVertical: 11,
-		marginHorizontal: 34,
-	},
-	column: {
-		alignItems: "flex-start",
-		marginRight: 21,
-	},
-	column2: {
-		alignItems: "center",
-		marginBottom: 8,
-	},
-	column3: {
-		alignItems: "flex-start",
-		marginRight: 43,
-	},
-	column4: {
-		alignItems: "flex-start",
-		marginRight: 48,
-	},
-	column5: {
-		alignItems: "center",
-		paddingVertical: 3,
-		paddingHorizontal: 4,
-		marginRight: 5,
-	},
-	column6: {
-		backgroundColor: "#FFFFFF",
-		borderColor: "#9CA7B7",
-		borderRadius: 10,
-		borderWidth: 1,
-		paddingVertical: 13,
-		marginBottom: 127,
-		marginHorizontal: 30,
-	},
-	image: {
-		width: 143,
-		height: 54,
-	},
-	image2: {
-		width: 24,
-		height: 24,
-		marginRight: 101,
-	},
-	image3: {
-		width: 80,
-		height: 80,
-		marginRight: 20,
-	},
-	image4: {
-		width: 12,
-		height: 1,
-		marginRight: 12,
-	},
-	image5: {
-		width: 12,
-		height: 12,
-	},
-	image6: {
-		width: 21,
-		height: 21,
-	},
-	image7: {
-		width: 80,
-		height: 80,
-		marginRight: 19,
-	},
-	image8: {
-		width: 12,
-		height: 8,
-		marginRight: 12,
-	},
-	image9: {
-		width: 80,
-		height: 80,
-		marginRight: 15,
-	},
-	image10: {
-		width: 8,
-		height: 1,
-	},
-	image11: {
-		width: 10,
-		height: 8,
-		marginRight: 4,
-	},
-	row: {
-		flexDirection: "row",
-		marginBottom: 8,
-	},
-	row2: {
-		flexDirection: "row",
-		alignItems: "center",
-		marginBottom: 18,
-		marginLeft: 30,
-	},
-	row3: {
-		flexDirection: "row",
-		alignItems: "center",
-		backgroundColor: "#FFFFFF",
-		paddingVertical: 15,
-		paddingHorizontal: 30,
-	},
-	row4: {
-		flexDirection: "row",
-		alignItems: "center",
-		paddingRight: 85,
-	},
-	row5: {
-		flexDirection: "row",
-		alignItems: "center",
-		paddingRight: 64,
-	},
-	row6: {
-		flexDirection: "row",
-		alignItems: "center",
-		backgroundColor: "#FFFFFF",
-		paddingVertical: 14,
-		paddingHorizontal: 30,
-		marginBottom: 57,
-	},
-	row7: {
-		flexDirection: "row",
-		alignItems: "center",
-		paddingRight: 67,
-	},
-	row8: {
-		flexDirection: "row",
-		alignItems: "center",
-		marginBottom: 12,
-		marginLeft: 31,
+	  flex: 1,
+	  backgroundColor: '#F9F9F9',
 	},
 	scrollView: {
-		flex: 1,
-		backgroundColor: "#FFFFFF",
+	  padding: 16,
 	},
-	text: {
-		color: "#000000",
-		fontSize: 17,
-		//fontWeight: "bold",
-		marginVertical: 18,
-		marginLeft: 31,
-		marginRight: 12,
-		fontFamily: 'Outfit-Regular',
+	row3: {
+	  flexDirection: 'row',
+	  alignItems: 'center',
+	  backgroundColor: '#fff',
+	  borderRadius: 12,
+	  padding: 12,
+	  marginBottom: 12,
+	  //shadowColor: '#000',
+	  //shadowOpacity: 0.1,
+	  //shadowRadius: 8,
+	  //elevation: 4,
 	},
-	text2: {
-		color: "#000000",
-		fontSize: 20,
-		margin: 10,
-		fontFamily: 'Outfit-Regular',
-	},
-	text3: {
-		color: "#000000",
-		fontSize: 14,
-		marginBottom: 8,
-		fontFamily: 'Outfit-Regular',
-	},
-	text4: {
-		color: "#9CA7B7",
-		fontSize: 12,
-		marginBottom: 1,
-		fontFamily: 'Outfit-Regular',
-	},
-	text5: {
-		color: "#000000",
-		fontSize: 16,
-		//fontWeight: "bold",
-		fontFamily: 'Outfit-Regular',
-	},
-	text6: {
-		color: "#9CA7B7",
-		fontSize: 12,
-		marginBottom: 9,
-		fontFamily: 'Outfit-Regular',
-	},
-	text7: {
-		color: "#000000",
-		fontSize: 14,
-		fontFamily: 'Outfit-Regular',
-	},
-	text8: {
-		color: "#9CA7B7",
-		fontSize: 11,
-		marginBottom: 75,
-		marginLeft: 16,
-		width: 163,
-		fontFamily: 'Outfit-Regular',
-	},
-	text9: {
-		color: "#FFFFFF",
-		fontSize: 16,
-		fontFamily: 'Outfit-Regular',
+	image3: {
+	  width: 80,
+	  height: 80,
+	  borderRadius: 10,
+	  marginRight: 12,
 	},
 	view: {
-		flex: 1,
-		alignItems: "flex-end",
-		marginRight: 12,
+	  flex: 1,
 	},
-	view2: {
-		alignItems: "flex-start",
-		paddingBottom: 11,
-		paddingHorizontal: 10,
+	column2: {
+	  justifyContent: 'center',
+	  alignItems: 'center',
+	  marginBottom: 4,
 	},
-	view3: {
-		alignItems: "flex-end",
+	text3: {
+	  fontSize: 16,
+	  fontWeight: '600',
+	  color: '#333',
+	  textAlign: 'center',
+	  alignSelf: 'center',
+	},
+	text4: {
+	  fontSize: 14,
+	  color: '#666',
+	  textAlign: 'center',
+	},
+	row4: {
+	  flexDirection: 'row',
+	  justifyContent: 'center',
+	  alignItems: 'center',
+	  marginTop: 8,
+	},
+	button: {
+	  paddingHorizontal: 12,
+	  paddingVertical: 6,
+	  borderRadius: 6,
+	  backgroundColor: '#1EB1C5',
+	  marginHorizontal: 6,
+	},
+	text5: {
+	  color: '#fff',
+	  fontWeight: 'bold',
 	},
 	view4: {
-		backgroundColor: "#FFFFFF",
-		borderColor: "#DFF6FB",
-		borderTopLeftRadius: 15,
-		borderTopRightRadius: 15,
-		borderWidth: 1,
-		paddingVertical: 19,
-		shadowColor: "#959DA533",
-		shadowOpacity: 0.2,
-		shadowOffset: {
-		    width: 8,
-		    height: 0
-		},
-		shadowRadius: 24,
-		elevation: 24,
+	  marginVertical: 20,
+	  alignItems: 'center',
+	},
+	button4: {
+	  backgroundColor: '#1EB1C5',
+	  paddingVertical: 12,
+	  paddingHorizontal: 28,
+	  borderRadius: 8,
+	  shadowColor: '#1EB1C5',
+	  shadowOffset: { width: 0, height: 4 },
+	  shadowOpacity: 0.3,
+	  shadowRadius: 6,
+	  elevation: 5,
+	},
+	text9: {
+	  color: '#fff',
+	  fontSize: 16,
+	  fontWeight: '600',
 	},
 	emptyContainer: {
-		flex: 1,
-		justifyContent: 'center',
-		alignItems: 'center',
-		marginTop: 50,
-	  },
-	  emptyText: {
-		fontSize: 18,
-		color: '#777',
-		marginBottom: 20,
-	  },
-	  homeButton: {
-		backgroundColor: "#1EB1C5",
-		paddingVertical: 12,
-		paddingHorizontal: 24,
-		borderRadius: 30,
-		elevation: 3,
-		shadowColor: "#000",
-		shadowOffset: { width: 0, height: 2 },
-		shadowOpacity: 0.2,
-		shadowRadius: 3,
-	  },
-	  
-	  homeButtonContent: {
-		flexDirection: "row",
-		alignItems: "center",
-		justifyContent: "center",
-	  },
-	  
-	  homeButtonText: {
-		color: "#fff",
-		fontSize: 16,
-		fontWeight: "bold",
-	  },
-	  
-	  
-});
+	  flex: 1,
+	  alignItems: 'center',
+	  justifyContent: 'center',
+	  paddingVertical: 40,
+	},
+	emptyText: {
+	  fontSize: 18,
+	  color: '#555',
+	  marginBottom: 16,
+	  textAlign: 'center',
+	},
+	homeButton: {
+	  backgroundColor: '#1EB1C5',
+	  borderRadius: 8,
+	  padding: 12,
+	  marginTop: 10,
+	},
+	homeButtonContent: {
+	  flexDirection: 'row',
+	  alignItems: 'center',
+	},
+	homeButtonText: {
+	  color: '#fff',
+	  fontSize: 16,
+	  fontWeight: '500',
+	},
+  });
+  
 
 export default CartScreen;
 // import React, { useEffect, useState } from "react";
