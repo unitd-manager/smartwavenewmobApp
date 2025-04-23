@@ -11,6 +11,9 @@ import Categories from "./screens/Categories";
 import Cart from "./screens/Cart";
 import ProductList from "./screens/ProductList";
 import ProductDetails from "./screens/ProductDetails";
+import AboutUs from "./screens/AboutUs";
+import Profile from "./screens/Profile";
+import ContactUs from "./screens/ContactUs";
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -96,6 +99,9 @@ const AccountStack = () => (
       component={Account}
       options={{ title: "My Account" }}
     />
+             <Stack.Screen name="AboutUs" component={AboutUs}  options={{ title: "About Us" }} />
+             <Stack.Screen name="Profile" component={Profile}  options={{ title: "Profile" }} />
+             <Stack.Screen name="ContactUs" component={ContactUs}  options={{ title: "Contact Us" }} />
   </Stack.Navigator>
 );
 

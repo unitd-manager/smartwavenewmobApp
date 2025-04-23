@@ -77,7 +77,10 @@ export default function SignInScreen({ navigation }) {
 
 				{/* Sign-in Heading */}
 				<View style={styles.column}>
-					<Text style={styles.text2}>{"Please Sign In"}</Text>
+				<Text style={styles.text2}>
+  <Text style={{ color: 'black' }}>Please </Text>
+  <Text style={{ color: '#1EB1C5' }}>Sign In</Text>
+</Text>
 					<Text style={styles.text3}>{"Enter your Dipstore account details for a personalised experience"}</Text>
 				</View>
 
@@ -186,6 +189,7 @@ const styles = StyleSheet.create({
 		fontFamily: 'Outfit-Regular',
 	},
 	column: {
+		marginTop:30,
 		marginBottom: 55,
 		marginHorizontal: 34,
 		fontFamily: 'Outfit-Regular',
@@ -233,7 +237,7 @@ const styles = StyleSheet.create({
 	},
 	errorText: { color: "red", fontSize: 12, marginBottom: 10, marginLeft: 12,fontFamily: 'Outfit-Regular', },
 	text: { color: "#373737", fontSize: 17, fontWeight: "bold", marginVertical: 18, marginLeft: 47,fontFamily: 'Outfit-Regular', },
-	text2: { color: "#000000", fontSize: 30, fontWeight: "bold", textAlign: "center", marginBottom: 15,fontFamily: 'Outfit-Regular' },
+	text2: { color: "#000000", fontSize: 30,  textAlign: "center", marginBottom: 15,fontFamily: 'Outfit-Regular' },
 	text3: { color: "#9CA7B7", fontSize: 16, textAlign: "center",fontFamily: 'Outfit-Regular' },
 	text4: { color: "#595D64", fontSize: 16, marginBottom: 5, marginLeft: 12,fontFamily: 'Outfit-Regular', },
 	text5: { color: "#595E64", fontSize: 14, textAlign: "center", flex: 1,fontFamily: 'Outfit-Regular', },

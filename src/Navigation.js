@@ -26,6 +26,8 @@ import Frame from "./screens/Frame";
 import TabNavigator from './TabNavigation';
 import { useDispatch } from "react-redux";
 import { fetchCartItems } from "./redux/slices/cartSlice";
+import Profile from "./screens/Profile";
+import ContactUs from "./screens/ContactUs";
 
 const Stack = createStackNavigator();
 
@@ -115,6 +117,8 @@ useEffect(() => {
             <Stack.Screen name="NewPassword" component={NewPassword} />
             <Stack.Screen name="Frame" component={Frame} />
             <Stack.Screen name="LoginPage" component={LoginPage} />
+            <Stack.Screen name="Profile" component={Profile} />
+            <Stack.Screen name="ContactUs" component={ContactUs} />
           {/* </>
         ) : (
           <> */}

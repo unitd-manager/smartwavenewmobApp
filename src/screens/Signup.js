@@ -314,7 +314,7 @@ const styles = StyleSheet.create({
 	text2: {
 		color: "#000000",
 		fontSize: 30,
-		fontWeight: "bold",
+		//fontWeight: "bold",
 		textAlign: "center",
 		marginBottom: 15,
     fontFamily: 'Outfit-Regular',

@@ -46,13 +46,21 @@ const AccountScreen = ({ navigation }) => {
   }, []);
 
   const menuItems = [
-    // { icon: 'user', label: 'Your Profile', screen: 'Profile' },
+    { icon: 'user', label: 'Your Profile', screen: 'Profile' },
+    { icon: 'info', label: 'About Us', screen: 'AboutUs' },
+    { icon: 'phone', label: 'Contact Us', screen: 'ContactUs' },
     // { icon: 'file-text', label: 'Enquiry History', screen: 'EnquiryHistory' },
     // { icon: 'lock', label: 'Change password', screen: 'ChangePassword' },
     // { icon: 'truck', label: 'Shipping Address', screen: 'ShippingAddress' },
     { icon: 'log-out', label: 'Logout', screen: 'Logout' },
   ];
-
+  const userlessmenuItems = [
+    { icon: 'info', label: 'About Us', screen: 'AboutUs' },
+    { icon: 'phone-call', label: 'Contact Us', screen: 'ContactUs' },
+    { icon: 'clipboard', label: 'Log in', screen: 'LoginPage' },
+    { icon: 'shield', label: 'Register', screen: 'Signup' },
+  ];
+  
   if (!isLoggedIn) {
     return (
       <ScrollView style={styles.container}>
@@ -68,27 +76,19 @@ const AccountScreen = ({ navigation }) => {
         <Text style={styles.name}>{userData?.name || 'No User'}</Text>
       </View>
       <View style={styles.menu}>
-  <TouchableOpacity
-    style={styles.menuItem}
-    onPress={() => navigation.navigate('LoginPage')}
-  >
-    <View style={styles.menuIconText}>
-      <Icon name="log-in" size={20} color="#00BCD4" />
-      <Text style={styles.menuText}>Login</Text>
-    </View>
-    {/* <Icon name="chevron-right" size={20} color="#888" /> */}
-  </TouchableOpacity>
-
-  <TouchableOpacity
-    style={styles.menuItem}
-    onPress={() => navigation.navigate('Signup')}
-  >
-    <View style={styles.menuIconText}>
-      <Icon name="user-plus" size={20} color="#00BCD4" />
-      <Text style={styles.menuText}>Signup</Text>
-    </View>
-    {/* <Icon name="chevron-right" size={20} color="#888" /> */}
-  </TouchableOpacity>
+      {userlessmenuItems.map((item, index) => (
+    <TouchableOpacity
+      key={index}
+      style={styles.menuItem}
+      onPress={() => navigation.navigate(item.screen)}
+    >
+      <View style={styles.menuIconText}>
+        <Icon name={item.icon} size={20} color="#00BCD4" />
+        <Text style={styles.menuText}>{item.label}</Text>
+      </View>
+      <Icon name="chevron-right" size={20} color="#888" />
+    </TouchableOpacity>
+  ))}
 </View>
     </ScrollView>
     );
@@ -125,7 +125,7 @@ const AccountScreen = ({ navigation }) => {
           { cancelable: true }
         );
       } else {
-        // navigation.navigate(item.screen);
+         navigation.navigate(item.screen);
       }
     }}
   >
