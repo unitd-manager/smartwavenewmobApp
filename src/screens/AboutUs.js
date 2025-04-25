@@ -39,7 +39,7 @@ const AboutUsScreen = () => {
         {funFactData?.map((item, idx) => (
           <View key={idx} style={styles.statItem}>
             <Text style={styles.statValue}>{item.countNum}</Text>
-            <Text>{item.title}</Text>
+            <Text style={{fontFamily: 'Outfit-Regular'}}>{item.title}</Text>
           </View>
         ))}
       </View>
@@ -51,21 +51,22 @@ const AboutUsScreen = () => {
 };
 
 const styles = StyleSheet.create({
-  container: { padding: 20, backgroundColor: '#fff' },
-  pageTitle: { textAlign: 'center', fontWeight: 'bold', fontSize: 16 },
-  subTitle: { textAlign: 'center', fontSize: 18, marginVertical: 10 },
+  container: { padding: 20, backgroundColor: '#fff',fontFamily: 'Outfit-Regular', },
+  pageTitle: { textAlign: 'center',  fontSize: 16,fontFamily: 'Outfit-Regular', },
+  subTitle: { textAlign: 'center', fontSize: 18, marginVertical: 10,fontFamily: 'Outfit-Regular', },
   image: { width: '100%', height: 200, resizeMode: 'cover', marginBottom: 10 },
-  sectionTitle: { fontWeight: 'bold', fontSize: 16, marginTop: 20 },
-  text: { fontSize: 14, color: '#555', marginVertical: 5 },
+  sectionTitle: {  fontSize: 16, marginTop: 20,fontFamily: 'Outfit-Regular', },
+  text: { fontSize: 14, color: '#555', marginVertical: 5,fontFamily: 'Outfit-Regular', },
   statsContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'space-between',
     marginVertical: 20,
+    fontFamily: 'Outfit-Regular',
   },
-  statItem: { width: '45%', marginVertical: 10, alignItems: 'center' },
-  statValue: { fontSize: 20, fontWeight: 'bold', color: '#00bcd4' },
-  footer: { textAlign: 'center', fontSize: 12, color: '#888', marginTop: 40 },
+  statItem: { width: '45%', marginVertical: 10, alignItems: 'center',fontFamily: 'Outfit-Regular', },
+  statValue: { fontSize: 20,  color: '#00bcd4',fontFamily: 'Outfit-Regular', },
+  footer: { textAlign: 'center', fontSize: 12, color: '#888', marginTop: 40,fontFamily: 'Outfit-Regular', },
 });
 
 export default AboutUsScreen;

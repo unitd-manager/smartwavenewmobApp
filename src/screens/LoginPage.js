@@ -1,251 +1,260 @@
-import React, { useState } from "react";
-import { SafeAreaView, View, ScrollView, Text, Image, TouchableOpacity, TextInput, StyleSheet } from "react-native";
-import api from "../constants/api";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import React, { useState } from 'react';
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+  Alert,
+  Image,
+} from 'react-native';
+import Icon from 'react-native-vector-icons/Ionicons';
+import { useNavigation } from '@react-navigation/native';
+import api from '../constants/api';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-export default function SignInScreen({ navigation }) {
-	const [email, setEmail] = useState("smartwave@gmail.com");
-	const [password, setPassword] = useState("");
-	const [passwordVisible, setPasswordVisible] = useState(false);
-	const [errors, setErrors] = useState({});
+const SignInScreen = () => {
+  const navigation = useNavigation();
 
-    const validateInputs = () => {
-        let valid = true;
-        let newErrors = {};
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [emailValid, setEmailValid] = useState(false);
+  const [passwordValid, setPasswordValid] = useState(false);
 
-        if (!email) {
-            newErrors.email = "Email is required";
-            valid = false;
-        } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-            newErrors.email = "Enter a valid email";
-            valid = false;
-        }
+  const [emailError, setEmailError] = useState('');
+  const [passwordError, setPasswordError] = useState('');
 
-        if (!password) {
-            newErrors.password = "Password is required";
-            valid = false;
-        } else if (password.length < 6) {
-            newErrors.password = "Password must be at least 6 characters";
-            valid = false;
-        }
+  const validateEmail = (text) => {
+    setEmail(text);
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const isValid = emailRegex.test(text);
+    setEmailValid(isValid);
+    if (text === '') {
+      setEmailError('Email is required');
+    } else if (!isValid) {
+      setEmailError('Please enter a valid email address');
+    } else {
+      setEmailError('');
+    }
+  };
 
-        setErrors(newErrors);
-        return valid;
-    };
+  const validatePassword = (text) => {
+    setPassword(text);
+    const isValid = text.length >= 6;
+    setPasswordValid(isValid);
+    if (text === '') {
+      setPasswordError('Password is required');
+    } else if (!isValid) {
+      setPasswordError('Password must be at least 6 characters');
+    } else {
+      setPasswordError('');
+    }
+  };
 
-    const handleLogin = () => {
-		const signinData={email:email, password:password}
-        if (validateInputs()) {
-			api.post("/api/login", signinData).then((res) => {
-				if (res && res.status === "400") {
-				  alert("Invalid Username or Password");
-				  
-				} 
-				else {
-				  AsyncStorage.setItem("user", JSON.stringify(res.data.data));
-				  AsyncStorage.setItem("token", JSON.stringify(res.data.token));
-		
-				  setTimeout(()=>{
-		navigation.navigate(' ')
-				  },300)
-				}
-			  }).catch((err)=>{
-				alert("Invalid Username or Password");
-			  });
-        }
-    };
-	return (
-		<SafeAreaView style={styles.container}>
-			<ScrollView style={styles.scrollView}>
-				
+  const handleSignIn = () => {
+    let isValid = true;
 
-				{/* Logo */}
-				{/* <Image
-					source={{ uri: "https://storage.googleapis.com/tagjs-prod.appspot.com/pNd58t8xI9/grso2jue.png" }}
-					resizeMode="stretch"
-					style={styles.image2}
-				/> */}
+    if (!email) {
+      setEmailError('Email is required');
+      isValid = false;
+    }
+    if (!emailValid) {
+      setEmailError('Please enter a valid email address');
+      isValid = false;
+    }
 
-				{/* Icon */}
-				{/* <View style={styles.view}>
-					<Image
-						source={{ uri: "https://storage.googleapis.com/tagjs-prod.appspot.com/pNd58t8xI9/uxnnbz22.png" }}
-						resizeMode="stretch"
-						style={styles.image3}
-					/>
-				</View> */}
+    if (!password) {
+      setPasswordError('Password is required');
+      isValid = false;
+    }
+    if (!passwordValid) {
+      setPasswordError('Password must be at least 6 characters');
+      isValid = false;
+    }
 
-				{/* Sign-in Heading */}
-				<View style={styles.column}>
-				<Text style={styles.text2}>
-  <Text style={{ color: 'black' }}>Please </Text>
-  <Text style={{ color: '#1EB1C5' }}>Sign In</Text>
-</Text>
-					<Text style={styles.text3}>{"Enter your Dipstore account details for a personalised experience"}</Text>
-				</View>
+    if (isValid) {
+		let signinData={
+			email,password
+		}
+		api.post("/api/login", signinData).then((res) => {
+            if (res && res.status === "400") {
+             
+			  Alert.alert("Invalid Username or Password");
+            } 
+            else {
+              AsyncStorage.setItem("user", JSON.stringify(res.data.data));
+              AsyncStorage.setItem("token", JSON.stringify(res.data.token));
+			  Alert.alert('Success', 'Logged in successfully!');
+              setTimeout(()=>{
+  navigation.navigate(" ")
+              },300)
+            }
+          }).catch((err)=>{
+			Alert.alert("Invalid Username or Password");
+          });
+      
+    }
+  };
 
-				{/* Email Input */}
-				<View style={styles.column2}>
-					<Text style={styles.text4}>{"Email"}</Text>
-					<View style={styles.buttonRow}>
-						<Image
-							source={{ uri: "https://storage.googleapis.com/tagjs-prod.appspot.com/pNd58t8xI9/vaf8uvi2.png" }}
-							resizeMode="stretch"
-							style={styles.image4}
-						/>
-						<TextInput
-							style={styles.textInput}
-							value={email}
-							onChangeText={setEmail}
-							keyboardType="email-address"
-						/>
-						<Image
-							source={{ uri: "https://storage.googleapis.com/tagjs-prod.appspot.com/pNd58t8xI9/66n4tj2x.png" }}
-							resizeMode="stretch"
-							style={styles.image5}
-						/>
-					</View>
-					{errors.email && <Text style={styles.errorText}>{errors.email}</Text>}
-					{/* Password Input */}
-					<Text style={styles.text4}>{"Password"}</Text>
-					<View style={styles.row2}>
-						<TextInput
-							placeholder="Enter password"
-							value={password}
-							onChangeText={setPassword}
-							secureTextEntry={!passwordVisible}
-							style={[styles.textInput, { flex: 1 }]}
-						/>
-						<TouchableOpacity onPress={() => setPasswordVisible(!passwordVisible)}>
-							<Image
-								source={{
-									uri: passwordVisible
-										? "https://cdn-icons-png.flaticon.com/512/2767/2767146.png" // Eye open
-										: "https://cdn-icons-png.flaticon.com/512/565/565655.png", // Eye closed
-								}}
-								resizeMode="contain"
-								style={styles.image7}
-							/>
-						</TouchableOpacity>
-					</View>
-					{errors.password && <Text style={styles.errorText}>{errors.password}</Text>}
-					{/* Forgot Password */}
-					<View style={styles.view2}>
-						<Text style={styles.text7} onPress={() => navigation.navigate('ForgotPassword')}>
-							{"Forgot Password?"}
-						</Text>
-					</View>
+  return (
+    <View style={styles.container}>
+      {/* 🔽 Image Above Title */}
+      <Image
+        source={require('../assets/signin/logscreen.png')} // Make sure this path is correct
+        style={styles.logo}
+        resizeMode="contain"
+      />
 
-					{/* Sign-in Button */}
-					<TouchableOpacity style={styles.button} onPress={handleLogin}>
-						<Text style={styles.text8}>{"Sign In"}</Text>
-					</TouchableOpacity>
-				</View>
+      <Text style={styles.title}>
+        Please <Text style={styles.highlight}>Sign In</Text>
+      </Text>
+      <Text style={styles.subtitle}>
+        Enter your Dipstore account details for a personalised experience
+      </Text>
 
-				{/* Signup Link */}
-				<View style={styles.view3}>
-					<Text style={styles.text9} onPress={() => navigation.navigate('Signup')}>
-						{"First time here? Sign Up"}
-					</Text>
-				</View>
+      {/* Email Input */}
+      <View style={styles.inputContainer}>
+        <Icon name="mail-outline" size={20} color="#9E9E9E" style={styles.icon} />
+        <TextInput
+          style={styles.input}
+          placeholder="Email"
+          keyboardType="email-address"
+          value={email}
+          onChangeText={validateEmail}
+        />
+        {emailValid && (
+          <Icon name="checkmark-circle" size={20} color="green" style={styles.iconRight} />
+        )}
+      </View>
+      {emailError !== '' && <Text style={styles.errorText}>{emailError}</Text>}
 
-				{/* Bottom Image */}
-				<View style={styles.view4}>
-					<Image
-						source={{ uri: "https://storage.googleapis.com/tagjs-prod.appspot.com/pNd58t8xI9/5zqjo0rm.png" }}
-						resizeMode="stretch"
-						style={styles.image8}
-					/>
-				</View>
-			</ScrollView>
-		</SafeAreaView>
-	);
-}
+      {/* Password Input */}
+      <View style={styles.inputContainer}>
+        <Icon name="lock-closed-outline" size={20} color="#9E9E9E" style={styles.icon} />
+        <TextInput
+          style={styles.input}
+          placeholder="Password"
+          secureTextEntry={!showPassword}
+          value={password}
+          onChangeText={validatePassword}
+        />
+        <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
+          <Icon
+            name={showPassword ? 'eye-off-outline' : 'eye-outline'}
+            size={20}
+            color="#9E9E9E"
+            style={styles.iconRight}
+          />
+        </TouchableOpacity>
+      </View>
+      {passwordError !== '' && <Text style={styles.errorText}>{passwordError}</Text>}
+
+      {/* Forgot Password */}
+      <TouchableOpacity onPress={() => Alert.alert('Forgot Password')}>
+        <Text style={styles.forgotPassword}>Forgot Password?</Text>
+      </TouchableOpacity>
+
+      {/* Sign In Button */}
+      <TouchableOpacity style={styles.button} onPress={handleSignIn}>
+        <Text style={styles.buttonText}>Sign In</Text>
+      </TouchableOpacity>
+
+      {/* Sign Up Link */}
+      <View style={styles.footer}>
+        <Text>First time here </Text>
+        <TouchableOpacity onPress={() => navigation.navigate('SignUp')}>
+          <Text style={styles.highlight}>Sign Up</Text>
+        </TouchableOpacity>
+      </View>
+    </View>
+  );
+};
+
+export default SignInScreen;
 
 const styles = StyleSheet.create({
-	container: {
-		flex: 1,
-		backgroundColor: "#FFFFFF",
-		fontFamily: 'Outfit-Regular',
-	},
-	button: {
-		alignItems: "center",
-		backgroundColor: "#1EB1C5",
-		borderRadius: 10,
-		paddingVertical: 17,
-		marginHorizontal: 1,
-		fontFamily: 'Outfit-Regular',
-	},
-	buttonRow: {
-		flexDirection: "row",
-		alignItems: "center",
-		backgroundColor: "#FFFFFF",
-		borderColor: "#EEEFEE",
-		borderRadius: 8,
-		borderWidth: 1,
-		paddingVertical: 16,
-		paddingHorizontal: 12,
-		marginBottom: 20,
-		fontFamily: 'Outfit-Regular',
-	},
-	column: {
-		marginTop:30,
-		marginBottom: 55,
-		marginHorizontal: 34,
-		fontFamily: 'Outfit-Regular',
-	},
-	column2: {
-		marginBottom: 20,
-		marginHorizontal: 30,
-		fontFamily: 'Outfit-Regular',
-	},
-	image: { width: 143, height: 54 },
-	image2: { width: 24, height: 24, marginBottom: 14, marginLeft: 30 },
-	image3: { width: 232, height: 232 },
-	image4: { width: 16, height: 16, marginRight: 10 },
-	image5: { width: 16, height: 16 },
-	image7: { width: 24, height: 24, tintColor: "#595D64" },
-	image8: { width: 100, height: 1 },
-	row: {
-		flexDirection: "row",
-		marginBottom: 14,
-		fontFamily: 'Outfit-Regular',
-	},
-	row2: {
-		flexDirection: "row",
-		backgroundColor: "#FFFFFF",
-		borderColor: "#1EB1C5",
-		borderRadius: 8,
-		borderWidth: 1,
-		paddingVertical: 12,
-		paddingHorizontal: 12,
-		marginBottom: 9,
-		alignItems: "center",
-		fontFamily: 'Outfit-Regular',
-	},
-	textInput: {
-		color: "#595E64",
-		fontSize: 14,
-		flex: 1,
-		paddingVertical: 12,
-		fontFamily: 'Outfit-Regular',
-	},
-	scrollView: {
-		flex: 1,
-		backgroundColor: "#FFFFFF",
-		fontFamily: 'Outfit-Regular',
-	},
-	errorText: { color: "red", fontSize: 12, marginBottom: 10, marginLeft: 12,fontFamily: 'Outfit-Regular', },
-	text: { color: "#373737", fontSize: 17, fontWeight: "bold", marginVertical: 18, marginLeft: 47,fontFamily: 'Outfit-Regular', },
-	text2: { color: "#000000", fontSize: 30,  textAlign: "center", marginBottom: 15,fontFamily: 'Outfit-Regular' },
-	text3: { color: "#9CA7B7", fontSize: 16, textAlign: "center",fontFamily: 'Outfit-Regular' },
-	text4: { color: "#595D64", fontSize: 16, marginBottom: 5, marginLeft: 12,fontFamily: 'Outfit-Regular', },
-	text5: { color: "#595E64", fontSize: 14, textAlign: "center", flex: 1,fontFamily: 'Outfit-Regular', },
-	text7: { color: "#1EB1C5", fontSize: 14,fontFamily: 'Outfit-Regular' },
-	text8: { color: "#FFFFFF", fontSize: 18,fontFamily: 'Outfit-Regular' },
-	text9: { color: "#595D64", fontSize: 14, fontFamily: 'Outfit-Regular' },
-	view: { alignItems: "center", marginBottom: 36,fontFamily: 'Outfit-Regular' },
-	view2: { alignItems: "flex-end", marginBottom: 40 ,fontFamily: 'Outfit-Regular' },
-	view3: { alignItems: "center", marginBottom: 22 ,fontFamily: 'Outfit-Regular'},
-	view4: { height: 1, alignItems: "center", marginBottom: 16,fontFamily: 'Outfit-Regular' },
+  container: {
+    flex: 1,
+    padding: 20,
+    justifyContent: 'center',
+    backgroundColor: '#fff',
+  },
+  logo: {
+    width: 160,
+    height: 160,
+    alignSelf: 'center',
+    marginBottom: 10,
+  },
+  title: {
+    fontSize: 24,
+    textAlign: 'center',
+    fontFamily: 'Outfit-Regular',
+  },
+  highlight: {
+    color: '#00B4D8',
+    fontFamily: 'Outfit-Regular',
+  },
+  subtitle: {
+    textAlign: 'center',
+    color: '#9E9E9E',
+    marginVertical: 10,
+    fontSize: 13,
+    fontFamily: 'Outfit-Regular',
+  },
+  inputContainer: {
+    flexDirection: 'row',
+    borderWidth: 1,
+    borderColor: '#E0E0E0',
+    borderRadius: 8,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    alignItems: 'center',
+    marginTop: 15,
+  },
+  input: {
+    flex: 1,
+    marginLeft: 8,
+    fontSize: 14,
+    paddingVertical: 4,
+    fontFamily: 'Outfit-Regular',
+  },
+  icon: {
+    marginRight: 5,
+  },
+  iconRight: {
+    marginLeft: 5,
+  },
+  errorText: {
+    color: 'red',
+    fontSize: 12,
+    marginTop: 4,
+    marginLeft: 4,
+    fontFamily: 'Outfit-Regular',
+  },
+  forgotPassword: {
+    color: '#00B4D8',
+    textAlign: 'right',
+    marginTop: 10,
+    marginBottom: 20,
+    fontFamily: 'Outfit-Regular',
+  },
+  button: {
+    backgroundColor: '#00B4D8',
+    paddingVertical: 12,
+    borderRadius: 10,
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  buttonText: {
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 16,
+    fontFamily: 'Outfit-Regular',
+  },
+  footer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    fontFamily: 'Outfit-Regular',
+  },
 });

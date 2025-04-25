@@ -1,5 +1,5 @@
 import React, { useState,useEffect } from 'react';
-import { View, StyleSheet, TouchableOpacity, TextInput, ScrollView, Alert } from 'react-native';
+import { View, StyleSheet, TouchableOpacity, TextInput, ScrollView, Alert,useColorScheme,ActivityIndicator } from 'react-native';
 import { Text, Button, Avatar, Divider } from 'react-native-paper';
 import api from '../constants/api';
 import imageBase from '../constants/imageBase';
@@ -7,6 +7,12 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import AddressSection from '../components/AddressSection';
 
 const Profile = ({ navigation }) => {
+
+  const colorScheme = useColorScheme();
+const isDarkMode = colorScheme === 'dark';
+const textColor = isDarkMode ? '#fff' : '#000'; 
+const [loading, setLoading] = useState(true);
+
   const [editing, setEditing] = useState(false);
   const [user, setUser] = useState({});
   const [userData, setUserData] = useState();
@@ -14,21 +20,21 @@ const Profile = ({ navigation }) => {
   const [allcountries, setallCountries] = useState();
   const [imageUrl, setImageUrl] = useState("");
   const [profile, setProfile] = useState({
-    first_name: 'Jane Doe',
-    bio: '',
-    email: 'jane@example.com',
-    avatar: 'https://i.pravatar.cc/150?img=12',
-    mobile: '',
-    gst: '',
-    fssai: '',
-    iec: '',
-    pan: '',
-    address1: '',
-    address2: '',
-    address_area: '',
-    address_city: '',
-    address_state: '',
-    address_po_code: '',
+    // first_name: '',
+    // bio: '',
+    // email: '',
+    // avatar: '',
+    // mobile: '',
+    // gst: '',
+    // fssai: '',
+    // iec: '',
+    // pan: '',
+    // address1: '',
+    // address2: '',
+    // address_area: '',
+    // address_city: '',
+    // address_state: '',
+    // address_po_code: '',
   });
   const getUser = () => {
     api
@@ -104,15 +110,17 @@ const Profile = ({ navigation }) => {
             const user = jsonValue != null ? JSON.parse(jsonValue) : null;
             setUser(user);
             if (user) {
-                setUser(user);
+              setLoading(true); 
                 api
                 .post("/contact/getContactsById", { contact_id: user.contact_id })
                 .then((res) => {
                   console.log('profile',res.data.data[0])
                   setProfile(res.data.data[0]);
+                  setLoading(false);
                 })
                 .catch((err) => {
                   console.log(err);
+                  setLoading(false);
                 });
                 getAllCountries();
             }
@@ -140,8 +148,13 @@ const Profile = ({ navigation }) => {
       });
   }, [user.contact_id]);
 
-  return (
+  return loading ? (
+    <View style={styles.loaderContainer}>
+      <ActivityIndicator size="large" color="#007AFF" />
+    </View>
+  ) : (
     <ScrollView contentContainerStyle={styles.container}>
+       
       <TouchableOpacity disabled={!editing}>
         <Avatar.Image size={100} source={{ uri: profile?.avatar }} />
       </TouchableOpacity>
@@ -149,43 +162,136 @@ const Profile = ({ navigation }) => {
       {editing ? (
         <>
           {/* Personal & Business Info */}
-          <TextInput style={styles.input} value={profile?.first_name} onChangeText={text => handleChange('first_name', text)} placeholder="Name" />
-          <TextInput style={styles.input} value={profile?.bio} onChangeText={text => handleChange('bio', text)} placeholder="Bio" />
-          <TextInput style={styles.input} value={profile?.email} onChangeText={text => handleChange('email', text)} placeholder="Email" keyboardType="email-address" />
-          <TextInput style={styles.input} value={profile?.mobile} onChangeText={text => handleChange('mobile', text)} placeholder="Mobile" keyboardType="phone-pad" />
-          <TextInput style={styles.input} value={profile?.gst} onChangeText={text => handleChange('gst', text)} placeholder="GST Number" />
-          <TextInput style={styles.input} value={profile?.fssai} onChangeText={text => handleChange('fssai', text)} placeholder="FSSAI Number" />
-          <TextInput style={styles.input} value={profile?.iec} onChangeText={text => handleChange('iec', text)} placeholder="IEC Code" />
-          <TextInput style={styles.input} value={profile?.pan} onChangeText={text => handleChange('pan', text)} placeholder="PAN Number" />
+          <TextInput style={[
+    styles.input,
+    {
+      color: isDarkMode ? '#fff' : '#000',
+      borderBottomColor: isDarkMode ? '#666' : '#ccc',
+      placeholderTextColor: isDarkMode ? '#aaa' : '#888'
+    }
+  ]} value={profile?.first_name} onChangeText={text => handleChange('first_name', text)} placeholder="Name" placeholderTextColor={isDarkMode ? '#aaa' : '#888'} />
+          <TextInput style={[
+    styles.input,
+    {
+      color: isDarkMode ? '#fff' : '#000',
+      borderBottomColor: isDarkMode ? '#666' : '#ccc',
+      placeholderTextColor: isDarkMode ? '#aaa' : '#888'
+    }
+  ]} value={profile?.bio} onChangeText={text => handleChange('bio', text)} placeholder="Bio" placeholderTextColor={isDarkMode ? '#aaa' : '#888'}/>
+          <TextInput style={[
+    styles.input,
+    {
+      color: isDarkMode ? '#fff' : '#000',
+      borderBottomColor: isDarkMode ? '#666' : '#ccc',
+      placeholderTextColor: isDarkMode ? '#aaa' : '#888'
+    }
+  ]} value={profile?.email} onChangeText={text => handleChange('email', text)} placeholder="Email" keyboardType="email-address" placeholderTextColor={isDarkMode ? '#aaa' : '#888'}/>
+          <TextInput style={[
+    styles.input,
+    {
+      color: isDarkMode ? '#fff' : '#000',
+      borderBottomColor: isDarkMode ? '#666' : '#ccc',
+      placeholderTextColor: isDarkMode ? '#aaa' : '#888'
+    }
+  ]} value={profile?.mobile} onChangeText={text => handleChange('mobile', text)} placeholder="Mobile" keyboardType="phone-pad" placeholderTextColor={isDarkMode ? '#aaa' : '#888'}/>
+          <TextInput style={[
+    styles.input,
+    {
+      color: isDarkMode ? '#fff' : '#000',
+      borderBottomColor: isDarkMode ? '#666' : '#ccc',
+      placeholderTextColor: isDarkMode ? '#aaa' : '#888'
+    }
+  ]} value={profile?.gst} onChangeText={text => handleChange('gst', text)} placeholder="GST Number" placeholderTextColor={isDarkMode ? '#aaa' : '#888'}/>
+          <TextInput style={[
+    styles.input,
+    {
+      color: isDarkMode ? '#fff' : '#000',
+      borderBottomColor: isDarkMode ? '#666' : '#ccc',
+      placeholderTextColor: isDarkMode ? '#aaa' : '#888'
+    }
+  ]} value={profile?.fssai} onChangeText={text => handleChange('fssai', text)} placeholder="FSSAI Number" placeholderTextColor={isDarkMode ? '#aaa' : '#888'}/>
+          <TextInput style={[
+    styles.input,
+    {
+      color: isDarkMode ? '#fff' : '#000',
+      borderBottomColor: isDarkMode ? '#666' : '#ccc',
+      placeholderTextColor: isDarkMode ? '#aaa' : '#888'
+    }
+  ]} value={profile?.iec} onChangeText={text => handleChange('iec', text)} placeholder="IEC Code" placeholderTextColor={isDarkMode ? '#aaa' : '#888'}/>
+          <TextInput style={[
+    styles.input,
+    {
+      color: isDarkMode ? '#fff' : '#000',
+      borderBottomColor: isDarkMode ? '#666' : '#ccc',
+      placeholderTextColor: isDarkMode ? '#aaa' : '#888'
+    }
+  ]} value={profile?.pan} onChangeText={text => handleChange('pan', text)} placeholder="PAN Number" placeholderTextColor={isDarkMode ? '#aaa' : '#888'}/>
 
           {/* Address Section Header */}
           <Text style={styles.sectionHeader}>Address Details</Text>
-          <TextInput style={styles.input} value={profile?.address1} onChangeText={text => handleChange('address1', text)} placeholder="Address Line 1" />
-          <TextInput style={styles.input} value={profile?.address2} onChangeText={text => handleChange('address2', text)} placeholder="Address Line 2" />
-          <TextInput style={styles.input} value={profile?.address_area} onChangeText={text => handleChange('address_area', text)} placeholder="Area" />
-          <TextInput style={styles.input} value={profile?.address_city} onChangeText={text => handleChange('address_city', text)} placeholder="City" />
-          <TextInput style={styles.input} value={profile?.address_state} onChangeText={text => handleChange('address_state', text)} placeholder="State" />
-          <TextInput style={styles.input} value={profile?.address_po_code} onChangeText={text => handleChange('address_po_code', text)} placeholder="Postal Code" keyboardType="number-pad" />
+          <TextInput style={[
+    styles.input,
+    {
+      color: isDarkMode ? '#fff' : '#000',
+      borderBottomColor: isDarkMode ? '#666' : '#ccc',
+      placeholderTextColor: isDarkMode ? '#aaa' : '#888'
+    }
+  ]} value={profile?.address1} onChangeText={text => handleChange('address1', text)} placeholder="Address Line 1" placeholderTextColor={isDarkMode ? '#aaa' : '#888'}/>
+          <TextInput style={[
+    styles.input,
+    {
+      color: isDarkMode ? '#fff' : '#000',
+      borderBottomColor: isDarkMode ? '#666' : '#ccc',
+      placeholderTextColor: isDarkMode ? '#aaa' : '#888'
+    }
+  ]} value={profile?.address2} onChangeText={text => handleChange('address2', text)} placeholder="Address Line 2" placeholderTextColor={isDarkMode ? '#aaa' : '#888'}/>
+          <TextInput style={[
+    styles.input,
+    {
+      color: isDarkMode ? '#fff' : '#000',
+      borderBottomColor: isDarkMode ? '#666' : '#ccc',
+      placeholderTextColor: isDarkMode ? '#aaa' : '#888'
+    }
+  ]} value={profile?.address_area} onChangeText={text => handleChange('address_area', text)} placeholder="Area" placeholderTextColor={isDarkMode ? '#aaa' : '#888'}/>
+          <TextInput style={[
+    styles.input,
+    {
+      color: isDarkMode ? '#fff' : '#000',
+      borderBottomColor: isDarkMode ? '#666' : '#ccc',
+      placeholderTextColor: isDarkMode ? '#aaa' : '#888'
+    }
+  ]} value={profile?.address_city} onChangeText={text => handleChange('address_city', text)} placeholder="City" placeholderTextColor={isDarkMode ? '#aaa' : '#888'}/>
+          <TextInput style={[
+    styles.input,
+    {
+      color: isDarkMode ? '#fff' : '#000',
+      borderBottomColor: isDarkMode ? '#666' : '#ccc',
+      placeholderTextColor: isDarkMode ? '#aaa' : '#888'
+    }
+  ]} value={profile?.address_state} onChangeText={text => handleChange('address_state', text)} placeholder="State" placeholderTextColor={isDarkMode ? '#aaa' : '#888'}/>
+          <TextInput style={[
+    styles.input,
+    {
+      color: isDarkMode ? '#fff' : '#000',
+      borderBottomColor: isDarkMode ? '#666' : '#ccc',
+      placeholderTextColor: isDarkMode ? '#aaa' : '#888'
+    }
+  ]} value={profile?.address_po_code} onChangeText={text => handleChange('address_po_code', text)} placeholder="Postal Code" keyboardType="number-pad" placeholderTextColor={isDarkMode ? '#aaa' : '#888'}/>
         </>
       ) : (
         <>
           {/* Personal & Business Info Display */}
-          <Text style={styles.name}>{profile?.first_name}</Text>
-          <Text style={styles.bio}>{profile?.bio}</Text>
-          <Text style={styles.email}>{profile?.email}</Text>
-          <Text style={styles.info}>Mobile: {profile?.mobile}</Text>
-          <Text style={styles.info}>GST: {profile?.gst}</Text>
-          <Text style={styles.info}>FSSAI: {profile?.fssai}</Text>
-          <Text style={styles.info}>IEC: {profile?.iec}</Text>
-          <Text style={styles.info}>PAN: {profile?.pan}</Text>
+          <Text style={[styles.name, { color: textColor }]}>{profile?.first_name}</Text>
+<Text style={[styles.bio, { color: textColor }]}>{profile?.bio}</Text>
+<Text style={[styles.email, { color: textColor }]}>{profile?.email}</Text>
+<Text style={[styles.info, { color: textColor }]}>Mobile: {profile?.mobile}</Text>
+<Text style={[styles.info, { color: textColor }]}>GST: {profile?.gst}</Text>
+<Text style={[styles.info, { color: textColor }]}>FSSAI: {profile?.fssai}</Text>
+<Text style={[styles.info, { color: textColor }]}>IEC: {profile?.iec}</Text>
+<Text style={[styles.info, { color: textColor }]}>PAN: {profile?.pan}</Text>
 
-          {/* <Text style={styles.sectionHeader}>Address Details</Text>
-          <Text style={styles.address}>{profile?.address1}</Text>
-          <Text style={styles.address}>{profile?.address2}</Text>
-          <Text style={styles.address}>{profile?.address_area}</Text>
-          <Text style={styles.address}>{profile?.address_city}</Text>
-          <Text style={styles.address}>{profile?.address_state}</Text>
-          <Text style={styles.address}>{profile?.address_po_code}</Text> */}
+
+        
 
           <AddressSection profile={profile} />
         </>
@@ -205,6 +311,8 @@ const Profile = ({ navigation }) => {
       >
         {'Save'}
       </Button>}
+     
+    
     </ScrollView>
   );
 };
@@ -213,11 +321,10 @@ const styles = StyleSheet.create({
   container: {
     padding: 24,
     alignItems: 'center',
-    backgroundColor: '#f7f7f7',
+    backgroundColor:'#f7f7f7',
     flexGrow: 1,
     fontFamily: 'Outfit-Regular',
-
-  },
+  },  
   name: {
     fontSize: 24,
     marginVertical: 8,
@@ -261,11 +368,9 @@ const styles = StyleSheet.create({
   input: {
     width: '90%',
     borderBottomWidth: 1,
-    borderBottomColor: '#ccc',
     marginBottom: 12,
     fontSize: 16,
     fontFamily: 'Outfit-Regular',
-
   },
   sectionHeader: {
     fontSize: 18,

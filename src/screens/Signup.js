@@ -1,32 +1,20 @@
-import React, { useState, useEffect } from "react";
-import {
-  SafeAreaView,
-  View,
-  ScrollView,
-  Text,
-  Image,
-  TextInput,
-  TouchableOpacity,
-  StyleSheet,
-  Alert,
-} from "react-native";
-import api from "../constants/api"; // make sure this is your actual API setup
+import React, { useState, useEffect } from 'react';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, ScrollView, Alert } from 'react-native';
+import api from '../constants/api';
 
-export default ({ navigation }) => {
+const SignUpScreen = ({navigation}) => {
   const [signupData, setSignupData] = useState({
-    name: '',
+    first_name: '',
     mobile: '',
     email: '',
     password: '',
   });
-  const [passwordVisible, setPasswordVisible] = useState(false);
-  const [mailId, setMailId] = useState("");
-  const [otp, setOTP] = useState("");
 
-  useEffect(() => {
-    getEmail();
-    generateOTP();
-  }, []);
+  const [formErrors, setFormErrors] = useState({});
+  const [passwordVisible, setPasswordVisible] = useState(false);
+  const [otp, setOTP] = useState('');
+  const [mailId, setmailId] = useState('');
+  const [userMessage, setMessage] = useState('');
 
   const generateOTP = () => {
     const min = 1000;
@@ -37,389 +25,289 @@ export default ({ navigation }) => {
 
   const getEmail = () => {
     api.get("/setting/getMailId").then((res) => {
-      setMailId(res.data.data[0]);
+      setmailId(res.data.data[0]);
     });
   };
 
-  const handleSignUp = async () => {
-    // Name validation
-    const nameRegex = /^[a-zA-Z ]+$/;
-    if (!signupData.name || !nameRegex.test(signupData.name)) {
-      Alert.alert("Validation Error", "Please enter a valid name.");
-      return;
+  const getMessage = () => {
+    api.get("/setting/getMessage").then((res) => {
+      setMessage(res.data.data[0]);
+    });
+  };
+
+  const validateForm = () => {
+    const errors = {};
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const mobileRegex = /^[6-9]\d{9}$/;
+
+    if (!signupData.first_name.trim()) {
+      errors.first_name = 'First Name is required';
     }
 
-    // Mobile validation
-    const mobileRegex = /^(\+91[-\s]?)?[6-9]\d{9}$/; // Indian mobile format example: +91-XXXXXXXXXX
-    if (!signupData.mobile || !mobileRegex.test(signupData.mobile)) {
-      Alert.alert("Validation Error", "Please enter a valid mobile number.");
-      return;
+    if (!signupData.mobile.trim()) {
+      errors.mobile = 'Mobile Number is required';
+    } else if (!mobileRegex.test(signupData.mobile.trim())) {
+      errors.mobile = 'Enter a valid 10-digit mobile number';
     }
 
-    // Email validation
-    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-    if (!signupData.email || !emailRegex.test(signupData.email)) {
-      Alert.alert("Validation Error", "Please enter a valid email address.");
-      return;
+    if (!signupData.email.trim()) {
+      errors.email = 'Email is required';
+    } else if (!emailRegex.test(signupData.email.trim())) {
+      errors.email = 'Enter a valid email address';
     }
 
-    // Password validation
-    if (!signupData.password || signupData.password.length < 6) {
-      Alert.alert("Validation Error", "Password must be at least 6 characters long.");
-      return;
+    if (!signupData.password.trim()) {
+      errors.password = 'Password is required';
+    } else if (signupData.password.length < 6) {
+      errors.password = 'Password should be at least 6 characters';
     }
 
-    const formData = {
-      first_name: signupData.name,
-      mobile: signupData.mobile,
-      email: signupData.email,
-      password: signupData.password,
-    };
-
-    try {
-      const res = await api.post("/api/register", formData);
-      Alert.alert("Success", "Account created successfully!");
-      sendMail();
-      navigation.navigate("LoginPage");
-    } catch (error) {
-      console.error("Signup error", error);
-      Alert.alert("Error", "Something went wrong while signing up.");
-    }
+    setFormErrors(errors);
+    return Object.keys(errors).length === 0;
   };
 
   const sendMail = () => {
-    const to = mailId.email;
-    const text = JSON.stringify(signupData);
+    const to = signupData.email;
     const subject = "Registration";
+
+    api
+      .post("/commonApi/sendUseremail", { to, subject })
+      .then((res) => {
+        console.log(res.data.data);
+        Alert.alert("Registration Email has been sent successfully");
+
+        navigation.navigate('LoginPage')
+      })
+      .catch((err) => {
+        Alert.alert("Registration Email already exists");
+      });
+
+    const adminTo = mailId.email;
+    const text = JSON.stringify(signupData);
     const dynamic_template_data = {
-      first_name: signupData.name,
+      first_name: signupData.first_name,
       email: signupData.email,
       password: signupData.password,
     };
     api
       .post("/commonApi/sendregisteremail", {
-        to,
+        to: adminTo,
         text,
         subject,
         dynamic_template_data,
       })
-      .then(() => {
-        Alert.alert("Success", "Registration Email has been sent successfully.");
-      })
-      .catch((err) => {
-        console.error("Email error", err);
-        Alert.alert("Error", "Error sending email.");
-      });
+      .then(() => {});
   };
 
-  const handleChange = (field, value) => {
-    setSignupData(prevState => ({
-      ...prevState,
-      [field]: value,
-    }));
+  const handleSignup = () => {
+    if (validateForm()) {
+      console.log('Form Submitted:', signupData);
+      const signupPayload = {
+        ...signupData,
+        otp_no: otp,
+        creation_date: new Date().toLocaleString(),
+        date_of_creation: new Date().toLocaleString(),
+      };
+      api
+        .post("/api/register", signupPayload)
+        .then((res) => {
+          console.log(res.data.data);
+          console.log('OTP:', otp);
+          Alert.alert("Registered Successfully");
+          sendMail();
+        })
+        .catch((err) => {
+          Alert.alert("This Email is already Registered");
+        });
+
+      setSignupData({ first_name: '', mobile: '', email: '', password: '' });
+      setFormErrors({});
+    }
   };
+
+  useEffect(() => {
+    getEmail();
+    getMessage();
+    generateOTP();
+  }, []);
 
   return (
-    <SafeAreaView style={styles.container}>
-      <ScrollView style={styles.scrollView}>
-        <View style={styles.column}>
-          <Text style={styles.text2}>Create New Account</Text>
-          <Text style={styles.text3}>
-            Looks like you don't have an account or connect with social networks
-          </Text>
-        </View>
+    <ScrollView contentContainerStyle={styles.container}>
+      <Text style={styles.title}>
+        Create <Text style={styles.titleHighlight}>New Account</Text>
+      </Text>
+      <Text style={styles.subtitle}>Looks like you don't have an account or connect with social networks</Text>
 
-        <Text style={styles.text4}>Full Name</Text>
+      <Text style={styles.label}>First Name</Text>
+      <TextInput
+        placeholder="John"
+        style={styles.input}
+        value={signupData.first_name}
+        onChangeText={(text) => {
+          setSignupData({ ...signupData, first_name: text });
+          setFormErrors({ ...formErrors, first_name: '' });
+        }}
+      />
+      {formErrors.first_name && <Text style={styles.errorText}>{formErrors.first_name}</Text>}
+
+      <Text style={styles.label}>Mobile No.</Text>
+      <TextInput
+        placeholder="+91- XXX XXXXX XXX"
+        style={styles.input}
+        keyboardType="numeric"
+        value={signupData.mobile}
+        onChangeText={(text) => {
+          setSignupData({ ...signupData, mobile: text });
+          setFormErrors({ ...formErrors, mobile: '' });
+        }}
+      />
+      {formErrors.mobile && <Text style={styles.errorText}>{formErrors.mobile}</Text>}
+
+      <Text style={styles.label}>Email Id</Text>
+      <TextInput
+        placeholder="eg: smartwave@gmail.com"
+        style={styles.input}
+        keyboardType="email-address"
+        value={signupData.email}
+        onChangeText={(text) => {
+          setSignupData({ ...signupData, email: text });
+          setFormErrors({ ...formErrors, email: '' });
+        }}
+      />
+      {formErrors.email && <Text style={styles.errorText}>{formErrors.email}</Text>}
+
+      <Text style={styles.label}>Password</Text>
+      <View style={styles.passwordContainer}>
         <TextInput
-          placeholder="John Watson"
-          value={signupData.name}
-          onChangeText={(value) => handleChange("name", value)}
-          style={styles.input}
+          placeholder="Enter your password"
+          style={styles.passwordInput}
+          secureTextEntry={!passwordVisible}
+          value={signupData.password}
+          onChangeText={(text) => {
+            setSignupData({ ...signupData, password: text });
+            setFormErrors({ ...formErrors, password: '' });
+          }}
         />
-
-        <Text style={styles.text4}>Mobile No.</Text>
-        <TextInput
-          placeholder="+91- XXX XXXX XXX"
-          value={signupData.mobile}
-          onChangeText={(value) => handleChange("mobile", value)}
-          style={styles.input2}
-        />
-
-        <Text style={styles.text4}>Email Id</Text>
-        <TextInput
-          placeholder="eg: smartwave@gmail.com"
-          value={signupData.email}
-          onChangeText={(value) => handleChange("email", value)}
-          style={styles.input3}
-        />
-
-        <Text style={styles.text7}>Password</Text>
-        <View style={styles.row2}>
-          <TextInput
-            placeholder="Enter your password"
-            value={signupData.password}
-            onChangeText={(value) => handleChange("password", value)}
-            secureTextEntry={!passwordVisible}
-            style={[styles.passinput, { flex: 1 }]}
-          />
-          <TouchableOpacity onPress={() => setPasswordVisible(!passwordVisible)}>
-            <Image
-              source={{
-                uri: passwordVisible
-                  ? "https://cdn-icons-png.flaticon.com/512/2767/2767146.png"
-                  : "https://cdn-icons-png.flaticon.com/512/565/565655.png",
-              }}
-              resizeMode="contain"
-              style={styles.passimage}
-            />
-          </TouchableOpacity>
-        </View>
-
-        <TouchableOpacity style={styles.button} onPress={handleSignUp}>
-          <Text style={styles.text9}>Sign Up</Text>
-        </TouchableOpacity>
-
-        <View style={styles.view2}>
-          <Text
-            style={styles.text10}
-            onPress={() => navigation.navigate("LoginPage")}
-          >
-            Already have an account? Login
-          </Text>
-        </View>
-
-        <View style={styles.view3}>
+        <TouchableOpacity onPress={() => setPasswordVisible(!passwordVisible)}>
           <Image
             source={{
-              uri: "https://storage.googleapis.com/tagjs-prod.appspot.com/pNd58t8xI9/jq40nop0.png",
+              uri: passwordVisible
+                ? "https://cdn-icons-png.flaticon.com/512/2767/2767146.png"
+                : "https://cdn-icons-png.flaticon.com/512/565/565655.png",
             }}
-            resizeMode="stretch"
-            style={styles.image3}
+            resizeMode="contain"
+            style={styles.eyeIcon}
           />
-        </View>
-      </ScrollView>
-    </SafeAreaView>
+        </TouchableOpacity>
+      </View>
+      {formErrors.password && <Text style={styles.errorText}>{formErrors.password}</Text>}
+
+      <TouchableOpacity style={styles.button} onPress={handleSignup}>
+        <Text style={styles.buttonText}>Sign Up</Text>
+      </TouchableOpacity>
+
+      <Text style={styles.loginText}>
+        Already have an account? <TouchableOpacity style={styles.button} onPress={navigation.navigate('LoginPage')}><Text style={styles.loginLink}>Login</Text></TouchableOpacity>      </Text>
+    </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
-	container: {
-		flex: 1,
-		backgroundColor: "#FFFFFF",
-    fontFamily: 'Outfit-Regular'
-	},
-	button: {
-		alignItems: "center",
-		backgroundColor: "#1EB1C5",
-		borderRadius: 10,
-		paddingVertical: 17,
-		marginBottom: 20,
-		marginHorizontal: 30,
+  container: {
+    padding: 24,
+    paddingTop: 60,
+    backgroundColor: '#fff',
+    flexGrow: 1,
     fontFamily: 'Outfit-Regular',
-	},
-	column: {
-		marginBottom: 75,
-		marginHorizontal: 34,
+  },
+  title: {
+    fontSize: 26,
+    fontWeight: '600',
+    textAlign: 'center',
+    marginBottom: 8,
     fontFamily: 'Outfit-Regular',
-	},
-	image: {
-		width: 143,
-		height: 54,
-	},
-	image2: {
-		width: 16,
-		height: 16,
-		marginTop: 14,
-	},
-	image3: {
-		width: 86,
-		height: 1,
-	},
-	input: {
-		color: "#595E64",
-		fontSize: 14,
-		marginBottom: 20,
-		marginHorizontal: 30,
-		backgroundColor: "#FFFFFF",
-		borderColor: "#EEEFEE",
-		borderRadius: 8,
-		borderWidth: 1,
-		paddingVertical: 16,
-		paddingLeft: 12,
-		paddingRight: 24,
+  },
+  titleHighlight: {
+    color: '#00B2B2',
     fontFamily: 'Outfit-Regular',
-	},
-	input2: {
-		color: "#9CA7B7",
-		fontSize: 14,
-		marginBottom: 20,
-		marginHorizontal: 30,
-		backgroundColor: "#FFFFFF",
-		borderColor: "#EEEFEE",
-		borderRadius: 8,
-		borderWidth: 1,
-		paddingVertical: 16,
-		paddingLeft: 12,
-		paddingRight: 24,
+  },
+  subtitle: {
+    textAlign: 'center',
+    color: '#8e8e93',
+    fontSize: 14,
+    marginBottom: 32,
     fontFamily: 'Outfit-Regular',
-	},
-	input3: {
-		color: "#9CA7B7",
-		fontSize: 14,
-		marginBottom: 20,
-		marginHorizontal: 30,
-		backgroundColor: "#FFFFFF",
-		borderColor: "#EEEFEE",
-		borderRadius: 8,
-		borderWidth: 1,
-		paddingVertical: 16,
-		paddingLeft: 12,
-		paddingRight: 24,
+  },
+  label: {
+    fontSize: 14,
+    marginBottom: 6,
+    marginTop: 12,
     fontFamily: 'Outfit-Regular',
-	},
-	row: {
-		flexDirection: "row",
-		marginBottom: 66,
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 10,
+    padding: 12,
+    marginBottom: 4,
+    fontSize: 14,
+    backgroundColor: '#fafafa',
     fontFamily: 'Outfit-Regular',
-	},
-	row2: {
-		flexDirection: "row",
-		justifyContent: "space-between",
-		backgroundColor: "#FFFFFF",
-		borderColor: "#EEEFEE",
-		borderRadius: 8,
-		borderWidth: 1,
-		paddingTop: 3,
-		paddingBottom: 17,
-		paddingLeft: 12,
-		paddingRight: 26,
-		marginBottom: 20,
-		marginHorizontal: 30,
+  },
+  passwordContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 10,
+    paddingHorizontal: 12,
+    backgroundColor: '#fafafa',
     fontFamily: 'Outfit-Regular',
-	},
-	scrollView: {
-		flex: 1,
-		backgroundColor: "#FFFFFF",
+  },
+  passwordInput: {
+    flex: 1,
+    height: 48,
+    fontSize: 14,
     fontFamily: 'Outfit-Regular',
-	},
-	text: {
-		color: "#373737",
-		fontSize: 17,
-		fontWeight: "bold",
-		marginVertical: 18,
-		marginLeft: 47,
-		marginRight: 59,
+  },
+  eyeIcon: {
+    width: 24,
+    height: 24,
+    tintColor: '#999',
     fontFamily: 'Outfit-Regular',
-	},
-	text2: {
-		color: "#000000",
-		fontSize: 30,
-		//fontWeight: "bold",
-		textAlign: "center",
-		marginBottom: 15,
+  },
+  errorText: {
+    color: 'red',
+    fontSize: 12,
+    marginBottom: 4,
     fontFamily: 'Outfit-Regular',
-	},
-	text3: {
-		color: "#9CA7B7",
-		fontSize: 16,
-		textAlign: "center",
+  },
+  button: {
+    backgroundColor: '#00B2B2',
+    paddingVertical: 14,
+    borderRadius: 12,
+    marginTop: 24,
+    alignItems: 'center',
     fontFamily: 'Outfit-Regular',
-	},
-	text4: {
-		color: "#595D64",
-		fontSize: 16,
-		marginBottom: 5,
-		marginLeft: 30,
+  },
+  buttonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
     fontFamily: 'Outfit-Regular',
-	},
-	text5: {
-		color: "#595D64",
-		fontSize: 16,
-		marginBottom: 5,
-		marginLeft: 33,
+  },
+  loginText: {
+    marginTop: 20,
+    textAlign: 'center',
+    fontSize: 14,
+    color: '#888',
     fontFamily: 'Outfit-Regular',
-	},
-	text6: {
-		color: "#595E64",
-		fontSize: 14,
-		marginLeft: 12,
+  },
+  loginLink: {
+    color: '#00B2B2',
+    fontWeight: '500',
     fontFamily: 'Outfit-Regular',
-	},
-	text7: {
-		color: "#595D64",
-		marginBottom: 5,
-		marginLeft: 30,
-    fontFamily: 'Outfit-Regular',
-	},
-	text8: {
-		color: "#595E64",
-    fontFamily: 'Outfit-Regular',
-	},
-	text9: {
-		color: "#FFFFFF",
-		fontSize: 18,
-    fontFamily: 'Outfit-Regular',
-	},
-	text10: {
-		color: "#595D64",
-		fontSize: 14,
-    fontFamily: 'Outfit-Regular',
-	},
-	view: {
-		backgroundColor: "#FFFFFF",
-		borderColor: "#EEEFEE",
-		borderRadius: 8,
-		borderWidth: 1,
-		paddingTop: 16,
-		paddingBottom: 41,
-		marginBottom: 20,
-		marginHorizontal: 30,
-    fontFamily: 'Outfit-Regular',
-	},
-	view2: {
-		alignItems: "center",
-		marginBottom: 51,
-    fontFamily: 'Outfit-Regular',
-	},
-	view3: {
-		height: 18,
-		alignItems: "center",
-		marginBottom: 18,
-    fontFamily: 'Outfit-Regular',
-	},
-	passtext: {
-        color: "#595D64",
-        marginBottom: 5,
-        marginLeft: 30,
-        fontFamily: 'Outfit-Regular',
-    },
-    passrow: {
-        flexDirection: "row",
-        alignItems: "center",
-        backgroundColor: "#FFFFFF",
-        borderColor: "#EEEFEE",
-        borderRadius: 8,
-        borderWidth: 1,
-        paddingVertical: 10,
-        paddingLeft: 12,
-        paddingRight: 10,
-        marginBottom: 20,
-        marginHorizontal: 30,
-        fontFamily: 'Outfit-Regular',
-    },
-    passinput: {
-        color: "#595E64",
-        fontSize: 14,
-        backgroundColor: "#FFFFFF",
-        flex: 1,
-        paddingVertical: 12,
-        paddingLeft: 10,
-        fontFamily: 'Outfit-Regular',
-    },
-    passimage: {
-        width: 24,
-        height: 24,
-        tintColor: "#595D64", // Adjust icon color if needed
-        fontFamily: 'Outfit-Regular',
-    },
+  },
 });
+
+export default SignUpScreen;

@@ -1,440 +1,178 @@
-import React from "react";
-import { SafeAreaView, View, ScrollView, Text, Image, TouchableOpacity, StyleSheet, } from "react-native";
-export default (props) => {
-	return (
-		<SafeAreaView style={styles.container}>
-			<ScrollView  style={styles.scrollView}>
-				<View style={styles.column}>
-					<View style={styles.row}>
-						<Text style={styles.text}>
-							{"9:41"}
-						</Text>
-						<Image
-							source = {{uri: "https://storage.googleapis.com/tagjs-prod.appspot.com/pNd58t8xI9/p914nldc.png"}} 
-							resizeMode = {"stretch"}
-							style={styles.image}
-						/>
-					</View>
-					<View style={styles.row2}>
-						<Image
-							source = {{uri: "https://storage.googleapis.com/tagjs-prod.appspot.com/pNd58t8xI9/45f10auz.png"}} 
-							resizeMode = {"stretch"}
-							style={styles.image2}
-						/>
-						<Text style={styles.text2}>
-							{"Enquiry History"}
-						</Text>
-					</View>
-				</View>
-				<View style={styles.row3}>
-					<View style={styles.column2}>
-						<View style={styles.view}>
-							<Text style={styles.text3}>
-								{"Total Enquiries"}
-							</Text>
-						</View>
-						<View style={styles.view2}>
-							<Text style={styles.text4}>
-								{"24"}
-							</Text>
-						</View>
-					</View>
-					<TouchableOpacity style={styles.buttonColumn} onPress={()=>alert('Pressed!')}>
-						<Text style={styles.text5}>
-							{"Pending"}
-						</Text>
-						<Text style={styles.text6}>
-							{"3"}
-						</Text>
-					</TouchableOpacity>
-				</View>
-				<View style={styles.column3}>
-					<View style={styles.row4}>
-						<View style={styles.column4}>
-							<Text style={styles.text7}>
-								{"E-ID #2025-0123"}
-							</Text>
-							<Text style={styles.text8}>
-								{"Jan 15, 2025"}
-							</Text>
-						</View>
-						<TouchableOpacity style={styles.button} onPress={()=>alert('Pressed!')}>
-							<Text style={styles.text9}>
-								{"Approved"}
-							</Text>
-						</TouchableOpacity>
-					</View>
-					<View style={styles.row5}>
-						<Text style={styles.text10}>
-							{"Preferred Contact"}
-						</Text>
-						<Image
-							source = {{uri: "https://storage.googleapis.com/tagjs-prod.appspot.com/pNd58t8xI9/bdres8r8.png"}} 
-							resizeMode = {"stretch"}
-							style={styles.image3}
-						/>
-					</View>
-				</View>
-				<View style={styles.column3}>
-					<View style={styles.row4}>
-						<View style={styles.column4}>
-							<Text style={styles.text7}>
-								{"Order #2458"}
-							</Text>
-							<Text style={styles.text8}>
-								{"Jan 15, 2025"}
-							</Text>
-						</View>
-						<TouchableOpacity style={styles.button2} onPress={()=>alert('Pressed!')}>
-							<Text style={styles.text11}>
-								{"Rejected"}
-							</Text>
-						</TouchableOpacity>
-					</View>
-					<View style={styles.row5}>
-						<Text style={styles.text10}>
-							{"Preferred Contact"}
-						</Text>
-						<Image
-							source = {{uri: "https://storage.googleapis.com/tagjs-prod.appspot.com/pNd58t8xI9/f8h5vkr3.png"}} 
-							resizeMode = {"stretch"}
-							style={styles.image3}
-						/>
-					</View>
-				</View>
-				<View style={styles.column3}>
-					<View style={styles.row4}>
-						<View style={styles.column4}>
-							<Text style={styles.text7}>
-								{"Order #2458"}
-							</Text>
-							<Text style={styles.text8}>
-								{"Jan 15, 2025"}
-							</Text>
-						</View>
-						<TouchableOpacity style={styles.button} onPress={()=>alert('Pressed!')}>
-							<Text style={styles.text9}>
-								{"Approved"}
-							</Text>
-						</TouchableOpacity>
-					</View>
-					<View style={styles.row5}>
-						<Text style={styles.text10}>
-							{"Preferred Contact"}
-						</Text>
-						<Image
-							source = {{uri: "https://storage.googleapis.com/tagjs-prod.appspot.com/pNd58t8xI9/wag3lu8d.png"}} 
-							resizeMode = {"stretch"}
-							style={styles.image3}
-						/>
-					</View>
-				</View>
-				<View style={styles.column3}>
-					<View style={styles.row4}>
-						<View style={styles.column4}>
-							<Text style={styles.text7}>
-								{"Order #2458"}
-							</Text>
-							<Text style={styles.text8}>
-								{"Jan 15, 2025"}
-							</Text>
-						</View>
-						<TouchableOpacity style={styles.button3} onPress={()=>alert('Pressed!')}>
-							<Text style={styles.text12}>
-								{"Pending"}
-							</Text>
-						</TouchableOpacity>
-					</View>
-					<View style={styles.row5}>
-						<Text style={styles.text10}>
-							{"Preferred Contact"}
-						</Text>
-						<Image
-							source = {{uri: "https://storage.googleapis.com/tagjs-prod.appspot.com/pNd58t8xI9/nuj3qtnu.png"}} 
-							resizeMode = {"stretch"}
-							style={styles.image3}
-						/>
-					</View>
-				</View>
-				<View style={styles.column3}>
-					<View style={styles.row4}>
-						<View style={styles.column4}>
-							<Text style={styles.text7}>
-								{"Order #2458"}
-							</Text>
-							<Text style={styles.text8}>
-								{"Jan 15, 2025"}
-							</Text>
-						</View>
-						<TouchableOpacity style={styles.button} onPress={()=>alert('Pressed!')}>
-							<Text style={styles.text9}>
-								{"Approved"}
-							</Text>
-						</TouchableOpacity>
-					</View>
-					<View style={styles.row5}>
-						<Text style={styles.text10}>
-							{"Preferred Contact"}
-						</Text>
-						<Image
-							source = {{uri: "https://storage.googleapis.com/tagjs-prod.appspot.com/pNd58t8xI9/zmxu49pm.png"}} 
-							resizeMode = {"stretch"}
-							style={styles.image3}
-						/>
-					</View>
-				</View>
-				<View style={styles.column5}>
-					<View style={styles.row4}>
-						<View style={styles.column4}>
-							<Text style={styles.text7}>
-								{"Order #2458"}
-							</Text>
-							<Text style={styles.text8}>
-								{"Jan 15, 2025"}
-							</Text>
-						</View>
-						<TouchableOpacity style={styles.button4} onPress={()=>alert('Pressed!')}>
-							<Text style={styles.text12}>
-								{"Pending"}
-							</Text>
-						</TouchableOpacity>
-					</View>
-					<View style={styles.row5}>
-						<Text style={styles.text10}>
-							{"Preferred Contact"}
-						</Text>
-						<Image
-							source = {{uri: "https://storage.googleapis.com/tagjs-prod.appspot.com/pNd58t8xI9/fx92g9y1.png"}} 
-							resizeMode = {"stretch"}
-							style={styles.image4}
-						/>
-					</View>
-				</View>
-			</ScrollView>
-		</SafeAreaView>
-	)
+import React,{useState,useEffect} from 'react';
+import { View, Text, FlatList, StyleSheet } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+
+
+export default function EnquiryHistory() {
+	const [enquiries, setEnquiries] = useState([]);
+	const [searchQuery, setSearchQuery] = useState(""); // Search state
+   const [user, setUser] = useState();
+
+		useEffect(() => {
+			const initialize = async () => {
+			  try {
+				const jsonValue = await AsyncStorage.getItem('user');
+				console.log('Retrieved from AsyncStorage:', jsonValue);
+				
+				const user = jsonValue != null ? JSON.parse(jsonValue) : null;
+				setUser(user);
+		  
+				if (user) {
+				  console.log('Contact ID:', user.contact_id);
+		  
+				  api.post(`/enquiry/getEnquiryByContactId`, {
+					contact_id: user?.contact_id,
+				  })
+				  .then((res) => {
+					const sortedEnquiries = res.data.data?.sort((a, b) => b.enquiry_id - a.enquiry_id);
+					setEnquiries(sortedEnquiries);
+				  })
+				  .catch((err) => {
+					console.log('API Error:', err);
+				  });
+				} else {
+				  console.warn('User not found in AsyncStorage.');
+				}
+		  
+			  } catch (e) {
+				console.error('Error reading user from AsyncStorage:', e);
+			  }
+			};
+		  
+			initialize();
+		  }, []);
+		  
+	 
+
+	  const total = enquiries.length;
+	  const pending = enquiries.filter(e => e.status === 'Pending').length;
+
+
+  const renderItem = ({ item }) => (
+    <View style={styles.card}>
+       <TouchableOpacity
+              onPress={() => navigation.navigate("EnquiryDetails", { enquiry: item })}
+            >
+      <Text style={styles.orderId}>{item.type} #{item.enquiry_id}</Text>
+      <Text style={styles.date}>{item.enquiry_date}</Text>
+      <Text style={styles.label}>Preferred Contact</Text>
+      <View
+        style={[
+          styles.statusBadge,
+          item.status === 'Approved'
+            ? styles.approved
+            : item.status === 'Rejected'
+            ? styles.rejected
+            : styles.pending,
+        ]}
+      >
+        <Text style={styles.statusText}>{item.status}</Text>
+      </View>
+      </TouchableOpacity>
+    </View>
+  );
+
+  return (
+    <View style={styles.container}>
+      <Text style={styles.header}>Enquiry History</Text>
+
+      <View style={styles.summaryContainer}>
+        <View style={styles.summaryCard}>
+          <Text style={styles.summaryTitle}>Total Enquiries</Text>
+          <Text style={styles.summaryCount}>{enquiries.length}</Text>
+        </View>
+        <View style={styles.summaryCard}>
+          <Text style={styles.summaryTitle}>Pending</Text>
+          <Text style={styles.summaryCount}>{
+                parseFloat(enquiries.filter((e) => e.order_code && e.order_code !== "").length
+              )}</Text>
+        </View>
+      </View>
+
+      <FlatList
+        data={enquiries}
+        renderItem={renderItem}
+        keyExtractor={(item, index) => `${item.enquiry_id}-${index}`}
+        contentContainerStyle={{ paddingBottom: 20 }}
+      />
+    </View>
+  );
 }
+
 const styles = StyleSheet.create({
-	container: {
-		flex: 1,
-		backgroundColor: "#FFFFFF",
-	},
-	button: {
-		backgroundColor: "#DCFCE7",
-		borderRadius: 9999,
-		paddingVertical: 4,
-		paddingHorizontal: 12,
-	},
-	button2: {
-		backgroundColor: "#FEE2E2",
-		borderRadius: 9999,
-		paddingVertical: 4,
-		paddingHorizontal: 12,
-	},
-	button3: {
-		backgroundColor: "#FEF9C3",
-		borderRadius: 9999,
-		paddingVertical: 5,
-		paddingHorizontal: 18,
-	},
-	button4: {
-		backgroundColor: "#FEF9C3",
-		borderRadius: 9999,
-		paddingVertical: 4,
-		paddingHorizontal: 18,
-	},
-	buttonColumn: {
-		backgroundColor: "#FFFFFF",
-		borderRadius: 12,
-		paddingVertical: 16,
-		shadowColor: "#0000000D",
-		shadowOpacity: 0.1,
-		shadowOffset: {
-		    width: 0,
-		    height: 1
-		},
-		shadowRadius: 2,
-		elevation: 2,
-	},
-	column: {
-		alignItems: "flex-start",
-		backgroundColor: "#FFFFFF",
-		borderBottomRightRadius: 10,
-		borderBottomLeftRadius: 10,
-		paddingBottom: 10,
-		marginBottom: 30,
-	},
-	column2: {
-		flex: 1,
-		backgroundColor: "#FFFFFF",
-		borderRadius: 12,
-		paddingVertical: 16,
-		marginRight: 12,
-		shadowColor: "#0000000D",
-		shadowOpacity: 0.1,
-		shadowOffset: {
-		    width: 0,
-		    height: 1
-		},
-		shadowRadius: 2,
-		elevation: 2,
-	},
-	column3: {
-		backgroundColor: "#FFFFFF",
-		borderRadius: 10,
-		paddingVertical: 12,
-		marginBottom: 10,
-		marginHorizontal: 30,
-		shadowColor: "#0000000D",
-		shadowOpacity: 0.1,
-		shadowOffset: {
-		    width: 0,
-		    height: 1
-		},
-		shadowRadius: 2,
-		elevation: 2,
-	},
-	column4: {
-		alignItems: "center",
-		paddingVertical: 1,
-	},
-	column5: {
-		backgroundColor: "#FFFFFF",
-		borderRadius: 10,
-		paddingTop: 12,
-		marginHorizontal: 30,
-		shadowColor: "#0000000D",
-		shadowOpacity: 0.1,
-		shadowOffset: {
-		    width: 0,
-		    height: 1
-		},
-		shadowRadius: 2,
-		elevation: 2,
-	},
-	image: {
-		width: 143,
-		height: 54,
-	},
-	image2: {
-		width: 24,
-		height: 24,
-		marginRight: 67,
-	},
-	image3: {
-		width: 24,
-		height: 24,
-	},
-	image4: {
-		width: 24,
-		height: 23,
-	},
-	row: {
-		flexDirection: "row",
-		marginBottom: 8,
-	},
-	row2: {
-		flexDirection: "row",
-		alignItems: "center",
-		marginLeft: 30,
-	},
-	row3: {
-		flexDirection: "row",
-		alignItems: "flex-start",
-		marginBottom: 30,
-		marginHorizontal: 30,
-	},
-	row4: {
-		flexDirection: "row",
-		justifyContent: "space-between",
-		alignItems: "center",
-		marginBottom: 10,
-		marginHorizontal: 16,
-	},
-	row5: {
-		flexDirection: "row",
-		alignItems: "center",
-		marginHorizontal: 16,
-	},
-	scrollView: {
-		flex: 1,
-		backgroundColor: "#F9FAFB",
-	},
-	text: {
-		color: "#000000",
-		fontSize: 17,
-		fontWeight: "bold",
-		marginVertical: 18,
-		marginLeft: 31,
-		marginRight: 12,
-	},
-	text2: {
-		color: "#000000",
-		fontSize: 20,
-		margin: 10,
-	},
-	text3: {
-		color: "#6B7280",
-		fontSize: 14,
-		marginRight: 43,
-	},
-	text4: {
-		color: "#000000",
-		fontSize: 20,
-		fontWeight: "bold",
-		marginRight: 115,
-	},
-	text5: {
-		color: "#6B7280",
-		fontSize: 14,
-		marginTop: 1,
-		marginBottom: 5,
-		marginLeft: 16,
-		marginRight: 87,
-	},
-	text6: {
-		color: "#000000",
-		fontSize: 20,
-		fontWeight: "bold",
-		marginVertical: 2,
-		marginLeft: 16,
-		marginRight: 127,
-	},
-	text7: {
-		color: "#000000",
-		fontSize: 14,
-		marginBottom: 5,
-	},
-	text8: {
-		color: "#9CA7B7",
-		fontSize: 12,
-	},
-	text9: {
-		color: "#16A34A",
-		fontSize: 12,
-	},
-	text10: {
-		color: "#000000",
-		fontSize: 14,
-		flex: 1,
-	},
-	text11: {
-		color: "#DC2626",
-		fontSize: 12,
-	},
-	text12: {
-		color: "#CA8A04",
-		fontSize: 12,
-	},
-	view: {
-		alignItems: "flex-end",
-		paddingVertical: 1,
-		marginBottom: 4,
-		marginHorizontal: 16,
-	},
-	view2: {
-		alignItems: "flex-end",
-		paddingVertical: 2,
-		marginHorizontal: 16,
-	},
+  container: { flex: 1, backgroundColor: '#f8f9fb', padding: 16 },
+  header: {
+    fontSize: 20,
+    fontWeight: '600',
+    marginBottom: 16,
+    textAlign: 'center',
+  },
+  summaryContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 16,
+  },
+  summaryCard: {
+    backgroundColor: '#fff',
+    padding: 16,
+    borderRadius: 12,
+    width: '48%',
+    shadowColor: '#ccc',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+    elevation: 3,
+  },
+  summaryTitle: {
+    color: '#7b7b8b',
+    fontSize: 14,
+  },
+  summaryCount: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginTop: 4,
+  },
+  card: {
+    backgroundColor: '#fff',
+    padding: 16,
+    borderRadius: 12,
+    marginBottom: 12,
+    position: 'relative',
+  },
+  orderId: {
+    fontSize: 16,
+    fontWeight: '500',
+  },
+  date: {
+    color: '#9a9a9a',
+    fontSize: 13,
+    marginVertical: 4,
+  },
+  label: {
+    color: '#3a3a3a',
+    fontSize: 14,
+  },
+  statusBadge: {
+    position: 'absolute',
+    right: 16,
+    top: 16,
+    paddingVertical: 4,
+    paddingHorizontal: 10,
+    borderRadius: 20,
+  },
+  approved: {
+    backgroundColor: '#d7f5dd',
+  },
+  rejected: {
+    backgroundColor: '#ffdede',
+  },
+  pending: {
+    backgroundColor: '#fef2c0',
+  },
+  statusText: {
+    fontSize: 12,
+    fontWeight: '500',
+    color: '#333',
+  },
 });

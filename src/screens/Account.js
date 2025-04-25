@@ -49,7 +49,8 @@ const AccountScreen = ({ navigation }) => {
     { icon: 'user', label: 'Your Profile', screen: 'Profile' },
     { icon: 'info', label: 'About Us', screen: 'AboutUs' },
     { icon: 'phone', label: 'Contact Us', screen: 'ContactUs' },
-    // { icon: 'file-text', label: 'Enquiry History', screen: 'EnquiryHistory' },
+    { icon: 'file-text', label: 'Enquiry History', screen: 'EnquiryHistory' },
+    { icon: 'file-text', label: 'Enquiry Details', screen: 'EnquiryDetails' },
     // { icon: 'lock', label: 'Change password', screen: 'ChangePassword' },
     // { icon: 'truck', label: 'Shipping Address', screen: 'ShippingAddress' },
     { icon: 'log-out', label: 'Logout', screen: 'Logout' },
@@ -57,8 +58,10 @@ const AccountScreen = ({ navigation }) => {
   const userlessmenuItems = [
     { icon: 'info', label: 'About Us', screen: 'AboutUs' },
     { icon: 'phone-call', label: 'Contact Us', screen: 'ContactUs' },
-    { icon: 'clipboard', label: 'Log in', screen: 'LoginPage' },
-    { icon: 'shield', label: 'Register', screen: 'Signup' },
+    { icon: 'log-in', label: 'Sign In', screen: 'LoginPage' },
+    { icon: 'user-plus', label: 'Register', screen: 'Signup' },
+   
+    
   ];
   
   if (!isLoggedIn) {

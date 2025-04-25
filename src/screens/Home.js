@@ -281,7 +281,7 @@ const[categories,setCategories]=useState([]);
 {newProducts.length > 0 && <View style={styles.section}>
   <View style={styles.sectionHeader}>
     <Text style={styles.sectionTitle}>New Products</Text>
-    <TouchableOpacity>
+    <TouchableOpacity >
       <Text style={styles.seeAll}></Text>
     </TouchableOpacity>
   </View>
