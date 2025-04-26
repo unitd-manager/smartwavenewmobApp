@@ -13,6 +13,9 @@ import { Button } from 'react-native-paper';
 import api from '../constants/api';
 
 const ContactUs = () => {
+  const scheme = useColorScheme();
+  const isDarkMode = scheme === 'dark';
+
   const [user, setUser] = useState({
     first_name: '',
     last_name: '',
@@ -22,13 +25,6 @@ const ContactUs = () => {
   });
 
   const [errors, setErrors] = useState({});
-  const [contact, setContact] = useState();
-  const [contacts, setContacts] = useState();
-  const [email, setEmail] = useState();
-  const [website, setWebsite] = useState(); 
-  const [address, setAddress] = useState();
-  const [mailId, setmailId] = useState("");
-  const [googlemapdata, setGoogleMapData] = useState('');
 
   const handleChange = (key, value) => {
     setUser(prev => ({ ...prev, [key]: value }));
@@ -37,12 +33,19 @@ const ContactUs = () => {
     }
   };
 
+  const [contact, setContact] = useState();
+  const [contacts, setContacts] = useState();
+  const [email, setEmail] = useState();
+  const [website, setWebsite] = useState(); 
+  const [address, setAddress] = useState();
+  const [mailId, setmailId] = useState("");
+  const [googlemapdata, setGoogleMapData] = useState('');
+
   const getEnquiryEmail = () => {
     api.get("/setting/getEnquiryMailId").then((res) => {
       setmailId(res.data.data[0]);
     });
   };
-
   const getContact = () => {
     api.get("/contact/getContacts").then((res) => {
       setContact(res.data.data[0]);
@@ -73,19 +76,17 @@ const ContactUs = () => {
     });
   };
 
-  const getGoogleMap = () => {
-    api.get('/setting/getSettingsForGoogleMap').then(res => {
-      setGoogleMapData(res.data.data[0]);
-    });
-  };
+  const getGoogleMap = () =>{
+    api.get('/setting/getSettingsForGoogleMap').then(res=>{
+      setGoogleMapData(res.data.data[0])
+     })
+  }
 
   const validateFields = () => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    const mobileRegex = /^[0-9]{10}$/;
-
+    const mobileRegex = /^[0-9]{10}$/; // For 10-digit numbers
     let tempErrors = {};
     if (!user.first_name.trim()) tempErrors.first_name = 'First name is required';
-
     if (!user.email.trim()) {
       tempErrors.email = 'Email is required';
     } else if (!emailRegex.test(user.email.trim())) {
@@ -96,8 +97,7 @@ const ContactUs = () => {
       tempErrors.contactNo = 'Contact number is required';
     } else if (!mobileRegex.test(user.contactNo.trim())) {
       tempErrors.contactNo = 'Invalid contact number format';
-    }
-
+    }  
     if (!user.comments.trim()) tempErrors.comments = 'Message is required';
     setErrors(tempErrors);
 
@@ -109,7 +109,10 @@ const ContactUs = () => {
       'Confirm Submission',
       'Are you sure you want to submit this enquiry?',
       [
-        { text: 'No', style: 'cancel' },
+        {
+          text: 'No',
+          style: 'cancel',
+        },
         {
           text: 'Yes',
           onPress: () => {
@@ -121,7 +124,7 @@ const ContactUs = () => {
                 comments: user.comments,
                 enquiry_code: code,
               })
-              .then(() => {
+              .then((res) => {
                 Alert.alert("Thank you!", "Your enquiry has been submitted.");
                 setUser({
                   first_name: '',
@@ -131,7 +134,7 @@ const ContactUs = () => {
                   comments: '',
                 });
               })
-              .catch(() => {
+              .catch((err) => {
                 Alert.alert("Error", "Enquiry submission failed!");
               });
           },
@@ -142,8 +145,12 @@ const ContactUs = () => {
 
   const generateCode = () => {
     api.post('/commonApi/getCodeValues', { type: 'enquiry' })
-      .then((res) => ContactSubmit(res.data.data))
-      .catch(() => ContactSubmit(''));
+      .then((res) => {
+        ContactSubmit(res.data.data);
+      })
+      .catch(() => {
+        ContactSubmit('');
+      });
   };
 
   const handleSubmit = () => {
@@ -216,23 +223,29 @@ const ContactUs = () => {
         <Text style={styles.info}>{contact && contact.mobile}</Text>
         <Text style={styles.label}>📧 Email:</Text>
         <Text style={styles.info}>{email && email.mailId}</Text>
+        
         <Text style={styles.label}>🌐 Website:</Text>
         <Text style={styles.info}>{website && website.web}</Text>
         <Text style={styles.label}>📍 Address:</Text>
-        <Text style={styles.info}>{address && address.addr}</Text>
+        <Text style={styles.info}>
+          {address && address.addr}
+        </Text>
       </View>
     </ScrollView>
   );
 };
 
-const CustomInput = ({ placeholder, value, onChangeText, error, ...rest }) => {
+const CustomInput = ({ placeholder, value, onChangeText, error, style, ...rest }) => {
+  const scheme = useColorScheme();
+  const isDarkMode = scheme === 'dark';
+
   return (
     <View style={{ marginBottom: 16 }}>
       <TextInput
         style={[
           styles.input,
-          { backgroundColor: '#f9f9f9', color: '#000' },
-          error && { borderColor: 'red' },
+          style,
+          error && { borderColor: 'red' }
         ]}
         placeholder={placeholder}
         placeholderTextColor="#888"
@@ -248,23 +261,25 @@ const CustomInput = ({ placeholder, value, onChangeText, error, ...rest }) => {
 const styles = StyleSheet.create({
   container: {
     padding: 24,
-    backgroundColor: '#ffffff',
+    backgroundColor: '#f9f9f9',
     flexGrow: 1,
   },
   heading: {
     fontSize: 26,
     marginBottom: 20,
     textAlign: 'center',
-    color: '#000',
+    color: '#333',
     fontFamily: 'Outfit-Regular',
   },
   form: {
-    backgroundColor: '#ffffff',
+    backgroundColor: '#fff',
     padding: 20,
     borderRadius: 10,
     elevation: 3,
   },
   input: {
+    backgroundColor: '#f9f9f9',
+    color: '#000',
     paddingHorizontal: 16,
     paddingVertical: 12,
     borderRadius: 8,
@@ -272,6 +287,7 @@ const styles = StyleSheet.create({
     borderColor: '#ccc',
     fontSize: 16,
     fontFamily: 'Outfit-Regular',
+    textAlignVertical: 'top', // important for multiline
   },
   errorText: {
     marginTop: 4,
@@ -299,13 +315,13 @@ const styles = StyleSheet.create({
   },
   label: {
     fontWeight: '600',
-    color: '#000',
+    color: '#555',
     marginTop: 8,
     fontFamily: 'Outfit-Regular',
   },
   info: {
     fontSize: 15,
-    color: '#000',
+    color: '#333',
     marginBottom: 4,
     fontFamily: 'Outfit-Regular',
   },
