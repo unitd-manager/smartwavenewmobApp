@@ -1,34 +1,18 @@
 import React from 'react';
-import { View, Text, StyleSheet, useColorScheme } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
 
 const AddressSection = ({ profile }) => {
-  const isDarkMode = useColorScheme() === 'dark';
-
-  const dynamicStyles = {
-    container: {
-      backgroundColor: isDarkMode ? '#1c1c1e' : '#f6f6f6',
-    },
-    sectionHeader: {
-      color: isDarkMode ? '#fff' : '#333',
-    },
-    address: {
-      color: isDarkMode ? '#ccc' : '#555',
-    },
-  };
-
   return (
-    <View style={[styles.container, dynamicStyles.container]}>
-      <Text style={[styles.sectionHeader, dynamicStyles.sectionHeader]}>
-        Address Details
-      </Text>
-      <Text style={[styles.address, dynamicStyles.address]}>
+    <View style={styles.container}>
+      <Text style={styles.sectionHeader}>Address Details</Text>
+      <Text style={styles.address}>
         {profile?.address1 || ''}{profile?.address1 && profile?.address2 ? ', ' : ''}
         {profile?.address2 || ''}
       </Text>
-      <Text style={[styles.address, dynamicStyles.address]}>
+      <Text style={styles.address}>
         {[profile?.address_area, profile?.address_city].filter(Boolean).join(', ')}
       </Text>
-      <Text style={[styles.address, dynamicStyles.address]}>
+      <Text style={styles.address}>
         {[profile?.address_state, profile?.address_po_code].filter(Boolean).join(' - ')}
       </Text>
     </View>
@@ -37,6 +21,7 @@ const AddressSection = ({ profile }) => {
 
 const styles = StyleSheet.create({
   container: {
+    backgroundColor: '#ffffff',
     padding: 16,
     borderRadius: 10,
     marginVertical: 10,
@@ -47,11 +32,13 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     marginBottom: 10,
     fontFamily: 'Outfit-Regular',
+    color: '#000000',
   },
   address: {
     fontSize: 16,
     marginBottom: 4,
     fontFamily: 'Outfit-Regular',
+    color: '#000000',
   },
 });
 

@@ -7,6 +7,7 @@ import {
   StyleSheet,
   Alert,
   Image,
+  useColorScheme,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { useNavigation } from '@react-navigation/native';
@@ -15,6 +16,9 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const SignInScreen = () => {
   const navigation = useNavigation();
+
+  const colorScheme = useColorScheme();
+const isDarkMode = colorScheme === 'dark';
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -119,6 +123,7 @@ const SignInScreen = () => {
         <TextInput
           style={styles.input}
           placeholder="Email"
+          placeholderTextColor={isDarkMode ? '#aaa' : '#888'}
           keyboardType="email-address"
           value={email}
           onChangeText={validateEmail}
@@ -133,8 +138,9 @@ const SignInScreen = () => {
       <View style={styles.inputContainer}>
         <Icon name="lock-closed-outline" size={20} color="#9E9E9E" style={styles.icon} />
         <TextInput
-          style={styles.input}
+          style={[styles.input, { color: isDarkMode ? '#fff' : '#000' }]}
           placeholder="Password"
+          placeholderTextColor={isDarkMode ? '#aaa' : '#888'}
           secureTextEntry={!showPassword}
           value={password}
           onChangeText={validatePassword}
@@ -163,7 +169,7 @@ const SignInScreen = () => {
       {/* Sign Up Link */}
       <View style={styles.footer}>
         <Text>First time here </Text>
-        <TouchableOpacity onPress={() => navigation.navigate('SignUp')}>
+        <TouchableOpacity onPress={() => navigation.navigate('Signup')}>
           <Text style={styles.highlight}>Sign Up</Text>
         </TouchableOpacity>
       </View>
@@ -218,6 +224,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     paddingVertical: 4,
     fontFamily: 'Outfit-Regular',
+    color: '#000',
   },
   icon: {
     marginRight: 5,

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, ScrollView, Alert } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, ScrollView, Alert, useColorScheme } from 'react-native';
 import api from '../constants/api';
 
 const SignUpScreen = ({navigation}) => {
@@ -9,6 +9,9 @@ const SignUpScreen = ({navigation}) => {
     email: '',
     password: '',
   });
+
+  const colorScheme = useColorScheme();
+const isDarkMode = colorScheme === 'dark';
 
   const [formErrors, setFormErrors] = useState({});
   const [passwordVisible, setPasswordVisible] = useState(false);
@@ -76,7 +79,10 @@ const SignUpScreen = ({navigation}) => {
         console.log(res.data.data);
         Alert.alert("Registration Email has been sent successfully");
 
-        navigation.navigate('LoginPage')
+        setTimeout(() => {
+          navigation.navigate('LoginPage');
+        }, 500);
+        
       })
       .catch((err) => {
         Alert.alert("Registration Email already exists");
@@ -141,6 +147,7 @@ const SignUpScreen = ({navigation}) => {
       <Text style={styles.label}>First Name</Text>
       <TextInput
         placeholder="John"
+        placeholderTextColor={isDarkMode ? '#aaa' : '#888'}
         style={styles.input}
         value={signupData.first_name}
         onChangeText={(text) => {
@@ -153,6 +160,7 @@ const SignUpScreen = ({navigation}) => {
       <Text style={styles.label}>Mobile No.</Text>
       <TextInput
         placeholder="+91- XXX XXXXX XXX"
+        placeholderTextColor={isDarkMode ? '#aaa' : '#888'}
         style={styles.input}
         keyboardType="numeric"
         value={signupData.mobile}
@@ -166,6 +174,7 @@ const SignUpScreen = ({navigation}) => {
       <Text style={styles.label}>Email Id</Text>
       <TextInput
         placeholder="eg: smartwave@gmail.com"
+        placeholderTextColor={isDarkMode ? '#aaa' : '#888'}
         style={styles.input}
         keyboardType="email-address"
         value={signupData.email}
@@ -180,6 +189,7 @@ const SignUpScreen = ({navigation}) => {
       <View style={styles.passwordContainer}>
         <TextInput
           placeholder="Enter your password"
+          placeholderTextColor={isDarkMode ? '#aaa' : '#888'}
           style={styles.passwordInput}
           secureTextEntry={!passwordVisible}
           value={signupData.password}
@@ -206,8 +216,14 @@ const SignUpScreen = ({navigation}) => {
         <Text style={styles.buttonText}>Sign Up</Text>
       </TouchableOpacity>
 
-      <Text style={styles.loginText}>
-        Already have an account? <TouchableOpacity style={styles.button} onPress={navigation.navigate('LoginPage')}><Text style={styles.loginLink}>Login</Text></TouchableOpacity>      </Text>
+      {/* <Text style={styles.loginText}>
+        Already have an account? <TouchableOpacity style={styles.button} onPress={()=>navigation.navigate('LoginPage')}><Text style={styles.loginLink}>Login</Text></TouchableOpacity>      </Text> */}
+    <View style={styles.footer}>
+            <Text> Already have an account?</Text>
+            <TouchableOpacity onPress={() => navigation.navigate('LoginPage')}>
+              <Text style={styles.loginLink}>Login</Text>
+            </TouchableOpacity>
+          </View>
     </ScrollView>
   );
 };
@@ -228,7 +244,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Outfit-Regular',
   },
   titleHighlight: {
-    color: '#00B2B2',
+    color: '#00B4D8',
     fontFamily: 'Outfit-Regular',
   },
   subtitle: {
@@ -283,7 +299,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Outfit-Regular',
   },
   button: {
-    backgroundColor: '#00B2B2',
+    backgroundColor: '#00B4D8',
     paddingVertical: 14,
     borderRadius: 12,
     marginTop: 24,
@@ -304,10 +320,17 @@ const styles = StyleSheet.create({
     fontFamily: 'Outfit-Regular',
   },
   loginLink: {
-    color: '#00B2B2',
-    fontWeight: '500',
+    color: '#00B4D8',
+    //fontWeight: '500',
     fontFamily: 'Outfit-Regular',
   },
+  footer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    fontFamily: 'Outfit-Regular',
+  },
+
+
 });
 
 export default SignUpScreen;
