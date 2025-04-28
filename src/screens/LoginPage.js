@@ -43,18 +43,24 @@ const isDarkMode = colorScheme === 'dark';
     }
   };
 
+  const passwordPattern = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*]).{8,}$/;
+
   const validatePassword = (text) => {
     setPassword(text);
-    const isValid = text.length >= 6;
-    setPasswordValid(isValid);
+  
     if (text === '') {
+      setPasswordValid(false);
       setPasswordError('Password is required');
-    } else if (!isValid) {
-      setPasswordError('Password must be at least 6 characters');
+    } else if (!passwordPattern.test(text)) {
+      setPasswordValid(false);
+      setPasswordError('Password must be at least 8 characters, with uppercase, lowercase, number, and special character');
     } else {
+      setPasswordValid(true);
       setPasswordError('');
     }
   };
+  
+
 
   const handleSignIn = () => {
     let isValid = true;
@@ -73,7 +79,7 @@ const isDarkMode = colorScheme === 'dark';
       isValid = false;
     }
     if (!passwordValid) {
-      setPasswordError('Password must be at least 6 characters');
+      setPasswordError('Password must be at least 8 characters, with uppercase, lowercase, number, and special character');
       isValid = false;
     }
 
@@ -138,7 +144,7 @@ const isDarkMode = colorScheme === 'dark';
       <View style={styles.inputContainer}>
         <Icon name="lock-closed-outline" size={20} color="#9E9E9E" style={styles.icon} />
         <TextInput
-          style={[styles.input, { color: isDarkMode ? '#fff' : '#000' }]}
+          style={styles.input}
           placeholder="Password"
           placeholderTextColor={isDarkMode ? '#aaa' : '#888'}
           secureTextEntry={!showPassword}
@@ -157,7 +163,7 @@ const isDarkMode = colorScheme === 'dark';
       {passwordError !== '' && <Text style={styles.errorText}>{passwordError}</Text>}
 
       {/* Forgot Password */}
-      <TouchableOpacity onPress={() => Alert.alert('Forgot Password')}>
+      <TouchableOpacity >
         <Text style={styles.forgotPassword}>Forgot Password?</Text>
       </TouchableOpacity>
 

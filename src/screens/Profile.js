@@ -153,16 +153,19 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     padding: 20,
     paddingBottom: 80,
+    fontFamily: 'Outfit-Regular',
   },
   loaderContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#FFFFFF',
+    fontFamily: 'Outfit-Regular',
   },
   avatarContainer: {
     alignItems: 'center',
     marginBottom: 20,
+    fontFamily: 'Outfit-Regular',
   },
   input: {
     borderBottomWidth: 1,
@@ -171,6 +174,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     paddingVertical: 8,
     color: '#000',
+    fontFamily: 'Outfit-Regular',
   },
   sectionHeader: {
     fontSize: 18,
@@ -178,36 +182,43 @@ const styles = StyleSheet.create({
     marginTop: 20,
     marginBottom: 10,
     color: '#000',
+    fontFamily: 'Outfit-Regular',
   },
   name: {
     fontSize: 22,
-    fontWeight: 'bold',
+    //fontWeight: 'bold',
     marginTop: 10,
     color: '#000',
+    fontFamily: 'Outfit-Regular',
   },
   bio: {
     fontSize: 16,
     marginTop: 4,
     color: '#000',
+    fontFamily: 'Outfit-Regular',
   },
   text: {
     fontSize: 16,
     marginTop: 2,
     color: '#000',
+    fontFamily: 'Outfit-Regular',
   },
   buttonGroup: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginTop: 20,
+    fontFamily: 'Outfit-Regular',
   },
   button: {
     flex: 1,
     marginHorizontal: 5,
     marginTop: 10,
     backgroundColor: '#00B4D8',
+    fontFamily: 'Outfit-Regular',
   },
   editButtonWrapper: {
     marginTop: 30,
+    fontFamily: 'Outfit-Regular',
   },
 });
 

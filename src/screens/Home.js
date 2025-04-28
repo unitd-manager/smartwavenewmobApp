@@ -1,4 +1,4 @@
-import React,{useEffect,useState,useCallback} from 'react';
+import React,{useEffect,useState,useCallback, useContext} from 'react';
 import { View, Text, ScrollView, Image, FlatList, StyleSheet, TouchableOpacity, Dimensions, Alert } from 'react-native';
 import BannerCarousel from '../components/BannerCarousel';
 import { useNavigation,useFocusEffect } from '@react-navigation/native';
@@ -7,6 +7,7 @@ import imageBase from '../constants/imageBase';
 import { useSelector, useDispatch } from 'react-redux';
 import { addToCart, fetchCartItems } from '../redux/slices/cartSlice';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { AuthContext } from '../context/AuthContext';
 
 
 const { width } = Dimensions.get('window');
@@ -15,13 +16,15 @@ const { width } = Dimensions.get('window');
 const Home = () => {
   const navigation = useNavigation();
 
+  const { user, logout } = useContext(AuthContext);
+
   const [sliderData, setSliderData] = useState([]);
 const[categories,setCategories]=useState([]);
   const [offerProducts, setOfferProducts] = useState([]);
   const [newProducts, setNewProducts] = useState([]);
   const [bestSellingProducts, setBestSellingProducts] = useState([]);
   const [mostPopularProducts, setMostPopularProducts] = useState([]);
-  const [user, setUser] = useState({});
+  const [userData, setUserData] = useState({});
 
   const dispatch = useDispatch();
 
@@ -131,8 +134,8 @@ const[categories,setCategories]=useState([]);
   };
   const getUserData = async () => {
     try {
-      const jsonValue = await AsyncStorage.getItem('user');
-      const user = jsonValue != null ? JSON.parse(jsonValue) : null;
+      // const jsonValue = await AsyncStorage.getItem('user');
+      // const user = jsonValue != null ? JSON.parse(jsonValue) : null;
 
       if (user?.contact_id) {
         
@@ -141,7 +144,7 @@ const[categories,setCategories]=useState([]);
           contact_id: user.contact_id,
         });
         console.log('user',user);
-        setUser(res.data.data[0]);
+        setUserData(res.data.data[0]);
       } else {
         
       }
@@ -151,20 +154,20 @@ const[categories,setCategories]=useState([]);
     }
   };
 
-  useFocusEffect(
-    useCallback(() => {
-      const fetchUser = async () => {
-        const userData = await AsyncStorage.getItem('user');
-        if (userData) {
-          setUser(JSON.parse(userData)); // update context or redux here
-        } else {
-          setUser(null);
-        }
-      };
+  // useFocusEffect(
+  //   useCallback(() => {
+  //     const fetchUser = async () => {
+  //       const userData = await AsyncStorage.getItem('user');
+  //       if (userData) {
+  //         setUserData(JSON.parse(userData)); // update context or redux here
+  //       } else {
+  //         setUserData(null);
+  //       }
+  //     };
   
-      fetchUser();
-    }, [])
-  );
+  //     fetchUser();
+  //   }, [])
+  // );
 
   useEffect(() => {
     getUserData();

@@ -59,11 +59,15 @@ const isDarkMode = colorScheme === 'dark';
       errors.email = 'Enter a valid email address';
     }
 
-    if (!signupData.password.trim()) {
-      errors.password = 'Password is required';
-    } else if (signupData.password.length < 6) {
-      errors.password = 'Password should be at least 6 characters';
-    }
+    // Password Validation
+  const passwordPattern = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*]).{8,}$/;
+  if (!signupData.password.trim()) {
+    errors.password = 'Password is required';
+  } else if (signupData.password.length < 8) {
+    errors.password = 'Password should be at least 8 characters';
+  } else if (!passwordPattern.test(signupData.password)) {
+    errors.password = 'Password must contain at least one uppercase letter, one lowercase letter, one digit, and one special character';
+  }
 
     setFormErrors(errors);
     return Object.keys(errors).length === 0;
@@ -285,6 +289,7 @@ const styles = StyleSheet.create({
     height: 48,
     fontSize: 14,
     fontFamily: 'Outfit-Regular',
+    color: '#000',
   },
   eyeIcon: {
     width: 24,
@@ -325,6 +330,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Outfit-Regular',
   },
   footer: {
+    marginTop:20,
     flexDirection: 'row',
     justifyContent: 'center',
     fontFamily: 'Outfit-Regular',

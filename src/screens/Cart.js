@@ -1,5 +1,5 @@
 
-import React, { useEffect, useState,useCallback } from "react";
+import React, { useEffect, useState,useCallback, useContext } from "react";
 import { SafeAreaView, View, ScrollView, Text, Image, TouchableOpacity, StyleSheet, ActivityIndicator, ImageBackground, Alert } from "react-native";
 import api from '../constants/api';
 import imageBase from "../constants/imageBase";
@@ -7,13 +7,17 @@ import { useSelector, useDispatch } from 'react-redux';
 import { fetchCartItems, deleteCartItem, addToCart,clearCart,updateCart } from '../redux/slices/cartSlice';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Icon from 'react-native-vector-icons/Ionicons';
+import { AuthContext } from "../context/AuthContext";
 //import BackButton from "../components/BackButton";
 
 
  const CartScreen = ({navigation}) => {
   const [cartItems, setCartItems] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [user, setUser] = useState();
+  //const [user, setUser] = useState();
+
+
+  const { user, logout } = useContext(AuthContext);
 
   const dispatch = useDispatch();
   const { items, status } = useSelector((state) => state.cart);
@@ -226,9 +230,7 @@ api
   useEffect(() => {
 	const initialize = async () => {
 	  try {
-		const jsonValue = await AsyncStorage.getItem('user');
-		const user = jsonValue != null ? JSON.parse(jsonValue) : null;
-		setUser(user);
+		
 		if (user) {
 		  dispatch(fetchCartItems(user));
 		}

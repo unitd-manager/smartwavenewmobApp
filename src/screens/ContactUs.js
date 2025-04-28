@@ -10,6 +10,7 @@ import {
   useColorScheme,
 } from 'react-native';
 import { Button } from 'react-native-paper';
+import Icon from 'react-native-vector-icons/FontAwesome';
 import api from '../constants/api';
 
 const ContactUs = () => {
@@ -219,18 +220,32 @@ const ContactUs = () => {
       </View>
 
       <View style={styles.infoBox}>
-        <Text style={styles.label}>📞 Phone:</Text>
-        <Text style={styles.info}>{contact && contact.mobile}</Text>
-        <Text style={styles.label}>📧 Email:</Text>
-        <Text style={styles.info}>{email && email.mailId}</Text>
-        
-        <Text style={styles.label}>🌐 Website:</Text>
-        <Text style={styles.info}>{website && website.web}</Text>
-        <Text style={styles.label}>📍 Address:</Text>
-        <Text style={styles.info}>
-          {address && address.addr}
-        </Text>
+      <View style={styles.row}>
+        <Icon name="phone" size={20} color="#000" />
+        <Text style={styles.label}> Phone:</Text>
       </View>
+      <Text style={styles.info}>{contact && contact.mobile}</Text>
+
+      <View style={styles.row}>
+        <Icon name="envelope" size={20} color="#000" />
+        <Text style={styles.label}> Email:</Text>
+      </View>
+      <Text style={styles.info}>{email && email.mailId}</Text>
+
+      <View style={styles.row}>
+        <Icon name="globe" size={20} color="#000" />
+        <Text style={styles.label}> Website:</Text>
+      </View>
+      <Text style={styles.info}>{website && website.web}</Text>
+
+      <View style={styles.row}>
+        <Icon name="map-marker" size={20} color="#000" />
+        <Text style={styles.label}> Address:</Text>
+      </View>
+      <Text style={styles.info}>
+        {address && address.addr}
+      </Text>
+    </View>
     </ScrollView>
   );
 };
@@ -325,6 +340,12 @@ const styles = StyleSheet.create({
     marginBottom: 4,
     fontFamily: 'Outfit-Regular',
   },
+  row: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 10, // optional
+  },
+  
 });
 
 export default ContactUs;

@@ -116,7 +116,7 @@ useEffect(() => {
             <Stack.Screen name="ShippingAddress" component={ShippingAddress} />
             <Stack.Screen name="NewPassword" component={NewPassword} />
             <Stack.Screen name="Frame" component={Frame} />
-            <Stack.Screen name="LoginPage" component={LoginPage} />
+            <Stack.Screen name="LoginPage" component={LoginPage} options={{ title: "Login" }}/>
             <Stack.Screen name="Profile" component={Profile} />
             <Stack.Screen name="ContactUs" component={ContactUs} />
           {/* </>
