@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, ScrollView, Alert, useColorScheme } from 'react-native';
 import api from '../constants/api';
+import Icon from 'react-native-vector-icons/Ionicons';
 
 const SignUpScreen = ({navigation}) => {
   const [signupData, setSignupData] = useState({
@@ -203,15 +204,12 @@ const isDarkMode = colorScheme === 'dark';
           }}
         />
         <TouchableOpacity onPress={() => setPasswordVisible(!passwordVisible)}>
-          <Image
-            source={{
-              uri: passwordVisible
-                ? "https://cdn-icons-png.flaticon.com/512/2767/2767146.png"
-                : "https://cdn-icons-png.flaticon.com/512/565/565655.png",
-            }}
-            resizeMode="contain"
-            style={styles.eyeIcon}
-          />
+        <Icon
+                     name={passwordVisible ? 'eye-off-outline' : 'eye-outline'}
+                     size={20}
+                     color="#9E9E9E"
+                     style={styles.eyeIcon}
+                   />
         </TouchableOpacity>
       </View>
       {formErrors.password && <Text style={styles.errorText}>{formErrors.password}</Text>}
@@ -223,7 +221,7 @@ const isDarkMode = colorScheme === 'dark';
       {/* <Text style={styles.loginText}>
         Already have an account? <TouchableOpacity style={styles.button} onPress={()=>navigation.navigate('LoginPage')}><Text style={styles.loginLink}>Login</Text></TouchableOpacity>      </Text> */}
     <View style={styles.footer}>
-            <Text> Already have an account?</Text>
+            <Text style={{ fontFamily: 'Outfit-Regular'}}> Already have an account?</Text>
             <TouchableOpacity onPress={() => navigation.navigate('LoginPage')}>
               <Text style={styles.loginLink}>Login</Text>
             </TouchableOpacity>

@@ -1,19 +1,23 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet, ScrollView, Alert } from 'react-native';
 import Icon from 'react-native-vector-icons/Feather';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import api from '../constants/api'; // your API setup
+import { AuthContext } from '../context/AuthContext';
+import { useDispatch } from 'react-redux';
+import { emptyCart } from '../redux/slices/cartSlice';
 
 const AccountScreen = ({ navigation }) => {
   const [userData, setUserData] = useState(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+const dispatch=useDispatch();
+
+const { user, logout } = useContext(AuthContext);
 
   const handleLogout = async () => {
     try {
-      await AsyncStorage.removeItem('user');
-      await AsyncStorage.clear();
-      setIsLoggedIn(false);
-      setUserData(null);
+      logout();
+    dispatch(emptyCart());
     } catch (error) {
       console.log('Error during logout:', error);
     }
@@ -21,8 +25,8 @@ const AccountScreen = ({ navigation }) => {
 
   const getUserData = async () => {
     try {
-      const jsonValue = await AsyncStorage.getItem('user');
-      const user = jsonValue != null ? JSON.parse(jsonValue) : null;
+      // const jsonValue = await AsyncStorage.getItem('user');
+      // const user = jsonValue != null ? JSON.parse(jsonValue) : null;
 
       if (user?.contact_id) {
         setIsLoggedIn(true);
@@ -49,10 +53,10 @@ const AccountScreen = ({ navigation }) => {
     { icon: 'user', label: 'Your Profile', screen: 'Profile' },
     { icon: 'info', label: 'About Us', screen: 'AboutUs' },
     { icon: 'phone', label: 'Contact Us', screen: 'ContactUs' },
-    // { icon: 'file-text', label: 'Enquiry History', screen: 'EnquiryHistory' },
-    // { icon: 'file-text', label: 'Enquiry Details', screen: 'EnquiryDetails' },
+   { icon: 'file-text', label: 'Enquiry History', screen: 'EnquiryHistory' },
+    { icon: 'heart', label: 'Wishlist', screen: 'WishlistScreen' },
     // { icon: 'lock', label: 'Change password', screen: 'ChangePassword' },
-    // { icon: 'truck', label: 'Shipping Address', screen: 'ShippingAddress' },
+     { icon: 'truck', label: 'Shipping Address', screen: 'ShippingAddress' },
     { icon: 'log-out', label: 'Logout', screen: 'Logout' },
   ];
   const userlessmenuItems = [
@@ -64,7 +68,7 @@ const AccountScreen = ({ navigation }) => {
     
   ];
   
-  if (!isLoggedIn) {
+  if (!user) {
     return (
       <ScrollView style={styles.container}>
       {/* <TouchableOpacity style={styles.backBtn} onPress={() => navigation.goBack()}>

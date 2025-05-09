@@ -1,225 +1,254 @@
-import React from "react";
-import { SafeAreaView, View, ScrollView, Text, Image, TouchableOpacity, StyleSheet, } from "react-native";
-export default (props) => {
-	return (
-		<SafeAreaView style={styles.container}>
-			<ScrollView  style={styles.scrollView}>
-				<View style={styles.row}>
-					<Text style={styles.text}>
-						{"9:41"}
-					</Text>
-					<Image
-						source = {{uri: "https://storage.googleapis.com/tagjs-prod.appspot.com/pNd58t8xI9/p9aljluq.png"}} 
-						resizeMode = {"stretch"}
-						style={styles.image}
-					/>
-				</View>
-				<View style={styles.row2}>
-					<Image
-						source = {{uri: "https://storage.googleapis.com/tagjs-prod.appspot.com/pNd58t8xI9/gv9yeut1.png"}} 
-						resizeMode = {"stretch"}
-						style={styles.image2}
-					/>
-					<Text style={styles.text2}>
-						{"Shipping Address"}
-					</Text>
-				</View>
-				<Text style={styles.text3}>
-					{"Shipping Address"}
-				</Text>
-				<View style={styles.row3}>
-					<View style={styles.row4}>
-						<Image
-							source = {{uri: "https://storage.googleapis.com/tagjs-prod.appspot.com/pNd58t8xI9/u07pt03j.png"}} 
-							resizeMode = {"stretch"}
-							style={styles.image3}
-						/>
-						<View style={styles.column}>
-							<Text style={styles.text4}>
-								{"Home"}
-							</Text>
-							<Text style={styles.text5}>
-								{"112 Castle Street, Rolla Sharjah, UAE\n85213"}
-							</Text>
-						</View>
-					</View>
-					<Image
-						source = {{uri: "https://storage.googleapis.com/tagjs-prod.appspot.com/pNd58t8xI9/g4dupy84.png"}} 
-						resizeMode = {"stretch"}
-						style={styles.image4}
-					/>
-				</View>
-				<View style={styles.row3}>
-					<View style={styles.row4}>
-						<Image
-							source = {{uri: "https://storage.googleapis.com/tagjs-prod.appspot.com/pNd58t8xI9/bk1dp1ow.png"}} 
-							resizeMode = {"stretch"}
-							style={styles.image3}
-						/>
-						<View style={styles.column}>
-							<Text style={styles.text4}>
-								{"Office"}
-							</Text>
-							<Text style={styles.text5}>
-								{"221 Tiger Building, Shaikh Zayed Road, Dubai UAE, 85214"}
-							</Text>
-						</View>
-					</View>
-					<Image
-						source = {{uri: "https://storage.googleapis.com/tagjs-prod.appspot.com/pNd58t8xI9/p95knpx2.png"}} 
-						resizeMode = {"stretch"}
-						style={styles.image4}
-					/>
-				</View>
-				<View style={styles.row5}>
-					<View style={styles.row4}>
-						<Image
-							source = {{uri: "https://storage.googleapis.com/tagjs-prod.appspot.com/pNd58t8xI9/wm9bhn6g.png"}} 
-							resizeMode = {"stretch"}
-							style={styles.image3}
-						/>
-						<View style={styles.column}>
-							<Text style={styles.text4}>
-								{"Friends"}
-							</Text>
-							<Text style={styles.text5}>
-								{"221 Naif Street, Deira Dubai, UAE,\n85213"}
-							</Text>
-						</View>
-					</View>
-					<Image
-						source = {{uri: "https://storage.googleapis.com/tagjs-prod.appspot.com/pNd58t8xI9/w2s85tqe.png"}} 
-						resizeMode = {"stretch"}
-						style={styles.image4}
-					/>
-				</View>
-				<TouchableOpacity style={styles.button} onPress={()=>alert('Pressed!')}>
-					<View style={styles.row6}>
-						<Image
-							source = {{uri: "https://storage.googleapis.com/tagjs-prod.appspot.com/pNd58t8xI9/pliu891v.png"}} 
-							resizeMode = {"stretch"}
-							style={styles.image5}
-						/>
-						<Text style={styles.text6}>
-							{"Add New Shipping Address"}
-						</Text>
-					</View>
-				</TouchableOpacity>
-			</ScrollView>
-		</SafeAreaView>
-	)
-}
+import React, { useContext, useEffect, useState } from 'react';
+import { View, Text, TextInput, Button, FlatList, TouchableOpacity, Alert, StyleSheet, Modal, ScrollView } from 'react-native';
+import api from '../constants/api';
+import { AuthContext } from '../context/AuthContext';
+
+const CurvedButton = ({ title, onPress, color = '#00B4D8' }) => (
+  <TouchableOpacity onPress={onPress} style={[styles.curvedButton, { backgroundColor: color }]}>
+    <Text style={styles.curvedButtonText}>{title}</Text>
+  </TouchableOpacity>
+);
+
+
+const ShippingAddress = () => {
+  
+  const [enquiries, setEnquiries] = useState([]);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [editMode, setEditMode] = useState(false);
+  const [selectedAddressId, setSelectedAddressId] = useState(null);
+
+const { user, logout } = useContext(AuthContext);
+
+  const [newAddress, setNewAddress] = useState({
+    shipper_name: '',
+    address_type: 'Shipping',
+    address_flat: '',
+    address_street: '',
+    address_town: '',
+    address_state: '',
+    address_country: '',
+    address_po_code: '',
+  });
+
+  const [errors, setErrors] = useState({});
+
+  useEffect(() => {
+    fetchAddresses();
+  }, []);
+
+  const fetchAddresses = async () => {
+    try {
+      const res = await api.post(`/address/getQuoteTrackItemsById`, {
+        contact_id: user?.contact_id,
+      });
+      setEnquiries(res.data.data);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleInputChange = (field, value) => {
+    setNewAddress({ ...newAddress, [field]: value });
+  };
+
+  const validateFields = () => {
+    let validationErrors = {};
+
+    if (!newAddress.shipper_name.trim()) validationErrors.shipper_name = 'Shipper Name is required';
+    if (!newAddress.address_flat.trim()) validationErrors.address_flat = 'Flat/House No. is required';
+    if (!newAddress.address_town.trim()) validationErrors.address_town = 'Town/City is required';
+    if (!newAddress.address_country.trim()) validationErrors.address_country = 'Country is required';
+    if (!newAddress.address_po_code.trim()) {
+      validationErrors.address_po_code = 'Postal Code is required';
+    } else if (!/^\d+$/.test(newAddress.address_po_code)) {
+      validationErrors.address_po_code = 'Postal Code must be numeric';
+    }
+
+    setErrors(validationErrors);
+    return Object.keys(validationErrors).length === 0;
+  };
+
+  const handleSaveAddress = async () => {
+    if (!validateFields()) return;
+
+    const apiEndpoint = editMode
+      ? `/address/editEquipmentRequestItem`
+      : `/address/insertQuoteItems`;
+
+    const payload = { ...newAddress, contact_id: user.contact_id };
+    if (editMode) payload.company_address_id = selectedAddressId;
+
+    try {
+      await api.post(apiEndpoint, payload);
+      Alert.alert(editMode ? 'Address Updated' : 'Address Added');
+      fetchAddresses();
+      setModalVisible(false);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleEdit = (address) => {
+    setNewAddress(address);
+    setSelectedAddressId(address.customer_address_id);
+    setEditMode(true);
+    setModalVisible(true);
+  };
+
+  const handleDelete = async (id) => {
+    Alert.alert('Confirm', 'Are you sure you want to delete?', [
+      { text: 'Cancel' },
+      {
+        text: 'Delete',
+        onPress: async () => {
+          try {
+            await api.post(`/address/deleteTrackEditItem`, {
+              customer_address_id: id,
+            });
+            Alert.alert('Address Deleted');
+            fetchAddresses();
+          } catch (err) {
+            console.error(err);
+          }
+        },
+      },
+    ]);
+  };
+
+  return (
+    <View style={styles.container}>
+      <Text style={styles.title}>Shipping Address</Text>
+      <CurvedButton title="Add Shipment Address" style={styles.customButton} onPress={() => {
+        setNewAddress({
+          shipper_name: '',
+          address_type: 'Shipping',
+          address_flat: '',
+          address_street: '',
+          address_town: '',
+          address_state: '',
+          address_country: '',
+          address_po_code: '',
+        });
+        setEditMode(false);
+        setModalVisible(true);
+      }} />
+
+      <FlatList
+        data={enquiries}
+        keyExtractor={(item, index) => index.toString()}
+        renderItem={({ item }) => (
+          <View style={styles.card}>
+            <Text style={styles.cardTitle}>{item.shipper_name}</Text>
+            <Text>{item.address_flat}, {item.address_street}, {item.address_town}</Text>
+            <Text>{item.address_state}, {item.address_country} {item.address_po_code}</Text>
+            <View style={styles.actionRow}>
+              <CurvedButton title="Edit" onPress={() => handleEdit(item)} />
+              <CurvedButton title="Delete" color="red" onPress={() => handleDelete(item.customer_address_id)} />
+            </View>
+          </View>
+        )}
+      />
+
+      <Modal visible={modalVisible} animationType="slide">
+        <ScrollView contentContainerStyle={styles.modalContent}>
+          <Text style={styles.modalTitle}>{editMode ? 'Edit Address' : 'Add Address'}</Text>
+          {[
+  { name: 'shipper_name', label: 'Shipper Name', placeholder: 'Enter shipper name' },
+  { name: 'address_flat', label: 'Flat/House No.', placeholder: 'Enter flat or house number' },
+  { name: 'address_street', label: 'Street', placeholder: 'Enter street' },
+  { name: 'address_town', label: 'Town/City', placeholder: 'Enter town or city' },
+  { name: 'address_state', label: 'State', placeholder: 'Enter state' },
+  { name: 'address_country', label: 'Country', placeholder: 'Enter country' },
+  { name: 'address_po_code', label: 'Postal Code', placeholder: 'Enter postal code' },
+].map(({ name, label, placeholder }) => (
+  <View key={name} style={styles.inputGroup}>
+    <Text style={styles.inputLabel}>{label}</Text>
+    <TextInput
+      style={styles.input}
+      placeholder={placeholder}
+      value={newAddress[name]}
+      onChangeText={(text) => handleInputChange(name, text)}
+    />
+    {errors[name] && <Text style={styles.errorText}>{errors[name]}</Text>}
+  </View>
+))}
+
+          <TextInput
+            style={styles.input}
+            value={newAddress.address_type}
+            editable={false}
+          />
+
+<View style={styles.editButtonWrapper}>
+  <CurvedButton title={editMode ? 'Update Address' : 'Save Address'} onPress={handleSaveAddress} />
+</View>
+<View style={styles.editButtonWrapper}>
+  <CurvedButton title="Cancel" onPress={() => setModalVisible(false)} />
+</View>
+
+        </ScrollView>
+      </Modal>
+    </View>
+  );
+};
+
+export default ShippingAddress;
+
 const styles = StyleSheet.create({
-	container: {
-		flex: 1,
-		backgroundColor: "#FFFFFF",
-	},
-	button: {
-		alignItems: "center",
-		backgroundColor: "#DFF6FB80",
-		borderColor: "#1EB1C5",
-		borderRadius: 10,
-		borderWidth: 1,
-		paddingVertical: 7,
-		marginBottom: 410,
-		marginHorizontal: 34,
-	},
-	column: {
-		flex: 1,
-	},
-	image: {
-		width: 143,
-		height: 54,
-	},
-	image2: {
-		width: 24,
-		height: 24,
-		marginRight: 66,
-	},
-	image3: {
-		width: 24,
-		height: 24,
-		marginRight: 10,
-	},
-	image4: {
-		width: 24,
-		height: 24,
-	},
-	image5: {
-		width: 32,
-		height: 32,
-		marginRight: 5,
-	},
-	row: {
-		flexDirection: "row",
-		marginBottom: 8,
-	},
-	row2: {
-		flexDirection: "row",
-		alignItems: "center",
-		marginBottom: 25,
-		marginLeft: 30,
-	},
-	row3: {
-		flexDirection: "row",
-		alignItems: "center",
-		backgroundColor: "#FFFFFF",
-		paddingVertical: 14,
-		marginHorizontal: 30,
-	},
-	row4: {
-		flex: 1,
-		flexDirection: "row",
-		alignItems: "flex-start",
-		marginRight: 12,
-	},
-	row5: {
-		flexDirection: "row",
-		alignItems: "center",
-		backgroundColor: "#FFFFFF",
-		paddingVertical: 14,
-		marginBottom: 20,
-		marginHorizontal: 30,
-	},
-	row6: {
-		flexDirection: "row",
-		alignItems: "center",
-	},
-	scrollView: {
-		flex: 1,
-		backgroundColor: "#FFFFFF",
-	},
-	text: {
-		color: "#000000",
-		fontSize: 17,
-		fontWeight: "bold",
-		marginVertical: 18,
-		marginLeft: 31,
-		marginRight: 12,
-	},
-	text2: {
-		color: "#000000",
-		fontSize: 18,
-		margin: 10,
-	},
-	text3: {
-		color: "#000000",
-		fontSize: 18,
-		marginBottom: 20,
-		marginLeft: 31,
-	},
-	text4: {
-		color: "#000000",
-		fontSize: 14,
-		marginBottom: 5,
-	},
-	text5: {
-		color: "#595E64",
-		fontSize: 12,
-	},
-	text6: {
-		color: "#1EB1C5",
-		fontSize: 14,
-		width: 172,
-	},
+  container: { padding: 20, flex: 1 ,fontFamily: 'Outfit-Regular',},
+  title: { fontSize: 22, fontWeight: 'bold', textAlign: 'center', marginBottom: 20,fontFamily: 'Outfit-Regular', },
+  card: { backgroundColor: '#f0f0f0', padding: 15, borderRadius: 8, marginBottom: 15,fontFamily: 'Outfit-Regular', },
+  cardTitle: { fontWeight: 'bold', fontSize: 16, fontFamily: 'Outfit-Regular', },
+  actionRow: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 10,fontFamily: 'Outfit-Regular', },
+  modalContent: { padding: 20 ,fontFamily: 'Outfit-Regular', },
+  modalTitle: { fontSize: 18, fontWeight: 'bold', marginBottom: 15, fontFamily: 'Outfit-Regular', },
+  inputGroup: { marginBottom: 10, fontFamily: 'Outfit-Regular', },
+  input: { borderWidth: 1, borderColor: '#ccc', borderRadius: 5, padding: 10 ,fontFamily: 'Outfit-Regular',},
+  errorText: { color: 'red', fontSize: 12 ,fontFamily: 'Outfit-Regular',},
+  customButton: {
+    backgroundColor: '#00B4D8', // Change to your desired color
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 8, // Change for border radius
+    alignItems: 'center',
+    marginVertical: 5,
+    fontFamily: 'Outfit-Regular',
+  },
+  customButtonText: {
+    color: '#fff',
+    //fontWeight: 'bold',
+    fontFamily: 'Outfit-Regular',
+  },
+  inputLabel: {
+    fontSize: 14,
+    marginBottom: 5,
+    fontFamily: 'Outfit-Regular',
+  },
+  buttonRow: {
+    marginVertical: 8,
+  },  
+  editButtonWrapper: {
+    marginTop: 30,
+    fontFamily: 'Outfit-Regular',
+  },
+  button: {
+    flex: 1,
+    marginHorizontal: 5,
+    marginTop: 10,
+    backgroundColor: '#00B4D8',
+    fontFamily: 'Outfit-Regular',
+  },
+  curvedButton: {
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 10,
+    alignItems: 'center',
+    marginVertical: 5,
+  },
+  curvedButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontFamily: 'Outfit-Regular',
+  },
+  
 });

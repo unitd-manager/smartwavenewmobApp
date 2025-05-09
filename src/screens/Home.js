@@ -8,6 +8,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { addToCart, fetchCartItems } from '../redux/slices/cartSlice';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { AuthContext } from '../context/AuthContext';
+import { addToWishlist, deleteWishlistItem, fetchWishlistItems } from '../redux/slices/wishlistSlice';
 
 
 const { width } = Dimensions.get('window');
@@ -26,7 +27,10 @@ const[categories,setCategories]=useState([]);
   const [mostPopularProducts, setMostPopularProducts] = useState([]);
   const [userData, setUserData] = useState({});
 
+const { wishitems, status } = useSelector((state) => state.wishlist);
   const dispatch = useDispatch();
+
+
 
   const getNewProducts = () => {
     api
@@ -110,14 +114,27 @@ const[categories,setCategories]=useState([]);
       });
   };
   
+  const deleteWishlist = (data) => {
+ 
+  
+     dispatch(deleteWishlistItem(data)) 
+             .then(() => { Alert.alert("Item removed from wishlist")
+               dispatch(fetchWishlistItems(user));
+             })
+             .catch((error) => {
+               console.error('Failed to remove from wishlist:', error);
+             });
 
+   
+  };
   const addCart = (data) => {
  console.log('user in home',user);
     if(user && user?.contact_id){
-     
-    data.contact_id=user?.contact_id
+      const updatedItem = { ...data, contact_id: user?.contact_id}; 
+
+    // data.contact_id=user?.contact_id
   
-     dispatch(addToCart(data)) 
+     dispatch(addToCart(updatedItem)) 
              .then(() => { Alert.alert("Item added to cart")
                dispatch(fetchCartItems(user));
              })
@@ -132,6 +149,30 @@ const[categories,setCategories]=useState([]);
     }
    
   };
+
+  
+      const addWishlist = (data) => {
+     
+        if(user){
+         
+        data.contact_id=user.contact_id
+      
+         dispatch(addToWishlist(data)) 
+                 .then(() => { Alert.alert("Item added to wishlist")
+                   dispatch(fetchWishlistItems(user));
+                 })
+                 .catch((error) => {
+                   console.error('Failed to add to cart:', error);
+                 });
+      
+        }
+        else{
+          Alert.alert("Please Login")
+         
+        }
+       
+      };
+
   const getUserData = async () => {
     try {
       // const jsonValue = await AsyncStorage.getItem('user');
@@ -269,7 +310,26 @@ const[categories,setCategories]=useState([]);
         >
     <Text style={styles.flashName} numberOfLines={1}>{item.title}</Text>
     </TouchableOpacity>
-    <TouchableOpacity style={styles.addToCartButton}  onPress={() => addCart(item)}>
+    <TouchableOpacity style={styles.addToCartButton}  onPress={() => {
+          const existingWishItem = wishitems.find(it => it.product_id === item.product_id);
+          if (existingWishItem) {
+            deleteWishlist(existingWishItem)
+          
+        }
+      else{
+        addWishlist(item)
+      }}}>
+      <Text style={styles.addToCartText} >{wishitems.some(it => it.product_id === item.product_id)
+      ? "Remove from Wishlist"
+      : "Add to Wishlist"}</Text>
+    </TouchableOpacity>
+    <TouchableOpacity style={styles.addToCartButton}  onPress={() =>{ 
+     if(item.grades){
+      Alert.alert('Please select grade before adding to cart');
+      navigation.navigate("ProductDetails", { productId: item.product_id })
+     }else{
+      addCart(item)}}
+      }>
       <Text style={styles.addToCartText}>Add to Cart</Text>
     </TouchableOpacity>
   </View>
@@ -318,7 +378,26 @@ const[categories,setCategories]=useState([]);
         >
     <Text style={styles.flashName} numberOfLines={1}>{item.title}</Text>
     </TouchableOpacity>
-    <TouchableOpacity style={styles.addToCartButton}  onPress={() => addCart(item)}>
+    <TouchableOpacity style={styles.addToCartButton}   onPress={() => {
+          const existingWishItem = wishitems.find(it => it.product_id === item.product_id);
+          if (existingWishItem) {
+            deleteWishlist(existingWishItem)
+          
+        }
+      else{
+        addWishlist(item)
+      }}}>
+      <Text style={styles.addToCartText}>{wishitems.some(it => it.product_id === item.product_id)
+      ? "Remove from Wishlist"
+      : "Add to Wishlist"}</Text>
+    </TouchableOpacity>
+    <TouchableOpacity style={styles.addToCartButton}  onPress={() =>{ 
+     if(item.grades){
+      Alert.alert('Please select grade before adding to cart');
+      navigation.navigate("ProductDetails", { productId: item.product_id })
+     }else{
+      addCart(item)}}
+      }>
       <Text style={styles.addToCartText}>Add to Cart</Text>
     </TouchableOpacity>
   </View>
@@ -367,7 +446,26 @@ const[categories,setCategories]=useState([]);
         >
     <Text style={styles.flashName} numberOfLines={1}>{item.title}</Text>
     </TouchableOpacity>
-    <TouchableOpacity style={styles.addToCartButton}  onPress={() => addCart(item)}>
+    <TouchableOpacity style={styles.addToCartButton}   onPress={() => {
+          const existingWishItem = wishitems.find(it => it.product_id === item.product_id);
+          if (existingWishItem) {
+            deleteWishlist(existingWishItem)
+          
+        }
+      else{
+        addWishlist(item)
+      }}}>
+      <Text style={styles.addToCartText}>{wishitems.some(it => it.product_id === item.product_id)
+      ? "Remove from Wishlist"
+      : "Add to Wishlist"}</Text>
+    </TouchableOpacity>
+    <TouchableOpacity style={styles.addToCartButton}  onPress={() =>{ 
+     if(item.grades){
+      Alert.alert('Please select grade before adding to cart');
+      navigation.navigate("ProductDetails", { productId: item.product_id })
+     } else{
+      addCart(item)}}
+      }>
       <Text style={styles.addToCartText}>Add to Cart</Text>
     </TouchableOpacity>
   </View>
@@ -416,7 +514,26 @@ const[categories,setCategories]=useState([]);
         >
     <Text style={styles.flashName} numberOfLines={1}>{item.title}</Text>
     </TouchableOpacity>
-    <TouchableOpacity style={styles.addToCartButton}  onPress={() => addCart(item)}>
+    <TouchableOpacity style={styles.addToCartButton}   onPress={() => {
+          const existingWishItem = wishitems.find(it => it.product_id === item.product_id);
+          if (existingWishItem) {
+            deleteWishlist(existingWishItem)
+          
+        }
+      else{
+        addWishlist(item)
+      }}}>
+      <Text style={styles.addToCartText}>{wishitems.some(it => it.product_id === item.product_id)
+      ? "Remove from Wishlist"
+      : "Add to Wishlist"}</Text>
+    </TouchableOpacity>
+    <TouchableOpacity style={styles.addToCartButton} onPress={() =>{ 
+     if(item.grades){
+      Alert.alert('Please select grade before adding to cart');
+      navigation.navigate("ProductDetails", { productId: item.product_id })
+     } else{
+      addCart(item)}}
+      }>
       <Text style={styles.addToCartText}>Add to Cart</Text>
     </TouchableOpacity>
   </View>
@@ -550,6 +667,7 @@ addToCartButton: {
   borderWidth: 1,
   borderRadius: 6,
   paddingVertical: 6,
+  marginTop:8,
   alignItems: 'center',
 },
 

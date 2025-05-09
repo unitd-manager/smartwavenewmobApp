@@ -112,7 +112,7 @@ const Profile = ({ navigation }) => {
 
           <View style={styles.buttonGroup}>
             <Button mode="contained" onPress={updateContact} style={styles.button}>Save</Button>
-            <Button mode="outlined" onPress={cancelEdit} style={styles.button}>Cancel</Button>
+            <Button mode="contained" onPress={cancelEdit} style={styles.button}>Cancel</Button>
           </View>
         </>
       ) : (
@@ -178,7 +178,7 @@ const styles = StyleSheet.create({
   },
   sectionHeader: {
     fontSize: 18,
-    fontWeight: 'bold',
+    //fontWeight: 'bold',
     marginTop: 20,
     marginBottom: 10,
     color: '#000',

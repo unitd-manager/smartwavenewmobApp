@@ -14,6 +14,9 @@ import ProductDetails from "./screens/ProductDetails";
 import AboutUs from "./screens/AboutUs";
 import Profile from "./screens/Profile";
 import ContactUs from "./screens/ContactUs";
+import WishlistScreen from "./screens/Wishlist";
+import EnquiryHistory from "./screens/EnquiryHistory";
+import EnquiryDetails from "./screens/EnquiryDetails";
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -102,6 +105,9 @@ const AccountStack = () => (
              <Stack.Screen name="AboutUs" component={AboutUs}  options={{ title: "About Us" }} />
              <Stack.Screen name="Profile" component={Profile}  options={{ title: "Profile" }} />
              <Stack.Screen name="ContactUs" component={ContactUs}  options={{ title: "Contact Us" }} />
+             <Stack.Screen name="WishlistScreen" component={WishlistScreen}  options={{ title: "Wishlist" }} />
+             <Stack.Screen name="EnquiryHistory" component={EnquiryHistory}  options={{ title: "Enquiries" }} />
+             <Stack.Screen name="EnquiryDetails" component={EnquiryDetails}  options={{ title: "Enquiry Details" }} />
   </Stack.Navigator>
 );
 

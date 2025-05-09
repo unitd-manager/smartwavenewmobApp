@@ -28,6 +28,7 @@ import { useDispatch } from "react-redux";
 import { fetchCartItems } from "./redux/slices/cartSlice";
 import Profile from "./screens/Profile";
 import ContactUs from "./screens/ContactUs";
+import WishlistScreen from "./screens/Wishlist";
 
 const Stack = createStackNavigator();
 
@@ -105,6 +106,7 @@ useEffect(() => {
             <Stack.Screen name="ForgotPassword" component={ForgotPassword} />
             <Stack.Screen name="Signup" component={Signup} />
             <Stack.Screen name="Cart" component={Cart} />
+            {/* <Stack.Screen name="WishlistScreen" component={WishlistScreen}  options={{ title: "Wishlist" }}/> */}
             <Stack.Screen name="Categories" component={Categories}  options={{ title: "Categories" }}/>
             <Stack.Screen name="AboutUs" component={AboutUs} />
             <Stack.Screen name="NewPasswordPopup" component={NewPasswordPopup} />

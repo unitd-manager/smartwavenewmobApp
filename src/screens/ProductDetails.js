@@ -1,4 +1,4 @@
-import React, { useEffect, useState,useCallback } from "react";
+import React, { useEffect, useState,useCallback, useContext } from "react";
 import {
   SafeAreaView,
   View,
@@ -12,18 +12,20 @@ import {
 } from "react-native";
 import api from "../constants/api";
 import { addToCart, fetchCartItems } from '../redux/slices/cartSlice';
+import { addToWishlist,fetchWishlistItems,deleteWishlistItem } from "../redux/slices/wishlistSlice";
 import imageBase from "../constants/imageBase";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useFocusEffect } from '@react-navigation/native';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Icon from 'react-native-vector-icons/Ionicons';
+import { AuthContext } from "../context/AuthContext";
 //import BackButton from "../components/BackButton";
 //import GradeSelector from "../components/GradePicker";
 
 export default ({ route }) => {
   const { productId } = route.params || {};
   const [product, setProduct] = useState({});
-  const [user, setUser] = useState({});
+  const [userData, setUser] = useState({});
   const [productStock, setProductStock] = useState(
     product.variation ? product.variation[0].size[0].stock : product.qty_in_stock
   );
@@ -33,11 +35,14 @@ export default ({ route }) => {
    
   );
 
-  
+  const{user,logout}=useContext(AuthContext);
 
   const dispatch = useDispatch();
-
+const { wishitems, status } = useSelector((state) => state.wishlist);
   
+const isInWishlist = () => {
+  return wishitems?.some(item => item.product_id === product.product_id);
+};
   const addCart = (data) => {
  
     if(user){
@@ -59,10 +64,47 @@ export default ({ route }) => {
     }
    
   };
+  const deleteWishlist = (data) => {
+ 
+  
+     dispatch(deleteWishlistItem(data)) 
+             .then(() => { Alert.alert("Item removed from wishlist")
+               dispatch(fetchWishlistItems(user));
+             })
+             .catch((error) => {
+               console.error('Failed to remove from wishlist:', error);
+             });
+
+   
+  };
+
+  
+  const addWishlist = (data) => {
+ 
+    if(user){
+    
+    data.contact_id=user.contact_id
+  
+     dispatch(addToWishlist(data)) 
+             .then(() => { Alert.alert("Item added to wishlist")
+               dispatch(fetchWishlistItems(user));
+             })
+             .catch((error) => {
+               console.error('Failed to add to cart:', error);
+             });
+  
+    }
+    else{
+      Alert.alert("Please Login")
+     
+    }
+   
+  };
+
    const getUserData = async () => {
       try {
-        const jsonValue = await AsyncStorage.getItem('user');
-        const user = jsonValue != null ? JSON.parse(jsonValue) : null;
+        // const jsonValue = await AsyncStorage.getItem('user');
+        // const user = jsonValue != null ? JSON.parse(jsonValue) : null;
   
         if (user?.contact_id) {
           
@@ -163,6 +205,22 @@ export default ({ route }) => {
   >
     <Icon name="cart-outline" size={20} color="#1EB1C5" style={styles.cartIcon} />
     <Text style={styles.carttext9}>{"Add to Cart"}</Text>
+  </TouchableOpacity>
+  
+  <TouchableOpacity
+    style={styles.cartbuttonRow}
+    onPress={() => {
+      const existingWishItem = wishitems.find(item => item.product_id === product.product_id);
+      if (isInWishlist()) {
+        deleteWishlist(existingWishItem)
+      
+    }
+  else{
+    addWishlist(product)
+  }}}
+  >
+    <Icon name={isInWishlist() ? "heart" : "heart-outline"}size={20} color="#1EB1C5" style={styles.cartIcon} />
+    
   </TouchableOpacity>
 </View>
 

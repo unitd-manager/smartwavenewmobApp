@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import {
   View,
   Text,
@@ -13,10 +13,15 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import { useNavigation } from '@react-navigation/native';
 import api from '../constants/api';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { AuthContext } from '../context/AuthContext';
+import { fetchCartItems } from '../redux/slices/cartSlice';
+import { useDispatch } from 'react-redux';
 
 const SignInScreen = () => {
   const navigation = useNavigation();
 
+const { user, login,logout } = useContext(AuthContext);
+const dispatch=useDispatch();
   const colorScheme = useColorScheme();
 const isDarkMode = colorScheme === 'dark';
 
@@ -95,6 +100,8 @@ const isDarkMode = colorScheme === 'dark';
             else {
               AsyncStorage.setItem("user", JSON.stringify(res.data.data));
               AsyncStorage.setItem("token", JSON.stringify(res.data.token));
+              login(res.data.data)
+                dispatch(fetchCartItems(res.data.data));
 			  Alert.alert('Success', 'Logged in successfully!');
               setTimeout(()=>{
   navigation.navigate(" ")
@@ -174,7 +181,7 @@ const isDarkMode = colorScheme === 'dark';
 
       {/* Sign Up Link */}
       <View style={styles.footer}>
-        <Text>First time here </Text>
+        <Text style={{ fontFamily: 'Outfit-Regular'}}>First time here </Text>
         <TouchableOpacity onPress={() => navigation.navigate('Signup')}>
           <Text style={styles.highlight}>Sign Up</Text>
         </TouchableOpacity>

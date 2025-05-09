@@ -1,23 +1,27 @@
-import React,{useState,useEffect} from 'react';
-import { View, Text, FlatList, StyleSheet } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import React,{useState,useEffect, useContext} from 'react';
+import { View, Text, FlatList, StyleSheet,TouchableOpacity } from 'react-native';
+//import AsyncStorage from '@react-native-async-storage/async-storage';
+import { AuthContext } from '../context/AuthContext';
+import api from '../constants/api';
 
 
-
-export default function EnquiryHistory() {
+export default function EnquiryHistory({navigation}) {
 	const [enquiries, setEnquiries] = useState([]);
 	const [searchQuery, setSearchQuery] = useState(""); // Search state
-   const [user, setUser] = useState();
+   const [userData, setUser] = useState();
 
+
+   
+     const { user, logout } = useContext(AuthContext);
 		useEffect(() => {
 			const initialize = async () => {
 			  try {
-				const jsonValue = await AsyncStorage.getItem('user');
-				console.log('Retrieved from AsyncStorage:', jsonValue);
+				// const jsonValue = await AsyncStorage.getItem('user');
+				// console.log('Retrieved from AsyncStorage:', jsonValue);
 				
-				const user = jsonValue != null ? JSON.parse(jsonValue) : null;
-				setUser(user);
-		  
+				// const user = jsonValue != null ? JSON.parse(jsonValue) : null;
+				// setUser(user);
+		  console.log('user enq',user);
 				if (user) {
 				  console.log('Contact ID:', user.contact_id);
 		  
@@ -55,8 +59,9 @@ export default function EnquiryHistory() {
               onPress={() => navigation.navigate("EnquiryDetails", { enquiry: item })}
             >
       <Text style={styles.orderId}>{item.type} #{item.enquiry_id}</Text>
+      <Text style={styles.orderId}>{item.type} {item.enquiry_code}</Text>
       <Text style={styles.date}>{item.enquiry_date}</Text>
-      <Text style={styles.label}>Preferred Contact</Text>
+      <Text style={styles.label}>{item.order_code }</Text>
       <View
         style={[
           styles.statusBadge,
@@ -101,17 +106,19 @@ export default function EnquiryHistory() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f8f9fb', padding: 16 },
+  container: { flex: 1, backgroundColor: '#f8f9fb', padding: 16,fontFamily: 'Outfit-Regular', },
   header: {
     fontSize: 20,
     fontWeight: '600',
     marginBottom: 16,
     textAlign: 'center',
+    fontFamily: 'Outfit-Regular',
   },
   summaryContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginBottom: 16,
+    fontFamily: 'Outfit-Regular',
   },
   summaryCard: {
     backgroundColor: '#fff',
@@ -123,15 +130,18 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 3,
     elevation: 3,
+    fontFamily: 'Outfit-Regular',
   },
   summaryTitle: {
     color: '#7b7b8b',
     fontSize: 14,
+    fontFamily: 'Outfit-Regular',
   },
   summaryCount: {
     fontSize: 24,
     fontWeight: 'bold',
     marginTop: 4,
+    fontFamily: 'Outfit-Regular',
   },
   card: {
     backgroundColor: '#fff',
@@ -139,19 +149,23 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     marginBottom: 12,
     position: 'relative',
+    fontFamily: 'Outfit-Regular',
   },
   orderId: {
     fontSize: 16,
     fontWeight: '500',
+    fontFamily: 'Outfit-Regular',
   },
   date: {
     color: '#9a9a9a',
     fontSize: 13,
     marginVertical: 4,
+    fontFamily: 'Outfit-Regular',
   },
   label: {
     color: '#3a3a3a',
     fontSize: 14,
+    fontFamily: 'Outfit-Regular',
   },
   statusBadge: {
     position: 'absolute',
@@ -160,19 +174,24 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
     paddingHorizontal: 10,
     borderRadius: 20,
+    fontFamily: 'Outfit-Regular',
   },
   approved: {
     backgroundColor: '#d7f5dd',
+    fontFamily: 'Outfit-Regular',
   },
   rejected: {
     backgroundColor: '#ffdede',
+    fontFamily: 'Outfit-Regular',
   },
   pending: {
     backgroundColor: '#fef2c0',
+    fontFamily: 'Outfit-Regular',
   },
   statusText: {
     fontSize: 12,
     fontWeight: '500',
     color: '#333',
+    fontFamily: 'Outfit-Regular',
   },
 });

@@ -1,4 +1,4 @@
-import React, { useState, useEffect,useCallback } from 'react';
+import React, { useState, useEffect,useCallback, useContext } from 'react';
 import {
   View,
   Text,
@@ -17,6 +17,8 @@ import { useSelector, useDispatch } from 'react-redux';
 import { addToCart, fetchCartItems } from '../redux/slices/cartSlice';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFocusEffect } from '@react-navigation/native';
+import { AuthContext } from '../context/AuthContext';
+import { addToWishlist, deleteWishlistItem, fetchWishlistItems } from '../redux/slices/wishlistSlice';
 //import BackButton from '../components/BackButton';
 
 const ProductListScreen = ({ route, navigation }) => {
@@ -26,12 +28,20 @@ const ProductListScreen = ({ route, navigation }) => {
   const [loading, setLoading] = useState(true);
   const [showSearch, setShowSearch] = useState(false);
   const [subcategories, setSubcategories] = useState([]);
+  
+  const [subCategoryTypes, setSubCategoryTypes] = useState([]);
   const [selectedSubcategories, setSelectedSubcategories] = useState([]);
   
+  const [selectedSubcategoryTypes, setSelectedSubcategoryTypes] = useState([]);
+
+const { user, logout } = useContext(AuthContext);
+
+const { wishitems, status } = useSelector((state) => state.wishlist);
+
   const filteredProducts = products.filter((item) =>
     item.title?.toLowerCase().includes(searchQuery?.toLowerCase())
   );
-   const [user, setUser] = useState({});
+   const [userData, setUser] = useState({});
   
     const dispatch = useDispatch();
   // const addToCart = (id) => {
@@ -51,8 +61,19 @@ const ProductListScreen = ({ route, navigation }) => {
       console.error('Failed to load subcategories', error);
     }
   };
+
+  const fetchSubcategoryTypes = async (subcategoryId) => {
+    try {
+      const response = await api.post('/category/getSubCategoryTypeBySubCategory', {
+        sub_category_id: subcategoryId,
+      });
+      setSubCategoryTypes(response.data.data || []);
+    } catch (error) {
+      console.error('Failed to load subcategories', error);
+    }
+  };
   
- 
+  
   const addCart = (data) => {
  console.log('data',data);
     if(user){
@@ -74,10 +95,47 @@ const ProductListScreen = ({ route, navigation }) => {
     }
    
   };
+  const deleteWishlist = (data) => {
+ 
+  
+     dispatch(deleteWishlistItem(data)) 
+             .then(() => { Alert.alert("Item removed from wishlist")
+               dispatch(fetchWishlistItems(user));
+             })
+             .catch((error) => {
+               console.error('Failed to remove from wishlist:', error);
+             });
+
+   
+  };
+  
+    
+    const addWishlist = (data) => {
+   
+      if(user){
+       
+      data.contact_id=user.contact_id
+    
+       dispatch(addToWishlist(data)) 
+               .then(() => { Alert.alert("Item added to wishlist")
+                 dispatch(fetchWishlistItems(user));
+               })
+               .catch((error) => {
+                 console.error('Failed to add to cart:', error);
+               });
+    
+      }
+      else{
+        Alert.alert("Please Login")
+       
+      }
+     
+    };
+  
    const getUserData = async () => {
       try {
-        const jsonValue = await AsyncStorage.getItem('user');
-        const user = jsonValue != null ? JSON.parse(jsonValue) : null;
+        // const jsonValue = await AsyncStorage.getItem('user');
+        // const user = jsonValue != null ? JSON.parse(jsonValue) : null;
   
         if (user?.contact_id) {
           
@@ -115,8 +173,26 @@ const ProductListScreen = ({ route, navigation }) => {
         }, [])
       );
     
+      const fetchSubcategoryTypeProducts = () => {
+        //setLoading(true);
+        console.log('subcategoeytypes',selectedSubcategoryTypes);
+        api.post('/category/getProductBySubCategoryType', { sub_category_type_ids: selectedSubcategoryTypes })
+          .then((res) => {
+            res.data.data.forEach((element) => {
+              element.tag = String(element.tag).split(",");
+              element.images = String(element.images).split(",");
+            });
+            setProducts(res.data.data);
+            setLoading(false)
+            console.log('subcategoeytypespros',res.data.data);
+          })
+          .catch(() => console.log("error"))
+          .finally(() => setLoading(false));
+      };
+    
 
     const fetchSubcategoryProducts = () => {
+      console.log('subcategories',selectedSubcategories);
       setLoading(true);
       api.post('/category/getProductBySubcategory', { sub_category_ids: selectedSubcategories })
         .then((res) => {
@@ -125,6 +201,7 @@ const ProductListScreen = ({ route, navigation }) => {
             element.images = String(element.images).split(",");
           });
           setProducts(res.data.data);
+          console.log('subcategoriespros',res.data.data);
         })
         .catch(() => console.log("error"))
         .finally(() => setLoading(false));
@@ -145,12 +222,16 @@ const ProductListScreen = ({ route, navigation }) => {
       .finally(() => setLoading(false));
   };
 useEffect(()=>{
-  if(selectedSubcategories.length >0){
+  if(selectedSubcategoryTypes.length >0){
+    fetchSubcategoryTypeProducts();
+} else if(selectedSubcategories.length >0){
   fetchSubcategoryProducts();
-} else{
+  
+}
+ else{
   fetchProducts();
 }
-},[selectedSubcategories])
+},[selectedSubcategories,selectedSubcategoryTypes])
   useEffect(() => {
     fetchProducts();
     fetchSubcategories();
@@ -190,13 +271,37 @@ useEffect(()=>{
             <Text style={styles.qtyBtn}>+</Text>
           </TouchableOpacity>
         </View>
-      ) : (
+      ) : (<>
         <TouchableOpacity
-          onPress={() => addCart(item)}
+        // onPress={() => addWishlist(item)}
+        onPress={() => {
+          const existingWishItem = wishitems.find(it => it.product_id === item.product_id);
+          if (existingWishItem) {
+            deleteWishlist(existingWishItem)
+          
+        }
+      else{
+        addWishlist(item)
+      }}}
+        style={styles.Wishlist}
+      >
+        <Text style={styles.Wishlist}> {wishitems.some(it => it.product_id === item.product_id)
+      ? "Remove from Wishlist"
+      : "Add to Wishlist"} </Text>
+      </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() =>{ 
+               if(item.grades){
+                Alert.alert('Please select grade before adding to cart');
+                navigation.navigate("ProductDetails", { productId: item.product_id })
+               } else{
+                addCart(item)}}
+                } 
           style={styles.addToCart}
         >
           <Text style={styles.addToCartText}>Add to Cart</Text>
         </TouchableOpacity>
+        </>
       )}
     </View>
   );
@@ -223,6 +328,7 @@ useEffect(()=>{
         />
       )}
 <View style={{ marginTop: 10 }}>
+{subcategories.length>0 && <Text style={styles.sectionTitle}>SubCategories</Text>}
   <FlatList
     horizontal
     showsHorizontalScrollIndicator={false}
@@ -233,20 +339,20 @@ useEffect(()=>{
       const isSelected = selectedSubcategories?.includes(item.sub_category_id);
       return (
         <TouchableOpacity
-          onPress={() => {
-            if (isSelected) {
-              // Unselect
-              setSelectedSubcategories((prev) =>
-                prev.filter((id) => id !== item.sub_category_id)
-              );
-            } else {
-              // Select
-              setSelectedSubcategories((prev) => [
-                ...prev,
-                item.sub_category_id,
-              ]);
-            }
-          }}
+        onPress={() => {
+          if (isSelected) {
+            setSelectedSubcategories((prev) =>
+              prev.filter((id) => id !== item.sub_category_id)
+            );
+            setSubCategoryTypes([]); // Clear subcategory types if deselected
+            setSelectedSubcategoryTypes([]); // Clear selected subcategory types
+          } else {
+            setSelectedSubcategories([item.sub_category_id]); // Only allow selecting one subcategory at a time
+            setSelectedSubcategoryTypes([]); // Clear selected subcategory types when selecting new subcategory
+            fetchSubcategoryTypes(item.sub_category_id);
+          }
+        }}
+        
           style={{
             backgroundColor: isSelected ? '#00AA88' : '#eee',
             paddingHorizontal: 12,
@@ -264,6 +370,48 @@ useEffect(()=>{
   />
 </View>
 
+<View style={{ marginTop: 10 }}>
+{subCategoryTypes.length>0 && <Text style={styles.sectionTitle}>Types</Text>}
+  <FlatList
+    horizontal
+    showsHorizontalScrollIndicator={false}
+    data={subCategoryTypes}
+    keyExtractor={(item) => item.sub_category_type_id.toString()}
+    contentContainerStyle={{ paddingHorizontal: 10 }}
+    renderItem={({ item }) => {
+      const isSelected = selectedSubcategoryTypes?.includes(item.sub_category_type_id);
+      return (
+        <TouchableOpacity
+          onPress={() => {
+            if (isSelected) {
+              // Unselect
+              setSelectedSubcategoryTypes((prev) =>
+                prev.filter((id) => id !== item.sub_category_type_id)
+              );
+            } else {
+              // Select
+              setSelectedSubcategoryTypes((prev) => [
+                ...prev,
+                item.sub_category_type_id,
+              ]);
+            }
+          }}
+          style={{
+            backgroundColor: isSelected ? '#00AA88' : '#eee',
+            paddingHorizontal: 12,
+            paddingVertical: 6,
+            borderRadius: 20,
+            marginRight: 10,
+          }}
+        >
+          <Text style={{ color: isSelected ? '#fff' : '#000',fontFamily: 'Outfit-Regular' }}>
+            {item.type_title}
+          </Text>
+        </TouchableOpacity>
+      );
+    }}
+  />
+</View>
 
       {loading ? (
         <ActivityIndicator size="large" color="#00AA88" style={{ marginTop: 40 }} />
@@ -366,6 +514,22 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     fontFamily: 'Outfit-Regular',
   },  
+  addToWishlist: {
+    borderWidth: 1,
+    borderColor: '#00AA88',
+    paddingVertical: 6,
+    borderRadius: 6,
+    marginTop: 6,
+    width: '90%',
+    alignItems: 'center',
+    alignSelf: 'center',
+    fontFamily: 'Outfit-Regular',
+  },  
+  addToWishlistText: {
+    color: '#00AA88',
+    fontSize: 12,
+    fontFamily: 'Outfit-Regular',
+  },
   discountBadge: {
     position: 'absolute',
     top: 10,
@@ -405,4 +569,25 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontFamily: 'Outfit-Regular',
   },
+  sectionTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    marginLeft: 12,
+    marginBottom: 4,
+    color: '#333',
+    fontFamily: 'Outfit-Regular',
+  },
+  
+  chip: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 20,
+    marginRight: 10,
+  },
+  
+  chipText: {
+    fontFamily: 'Outfit-Regular',
+    fontSize: 14,
+  },
+  
 });
