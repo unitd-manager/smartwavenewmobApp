@@ -1,26 +1,34 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, Platform } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 
-const GradeSelector = ({ product, selectedProductGrade, setSelectedProductGrade, setProductStock, setQuantityCount }) => {
+const GradeSelector = ({
+  product,
+  selectedProductGrade,
+  setSelectedProductGrade,
+  setProductStock,
+  setQuantityCount,
+}) => {
   return (
-    product?.grades && product.grades.length > 0 && (
+    product?.grades?.length > 0 && (
       <View style={styles.container}>
         <Text style={styles.label}>Select Grade</Text>
         <View style={styles.pickerWrapper}>
           <Picker
             selectedValue={selectedProductGrade}
             onValueChange={(itemValue) => {
-              const selectedData = product.grades.find((g) => g.name === itemValue);
+              const selectedData = product.grades.find((g) => g === itemValue);
               setSelectedProductGrade(itemValue);
               setProductStock(selectedData?.stock || 0);
               setQuantityCount(1);
             }}
             mode="dropdown"
+            style={styles.picker}
+            dropdownIconColor="#555"
           >
-            <Picker.Item label="Select a grade" value="" />
+            <Picker.Item label="Select a grade" value="" color="#888" />
             {product.grades.map((grade, index) => (
-              <Picker.Item key={index} label={grade.name} value={grade.name} />
+              <Picker.Item key={index} label={grade} value={grade} color="#000" />
             ))}
           </Picker>
         </View>
@@ -31,22 +39,32 @@ const GradeSelector = ({ product, selectedProductGrade, setSelectedProductGrade,
 
 const styles = StyleSheet.create({
   container: {
-    margin: 16,
-    backgroundColor: '#fff',
-    borderRadius: 8,
-    padding: 12,
-    elevation: 3,
+    marginHorizontal: 16,
+    backgroundColor: '#f5f5f5',
+    borderRadius: 10,
+    padding: 10,
+    elevation: 2,
   },
   label: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#444',
-    marginBottom: 8,
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#333',
+    marginBottom: 6,
   },
   pickerWrapper: {
     borderWidth: 1,
     borderColor: '#ccc',
     borderRadius: 8,
+    backgroundColor: '#fff',
+    height: 50,
+    justifyContent: 'center',
+    overflow: 'hidden',
+  },
+  picker: {
+    height: 50,
+    color: '#000', // ensures selected text is visible
+    fontSize: 14,
+    marginTop: Platform.OS === 'android' ? -4 : 0, // Android adjustment
   },
 });
 

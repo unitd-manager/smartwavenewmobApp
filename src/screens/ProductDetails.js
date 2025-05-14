@@ -20,7 +20,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import Icon from 'react-native-vector-icons/Ionicons';
 import { AuthContext } from "../context/AuthContext";
 //import BackButton from "../components/BackButton";
-//import GradeSelector from "../components/GradePicker";
+import GradeSelector from "../components/GradePicker";
 
 export default ({ route }) => {
   const { productId } = route.params || {};
@@ -46,9 +46,10 @@ const isInWishlist = () => {
   const addCart = (data) => {
  
     if(user){
+      if(selectedProductGrade){
      
     data.contact_id=user.contact_id
-  
+  data.grade=selectedProductGrade;
      dispatch(addToCart(data)) 
              .then(() => { Alert.alert("Item added to cart")
                dispatch(fetchCartItems(user));
@@ -56,7 +57,9 @@ const isInWishlist = () => {
              .catch((error) => {
                console.error('Failed to add to cart:', error);
              });
-  
+            } else{
+              Alert.alert("Please Select Grade")
+            }
     }
     else{
       Alert.alert("Please Login")
@@ -150,12 +153,14 @@ const isInWishlist = () => {
         let data = res.data.data[0];
         data.tag = String(data.tag).split(",");
         data.images = String(data.images).split(",");
+        data.grades = String(data.grades).split(",");
+        console.log('productdata',data);
         setProduct(data);
       })
       .catch((err) => {
         console.log(err);
       });
-  }, [productId]);
+  }, []);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -194,8 +199,9 @@ const isInWishlist = () => {
 
         <View style={styles.row3}>
           <Text style={styles.text3}>{product?.product_type}</Text>
-         
-        </View>
+          </View>
+         <GradeSelector product={product} selectedProductGrade={selectedProductGrade} setSelectedProductGrade={setSelectedProductGrade} setProductStock={setProductStock} setQuantityCount={setQuantityCount} />
+        
         <View style={styles.row5}>
   <Text style={styles.text5}>{product?.title}</Text>
 
