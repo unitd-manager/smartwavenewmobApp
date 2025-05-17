@@ -24,7 +24,7 @@ const GradeSelector = ({
             }}
             mode="dropdown"
             style={styles.picker}
-            dropdownIconColor="#555"
+            dropdownIconColor="#000" // Black icon color
           >
             <Picker.Item label="Select a grade" value="" color="#888" />
             {product.grades.map((grade, index) => (
@@ -40,7 +40,7 @@ const GradeSelector = ({
 const styles = StyleSheet.create({
   container: {
     marginHorizontal: 16,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#ffffff', // White background
     borderRadius: 10,
     padding: 10,
     elevation: 2,
@@ -48,23 +48,24 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#333',
+    color: '#000', // Ensure visible in all themes
     marginBottom: 6,
   },
   pickerWrapper: {
     borderWidth: 1,
     borderColor: '#ccc',
     borderRadius: 8,
-    backgroundColor: '#fff',
+    backgroundColor: '#ffffff', // White background for the dropdown
     height: 50,
     justifyContent: 'center',
     overflow: 'hidden',
   },
   picker: {
     height: 50,
-    color: '#000', // ensures selected text is visible
+    color: '#000000', // Selected item text color
     fontSize: 14,
-    marginTop: Platform.OS === 'android' ? -4 : 0, // Android adjustment
+    marginTop: Platform.OS === 'android' ? -4 : 0,
+    backgroundColor: '#ffffff', // Override dark mode on Android
   },
 });
 
