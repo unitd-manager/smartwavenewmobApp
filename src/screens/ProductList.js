@@ -283,9 +283,9 @@ useEffect(()=>{
       else{
         addWishlist(item)
       }}}
-        style={styles.Wishlist}
+        style={styles.addToCart}
       >
-        <Text style={styles.Wishlist}> {wishitems.some(it => it.product_id === item.product_id)
+        <Text style={styles.addToCartText}> {wishitems.some(it => it.product_id === item.product_id)
       ? "Remove from Wishlist"
       : "Add to Wishlist"} </Text>
       </TouchableOpacity>
