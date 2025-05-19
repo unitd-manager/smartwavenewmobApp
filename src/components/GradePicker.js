@@ -42,7 +42,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 16,
     backgroundColor: '#ffffff', // White background
     borderRadius: 10,
-    padding: 10,
+    padding: 3,
     elevation: 2,
   },
   label: {
@@ -56,12 +56,12 @@ const styles = StyleSheet.create({
     borderColor: '#ccc',
     borderRadius: 8,
     backgroundColor: '#ffffff', // White background for the dropdown
-    height: 50,
+    height: 52,
     justifyContent: 'center',
     overflow: 'hidden',
   },
   picker: {
-    height: 50,
+    height: 52,
     color: '#000000', // Selected item text color
     fontSize: 14,
     marginTop: Platform.OS === 'android' ? -4 : 0,

@@ -21,6 +21,7 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import { AuthContext } from "../context/AuthContext";
 //import BackButton from "../components/BackButton";
 import GradeSelector from "../components/GradePicker";
+import ProductDetailsSection from "../components/ProductDetailsSection";
 
 export default ({ route }) => {
   const { productId } = route.params || {};
@@ -153,7 +154,13 @@ const isInWishlist = () => {
         let data = res.data.data[0];
         data.tag = String(data.tag).split(",");
         data.images = String(data.images).split(",");
-        data.grades = String(data.grades).split(",");
+        //data.grades = String(data.grades).split(",").filter((el)=>{return el = null });
+        if (data.grades != null) {
+  data.grades = String(data.grades)
+    .split(",")
+    .map(grade => grade.trim())
+    .filter(el => el !== null && el !== '');
+}
         console.log('productdata',data);
         setProduct(data);
       })
@@ -200,19 +207,18 @@ const isInWishlist = () => {
         <View style={styles.row3}>
           <Text style={styles.text3}>{product?.product_type}</Text>
           </View>
-         <GradeSelector product={product} selectedProductGrade={selectedProductGrade} setSelectedProductGrade={setSelectedProductGrade} setProductStock={setProductStock} setQuantityCount={setQuantityCount} />
-        
+         
         <View style={styles.row5}>
   <Text style={styles.text5}>{product?.title}</Text>
 
-  <TouchableOpacity
+  {/* <TouchableOpacity
     style={styles.cartbuttonRow}
     onPress={() => addCart(product)}
   >
     <Icon name="cart-outline" size={20} color="#1EB1C5" style={styles.cartIcon} />
     <Text style={styles.carttext9}>{"Add to Cart"}</Text>
   </TouchableOpacity>
-  
+   */}
   <TouchableOpacity
     style={styles.cartbuttonRow}
     onPress={() => {
@@ -229,8 +235,9 @@ const isInWishlist = () => {
     
   </TouchableOpacity>
 </View>
-
-
+<View style={styles.gradeview}>
+<GradeSelector product={product} selectedProductGrade={selectedProductGrade} setSelectedProductGrade={setSelectedProductGrade} setProductStock={setProductStock} setQuantityCount={setQuantityCount} />  
+    </View>
         <Image
           source={{
             uri: "https://storage.googleapis.com/tagjs-prod.appspot.com/pNd58t8xI9/6hl7r52x.png",
@@ -239,7 +246,7 @@ const isInWishlist = () => {
           style={styles.image8}
         />
 
-        <View style={styles.row6}>
+        {/* <View style={styles.row6}>
           <Text style={styles.text7}>{"Product Detail"}</Text>
           <Image
             source={{
@@ -251,22 +258,24 @@ const isInWishlist = () => {
         </View>
 
         <Text style={styles.text8}>{product?.description}</Text>
-
-        {/* <View style={styles.view}>
+        <Text style={styles.text8}>{product?.product_description}</Text> */}
+<ProductDetailsSection product={product} />
+        <View style={styles.view}>
           <TouchableOpacity
             style={styles.buttonRow}
             onPress={() => addCart(product)}
           >
-            <Image
+            {/* <Image
               source={{
                 uri: "https://storage.googleapis.com/tagjs-prod.appspot.com/pNd58t8xI9/pev9ywvi.png",
               }}
               resizeMode={"stretch"}
               style={styles.image10}
-            />
+            /> */}
+            <Icon name="cart-outline" size={20} color="#fff" style={styles.cartIcon} />
             <Text style={styles.text9}>{"Add to Cart"}</Text>
           </TouchableOpacity>
-        </View> */}
+        </View>
       </ScrollView>
     </SafeAreaView>
   );
@@ -364,7 +373,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 10,
+    paddingHorizontal: 20,
   },
   
   
@@ -401,7 +410,7 @@ const styles = StyleSheet.create({
   },
   text5: {
     flex: 1,
-    fontSize: 16,
+    fontSize: 18,
     //fontWeight: 'bold',
     marginRight: 10, // spacing from cart button
     fontFamily: 'Outfit-Regular',
@@ -447,6 +456,9 @@ const styles = StyleSheet.create({
     },
     shadowRadius: 24,
     elevation: 24,
+  },
+   gradeview: {
+    marginTop:10,
   },
   cartbuttonRow: {
     flexDirection: "row",
