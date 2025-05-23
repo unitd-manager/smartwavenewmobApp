@@ -50,6 +50,8 @@ const EnquiryDetails = ({ route }) => {
   const [addressList, setAddressList] = useState([]);
   const [productsLinked, setProductsLinked] = useState([]);
   const [selectedAddress, setSelectedAddress] = useState(null);
+  
+  const [deletion, setDeletion] = useState(false);
 
   const [selectedAddressString, setSelectedAddressString] = useState('');
  const [file, setFile] = useState(null);
@@ -311,6 +313,7 @@ const deleteFile = (fileId, onDeleted) => {
           .post('/file/deleteFile', { media_id: fileId })
             .then((res) => {
               console.log('File deleted:', res.data);
+              setDeletion(!deletion);
               Alert.alert('Deleted!', 'Media has been deleted.');
               if (onDeleted) onDeleted(); // Refresh list or update UI
             })
@@ -325,6 +328,20 @@ const deleteFile = (fileId, onDeleted) => {
   );
 };
 
+useEffect(()=>{
+  api.post('/file/getListOfFiles', { record_id: enquiry.enquiry_id, room_name: 'PaymentReceipt' }).then((res) => {
+  setReceiptUrl(res.data);
+});
+ api.post('/file/getListOfFiles', { record_id: enquiry.enquiry_id, room_name: 'OnDocPayment' }).then((res) => {
+      setReceiptUrl1(res.data);
+    });
+    api.post('/file/getListOfFiles', { record_id: enquiry.enquiry_id, room_name: 'AfterArrival' }).then((res) => {
+      setReceiptUrl2(res.data);
+    });
+    api.post('/file/getListOfFiles', { record_id: enquiry.enquiry_id, room_name: 'Enquiry' }).then((res) => {
+      setReceiptUrl3(res.data);
+    });
+},[deletion])
 
 useEffect(()=>{
   api
