@@ -5,7 +5,7 @@ import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
 const ProductDetailsSection = ({ product }) => {
   const [showDetails, setShowDetails] = useState(false);
   const [showAdditional, setShowAdditional] = useState(false);
-const textWithoutTags = product?.product_description?.replace(/<[^>]*>/g, '');
+const textWithoutTags = (product?.product_description || '').replace(/<[^>]*>/g, '');
 
 const decodeHtmlEntities = (text) => {
   const entities = {

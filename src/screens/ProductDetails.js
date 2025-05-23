@@ -22,6 +22,7 @@ import { AuthContext } from "../context/AuthContext";
 //import BackButton from "../components/BackButton";
 import GradeSelector from "../components/GradePicker";
 import ProductDetailsSection from "../components/ProductDetailsSection";
+import ProductImageGallery from "../components/ProductImageGallery";
 
 export default ({ route }) => {
   const { productId } = route.params || {};
@@ -172,38 +173,8 @@ const isInWishlist = () => {
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView style={styles.scrollView}>
+        <ProductImageGallery images={product.images}/>
         
-        <ImageBackground
-          source={{
-            uri: product.images?.[0]
-              ? imageBase + product.images[0]
-              : "https://storage.googleapis.com/tagjs-prod.appspot.com/pNd58t8xI9/yp2hw732.png",
-          }}
-          resizeMode={"stretch"}
-          style={styles.column}
-        >
-          <View style={styles.row2}>
-          {/* <BackButton/> */}
-            <Text style={styles.text2}>{""}</Text>
-           <TouchableOpacity onPress={() => addCart(product)}>
-            <Image
-              source={{
-                uri: "https://storage.googleapis.com/tagjs-prod.appspot.com/pNd58t8xI9/o94ug29m.png",
-              }}
-              resizeMode={"stretch"}
-              style={styles.image3}
-            />
-            </TouchableOpacity>
-          </View>
-          <Image
-            source={{
-              uri: "https://storage.googleapis.com/tagjs-prod.appspot.com/pNd58t8xI9/hhra1eqf.png",
-            }}
-            resizeMode={"stretch"}
-            style={styles.image4}
-          />
-        </ImageBackground>
-
         <View style={styles.row3}>
           <Text style={styles.text3}>{product?.product_type}</Text>
           </View>

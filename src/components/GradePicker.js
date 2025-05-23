@@ -15,22 +15,24 @@ const GradeSelector = ({
         <Text style={styles.label}>Select Grade</Text>
         <View style={styles.pickerWrapper}>
           <Picker
-            selectedValue={selectedProductGrade}
-            onValueChange={(itemValue) => {
-              const selectedData = product.grades.find((g) => g === itemValue);
-              setSelectedProductGrade(itemValue);
-              setProductStock(selectedData?.stock || 0);
-              setQuantityCount(1);
-            }}
-            mode="dropdown"
-            style={styles.picker}
-            dropdownIconColor="#000" // Black icon color
-          >
-            <Picker.Item label="Select a grade" value="" color="#888" />
-            {product.grades.map((grade, index) => (
-              <Picker.Item key={index} label={grade} value={grade} color="#000" />
-            ))}
-          </Picker>
+  selectedValue={selectedProductGrade}
+  onValueChange={(itemValue) => {
+    const selectedData = product.grades.find((g) => g === itemValue);
+    setSelectedProductGrade(itemValue);
+    setProductStock(selectedData?.stock || 0);
+    setQuantityCount(1);
+  }}
+  mode="dropdown"
+  style={styles.picker}
+  dropdownIconColor="#000" // Ensures icon is visible
+  itemStyle={{ color: '#000' }} // iOS only
+>
+  <Picker.Item label="Select a grade" value="" color="#888" />
+  {product.grades.map((grade, index) => (
+    <Picker.Item key={index} label={grade} value={grade} color="#000" />
+  ))}
+</Picker>
+
         </View>
       </View>
     )
@@ -61,12 +63,11 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   picker: {
-    height: 52,
-    color: '#000000', // Selected item text color
-    fontSize: 14,
-    marginTop: Platform.OS === 'android' ? -4 : 0,
-    backgroundColor: '#ffffff', // Override dark mode on Android
-  },
+  height: 52,
+  color: '#000', // Text color
+  backgroundColor: '#fff', // Prevent dark background on Android
+},
+
 });
 
 export default GradeSelector;

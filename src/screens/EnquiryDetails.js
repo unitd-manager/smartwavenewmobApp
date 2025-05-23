@@ -1,11 +1,15 @@
 import React, { useContext, useEffect,useState } from 'react';
-import { View, Text, StyleSheet, useColorScheme, TouchableOpacity,ScrollView, Alert } from 'react-native';
+import { View, Text, StyleSheet, useColorScheme, TouchableOpacity,ScrollView, Alert,Image } from 'react-native';
 import AddressSelector from '../components/AddressSelector';
 import CarrierTrackingCard from '../components/CareerTrackingCard';
 import { AuthContext } from '../context/AuthContext';
 import api from '../constants/api';
 import { Button } from 'react-native-paper';
 import ProductsLinkedModal from '../components/ProductsLinkedModal';
+import { pick, types } from '@react-native-documents/picker'
+import FilePickerPreview from '../components/FileUpload';
+import { WebView } from 'react-native-webview';
+import FileList from '../components/FileList';
 
 const addresses = [
   {
@@ -30,18 +34,46 @@ const EnquiryDetails = ({ route }) => {
   const colorScheme = useColorScheme();
   const isDarkMode = colorScheme === 'dark';
 
+ 
   const { user, logout } = useContext(AuthContext);
   const [enquiries, setEnquiries] = useState({});
   const [tracking, setTracking] = useState({});
   const [profile, setProfile] = useState({});
   const [receiptFile, setReceiptFile] = useState(null);
   const [receiptFileDoc, setReceiptFileDoc] = useState(null);
+  const [receiptArrival, setReceiptArrival] = useState(null);
+  const [receiptArrival1, setReceiptArrival1] = useState(null);
   const [receiptUrl, setReceiptUrl] = useState("");
+  const [receiptUrl1, setReceiptUrl1] = useState("");
+  const [receiptUrl2, setReceiptUrl2] = useState("");
+  const [receiptUrl3, setReceiptUrl3] = useState("");
   const [addressList, setAddressList] = useState([]);
   const [productsLinked, setProductsLinked] = useState([]);
   const [selectedAddress, setSelectedAddress] = useState(null);
 
   const [selectedAddressString, setSelectedAddressString] = useState('');
+ const [file, setFile] = useState(null);
+
+  
+  const renderPreview = () => {
+    if (!file) return null;
+
+    const { type, uri, name } = file;
+
+    if (type.startsWith('image/')) {
+      return <Image source={{ uri }} style={styles.image} />;
+    } else if (type === 'application/pdf' || type.includes('msword')) {
+      return (
+        <WebView
+          source={{ uri }}
+          style={styles.webview}
+          startInLoadingState={true}
+        />
+      );
+    } else {
+      return <Text style={styles.text}>Preview not available for: {name}</Text>;
+    }
+  };
 
   const profileAddress = {
     customer_address_id: "profile", // Unique id for selection
@@ -85,6 +117,159 @@ const EnquiryDetails = ({ route }) => {
   
     return `${date.replace(/\//g, '-')} ${time.toLowerCase()}`;
   };
+const handleError = (error) => {
+  console.warn('File picker error:', error);
+};
+ const handleFileChange = (e) => {
+    const file = e.target.files[0];
+
+    if (file) {
+      if (file.type !== "application/pdf") {
+        alert("Only PDF files are allowed!");
+        e.target.value = "";
+        return;
+      }
+      setReceiptFile(file);
+    }
+  };
+const handleUpload = async () => {
+    if (!receiptFile) {
+      Alert.alert("Please select a file first.");
+      return;
+    }
+   console.log('receiptFile',receiptFile);
+    const formData = new FormData();
+    formData.append("files",{
+  uri: receiptFile.uri,
+  type: receiptFile.type,
+  name: receiptFile.name,
+});
+    formData.append("enquiry_id", enquiry.enquiry_id);
+    formData.append('record_id', enquiry.enquiry_id)
+    formData.append('room_name', 'PaymentReceipt')
+    formData.append('alt_tag_data', 'PaymentReceipt')
+    formData.append('description', 'PaymentReceipt')
+    console.log('formdata',formData);
+
+    api.post('/file/uploadFiles',formData, {
+  headers: {
+    'Content-Type': 'multipart/form-data',
+  },
+}
+    //   ,{onUploadProgress:(filedata)=>{
+    //   console.log( Math.round((filedata.loaded/filedata.total)*100))
+    //   setUploaded( Math.round((filedata.loaded/filedata.total)*100))                 
+    // }}
+  ).then(()=>{
+     api.post('/file/getListOfFiles', { record_id: enquiry.enquiry_id, room_name: 'PaymentReceipt' }).then((res) => {
+  setReceiptUrl(res.data);
+});
+      Alert.alert("Files Uploaded Successfully")
+      setReceiptFile(null);
+      // setTimeout(() => {
+      //     window.location.reload()
+      // }, 400);
+    }).catch(()=>{                  
+      Alert.alert("Unable to upload file")                                
+    })
+  };
+
+  
+  const handleFileDocChange = (e) => {
+    const file = e.target.files[0];
+
+    if (file) {
+      if (file.type !== "application/pdf") {
+        Alert.alert("Only PDF files are allowed!");
+        e.target.value = "";
+        return;
+      }
+      setReceiptFileDoc(file);
+    }
+  };
+
+  const handleUploadOnDoc = async () => {
+    if (!receiptFileDoc) {
+      Alert.alert("Please select a PDF file first.");
+      return;
+    }
+console.log('receiptFileDoc',receiptFileDoc);
+    const formData = new FormData();
+     formData.append("files",{
+  uri: receiptFileDoc.uri,
+  type: receiptFileDoc.type,
+  name: receiptFileDoc.name,
+});
+    formData.append("enquiry_id", enquiry.enquiry_id);
+    formData.append('record_id', enquiry.enquiry_id)
+    formData.append('room_name', 'OnDocPayment')
+    formData.append('alt_tag_data', 'OnDocPayment')
+    formData.append('description', 'OnDocPayment')
+    api.post('/file/uploadFiles',formData, {
+  headers: {
+    'Content-Type': 'multipart/form-data',
+  },
+}).then(()=>{
+      
+ api.post('/file/getListOfFiles', { record_id: enquiry.enquiry_id, room_name: 'OnDocPayment' }).then((res) => {
+      setReceiptUrl1(res.data);
+    });
+      Alert.alert("Files Uploaded Successfully")
+     setReceiptFileDoc(null);
+    }).catch(()=>{                  
+      Alert.alert("Unable to upload file")                                
+    })
+  }; 
+
+  const handleArrival = (e) => {
+    const file = e.target.files[0];
+
+    if (file) {
+      if (file.type !== "application/pdf") {
+        Alert.alert("Only PDF files are allowed!");
+        e.target.value = "";
+        return;
+      }
+      setReceiptArrival(file);
+    }
+  };
+
+  const handleUploadArrival = async () => {
+    if (!receiptArrival) {
+      Alert.alert("Please select a file first.");
+      return;
+    }
+
+console.log('receiptArrival',receiptArrival);
+    const formData = new FormData();
+     formData.append("files",{
+  uri: receiptArrival.uri,
+  type: receiptArrival.type,
+  name: receiptArrival.name,
+});
+    formData.append("enquiry_id", enquiry.enquiry_id);
+    formData.append('record_id', enquiry.enquiry_id)
+    formData.append('room_name', 'AfterArrival')
+    formData.append('alt_tag_data', 'AfterArrival')
+    formData.append('description', 'AfterArrival')
+    api.post('/file/uploadFiles',formData, {
+  headers: {
+    'Content-Type': 'multipart/form-data',
+  },
+}).then(()=>{
+ 
+    api.post('/file/getListOfFiles', { record_id: enquiry.enquiry_id, room_name: 'AfterArrival' }).then((res) => {
+      setReceiptUrl2(res.data);
+    });
+    
+      Alert.alert("Files Uploaded Successfully")
+      setReceiptArrival(null);
+    }).catch(()=>{                  
+      Alert.alert("Unable to upload file")                                
+    })
+  };
+
+
   const generateOrder = () => {
     if(selectedAddressString){
     // enquiry.modification_date = moment().format('DD-MM-YYYY h:mm:ss a');
@@ -108,6 +293,39 @@ const EnquiryDetails = ({ route }) => {
       }
    
   };
+
+const deleteFile = (fileId, onDeleted) => {
+  Alert.alert(
+    'Are you sure?',
+    "You won't be able to revert this!",
+    [
+      {
+        text: 'Cancel',
+        style: 'cancel',
+      },
+      {
+        text: 'Yes, delete it!',
+        style: 'destructive',
+        onPress: () => {
+          api
+          .post('/file/deleteFile', { media_id: fileId })
+            .then((res) => {
+              console.log('File deleted:', res.data);
+              Alert.alert('Deleted!', 'Media has been deleted.');
+              if (onDeleted) onDeleted(); // Refresh list or update UI
+            })
+            .catch((error) => {
+              console.error(error);
+              Alert.alert('Error', 'Unable to delete file.');
+            });
+        },
+      },
+    ],
+    { cancelable: true }
+  );
+};
+
+
 useEffect(()=>{
   api
   .post(`/contact/getContactsById`, { contact_id: user.contact_id })
@@ -129,6 +347,15 @@ useEffect(()=>{
 api.post('/file/getListOfFiles', { record_id: enquiry.enquiry_id, room_name: 'PaymentReceipt' }).then((res) => {
   setReceiptUrl(res.data);
 });
+ api.post('/file/getListOfFiles', { record_id: enquiry.enquiry_id, room_name: 'OnDocPayment' }).then((res) => {
+      setReceiptUrl1(res.data);
+    });
+    api.post('/file/getListOfFiles', { record_id: enquiry.enquiry_id, room_name: 'AfterArrival' }).then((res) => {
+      setReceiptUrl2(res.data);
+    });
+    api.post('/file/getListOfFiles', { record_id: enquiry.enquiry_id, room_name: 'Enquiry' }).then((res) => {
+      setReceiptUrl3(res.data);
+    });
 if(user){
 api
 .post(`/contact/getAddressessByContactId`, { contact_id: user.contact_id })
@@ -183,11 +410,30 @@ const combinedAddressList = [profileAddress, ...addressList];
         <Text style={styles.value}>{enquiry?.shipping_address}</Text>
       </View>
 
-      <Text style={[styles.header, { marginTop: 20 }]}>Payment Receipt</Text>
-      <TouchableOpacity style={styles.uploadBox}>
-        <Text style={styles.uploadText}>Upload your file here</Text>
-      </TouchableOpacity>
+       <View style={styles.precontainer}>
+      <View style={styles.previewContainer}>{renderPreview()}</View>
+      </View>
+ <FilePickerPreview title='Payment Receipt' setReceiptFile={setReceiptFile} receiptFile={receiptFile} handleUpload={handleUpload} />
+     <FileList
+      receiptUrl={receiptUrl} 
+      deleteFile={deleteFile} 
+      />
 
+<FilePickerPreview title='On documents payment' setReceiptFile={setReceiptFileDoc} receiptFile={receiptFileDoc} handleUpload={handleUploadOnDoc} />
+     <FileList
+      receiptUrl={receiptUrl1} 
+       deleteFile={deleteFile} 
+      />
+<FilePickerPreview title='After Arrival' setReceiptFile={setReceiptArrival} receiptFile={receiptArrival} handleUpload={handleUploadArrival} />
+     <FileList
+      receiptUrl={receiptUrl2} 
+       deleteFile={deleteFile} 
+      />
+      {/* <FilePickerPreview title='Buisness Document' setReceiptFile={setReceiptArrival1} receiptFile={receiptArrival1} handleUpload={handleUpload} />
+     <FileList
+      receiptUrl={receiptUrl3} 
+      // deleteFile={deleteFile} 
+      /> */}
       <AddressSelector addresses={combinedAddressList} onSelect={handleSelect} />
       <View style={styles.editButtonWrapper}>
             <Button mode="contained" onPress={generateOrder} style={styles.button} >Save Address</Button>
@@ -294,6 +540,8 @@ const getStyles = (isDarkMode) =>
       marginBottom:25,
       fontFamily: 'Outfit-Regular',
     },
+     previewContainer: { marginTop: 20, flex: 1 },
+      precontainer: { flex: 1, padding: 20 },
   });
 
 export default EnquiryDetails;
