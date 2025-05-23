@@ -190,10 +190,11 @@
 // });
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image } from 'react-native';
+import api from '../constants/api';
 
-const EmailVerificationScreen = () => {
+const EmailVerificationScreen = ({route,navigation}) => {
   const [otp, setOtp] = useState(['', '', '', '']);
-
+const { email } = route.params;
   const handleOtpChange = (value, index) => {
     const newOtp = [...otp];
     newOtp[index] = value;
@@ -202,8 +203,17 @@ const EmailVerificationScreen = () => {
 
   const verifyEmail = () => {
     const enteredOtp = otp.join('');
-    // You can call your API here to verify
-    console.log('Entered OTP:', enteredOtp);
+    
+      api.post('api/checkMailOtp', { email, otp_no:enteredOtp },{
+        headers: { 'Content-Type': 'application/json' }
+      }).then((res)=>{
+        Alert.alert('OTP verified Successfully');
+navigation.navigate('NewPassword', { email });
+      }).catch((err)=>{
+
+      console.error(err);
+      Alert.alert('Error verifying OTP');
+    }) 
   };
 
   return (
