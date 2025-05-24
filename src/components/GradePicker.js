@@ -15,24 +15,23 @@ const GradeSelector = ({
         <Text style={styles.label}>Select Grade</Text>
         <View style={styles.pickerWrapper}>
           <Picker
-  selectedValue={selectedProductGrade}
-  onValueChange={(itemValue) => {
-    const selectedData = product.grades.find((g) => g === itemValue);
-    setSelectedProductGrade(itemValue);
-    setProductStock(selectedData?.stock || 0);
-    setQuantityCount(1);
-  }}
-  mode="dropdown"
-  style={styles.picker}
-  dropdownIconColor="#000" // Ensures icon is visible
-  itemStyle={{ color: '#000' }} // iOS only
->
-  <Picker.Item label="Select a grade" value="" color="#888" />
-  {product.grades.map((grade, index) => (
-    <Picker.Item key={index} label={grade} value={grade} color="#000" />
-  ))}
-</Picker>
-
+            selectedValue={selectedProductGrade}
+            onValueChange={(itemValue) => {
+              const selectedData = product.grades.find((g) => g === itemValue);
+              setSelectedProductGrade(itemValue);
+              setProductStock(selectedData?.stock || 0);
+              setQuantityCount(1);
+            }}
+            mode="dropdown"
+            style={styles.picker}
+            dropdownIconColor="#000"
+            itemStyle={Platform.OS === 'ios' ? styles.itemStyle : undefined}
+          >
+            <Picker.Item label="Select a grade" value="" color="#888" />
+            {product.grades.map((grade, index) => (
+              <Picker.Item key={index} label={grade} value={grade} color="#000" />
+            ))}
+          </Picker>
         </View>
       </View>
     )
@@ -42,7 +41,7 @@ const GradeSelector = ({
 const styles = StyleSheet.create({
   container: {
     marginHorizontal: 16,
-    backgroundColor: '#ffffff', // White background
+    backgroundColor: '#ffffff',
     borderRadius: 10,
     padding: 3,
     elevation: 2,
@@ -50,24 +49,27 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#000', // Ensure visible in all themes
+    color: '#000',
     marginBottom: 6,
   },
   pickerWrapper: {
     borderWidth: 1,
     borderColor: '#ccc',
     borderRadius: 8,
-    backgroundColor: '#ffffff', // White background for the dropdown
+    backgroundColor: '#ffffff',
     height: 52,
     justifyContent: 'center',
     overflow: 'hidden',
   },
   picker: {
-  height: 52,
-  color: '#000', // Text color
-  backgroundColor: '#fff', // Prevent dark background on Android
-},
-
+    height: 52,
+    color: '#000',
+    backgroundColor: '#ffffff', // Ensures white background even in dark mode
+  },
+  itemStyle: {
+    color: '#000',
+    backgroundColor: '#fff',
+  },
 });
 
 export default GradeSelector;

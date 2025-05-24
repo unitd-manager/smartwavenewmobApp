@@ -170,7 +170,7 @@ const isDarkMode = colorScheme === 'dark';
       {passwordError !== '' && <Text style={styles.errorText}>{passwordError}</Text>}
 
       {/* Forgot Password */}
-      <TouchableOpacity onPress={navigation.navigate('ForgotPassword')}>
+      <TouchableOpacity onPress={()=>navigation.navigate('ForgotPassword')}>
         <Text style={styles.forgotPassword}>Forgot Password?</Text>
       </TouchableOpacity>
 

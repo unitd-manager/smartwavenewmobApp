@@ -46,7 +46,7 @@ const NewPasswordScreen = ({ route,navigation }) => {
       </TouchableOpacity>
 
       <Image
-        //source={require('./assets/new-password-illustration.png')} // Use your image here
+        source={require('../assets/images/banner/newpass.png')} // Use your image here
         style={styles.image}
         resizeMode="contain"
       />
@@ -124,7 +124,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   image: {
-    height: 150,
+    height: 200,
     alignSelf: 'center',
     marginBottom: 20,
   },

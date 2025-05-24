@@ -1,6 +1,7 @@
 import React, { useState,useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, Alert } from 'react-native';
 import api from '../constants/api';
+import Icon from 'react-native-vector-icons/MaterialIcons'; // Or Feather, FontAwesome, etc.
 
 const ForgotPasswordScreen = ({navigation}) => {
  const [email, setEmail] = useState("");
@@ -75,12 +76,12 @@ useEffect(()=>{
       </Text>
 
       <Image
-        //source={require('./assets/forgot-password-illustration.png')} // Add your image to assets
+        source={require('../assets/images/banner/forgot.png')} // Add your image to assets
         style={styles.image}
         resizeMode="contain"
       />
 
-      <View style={styles.inputBox}>
+      {/* <View style={styles.inputBox}>
         <Text style={styles.label}>Send OTP via Email</Text>
         <TextInput
           style={styles.input}
@@ -90,7 +91,22 @@ useEffect(()=>{
           onChangeText={setEmail}
           keyboardType="email-address"
         />
-      </View>
+      </View> */}
+	  <View style={styles.inputBox}>
+  <Text style={styles.label}>Send OTP via Email</Text>
+  <View style={styles.inputContainer}>
+    <Icon name="email" size={20} color="#888" style={styles.inputIcon} />
+    <TextInput
+      style={styles.input}
+      placeholder="Enter your email"
+      placeholderTextColor="#aaa"
+      value={email}
+      onChangeText={setEmail}
+      keyboardType="email-address"
+    />
+  </View>
+</View>
+
 
       <TouchableOpacity style={styles.button} onPress={handleContinue}>
         <Text style={styles.buttonText}>Continue</Text>
@@ -107,51 +123,93 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     padding: 24,
     justifyContent: 'flex-start',
+	  fontFamily: 'Outfit-Regular',
   },
-  headerText: {
+   headerText: {
+	marginTop: 20,
     fontSize: 28,
-    fontWeight: 'bold',
     color: '#000',
     marginBottom: 8,
-  },
-  highlight: {
-    color: '#00bcd4',
+    fontFamily: 'Outfit-Regular',
+    textAlign: 'center',         // <-- Center align text
   },
   subText: {
     color: '#666',
     fontSize: 14,
     marginBottom: 20,
+    fontFamily: 'Outfit-Regular',
+    textAlign: 'center',         // <-- Center align text
   },
-  image: {
-    height: 160,
-    width: '100%',
-    marginBottom: 20,
+
+  highlight: {
+    color: '#00bcd4',
+	  fontFamily: 'Outfit-Regular',
   },
-  inputBox: {
-    borderWidth: 1,
-    borderColor: '#00bcd4',
-    borderRadius: 10,
-    padding: 12,
+ 
+   image: {
+    height: 220,                  // <-- Increase height
+    width: 220,                   // <-- Fixed width for better control
+    alignSelf: 'center',          // <-- Center the image
     marginBottom: 24,
   },
+
+//   inputBox: {
+//     borderWidth: 1,
+//     borderColor: '#00bcd4',
+//     borderRadius: 10,
+//     padding: 12,
+//     marginBottom: 24,
+// 	  fontFamily: 'Outfit-Regular',
+//   },
   label: {
     fontSize: 14,
     marginBottom: 6,
     color: '#333',
+	  fontFamily: 'Outfit-Regular',
   },
-  input: {
-    fontSize: 16,
-    color: '#000',
-  },
+//   input: {
+//     fontSize: 16,
+//     color: '#000',
+// 	  fontFamily: 'Outfit-Regular',
+//   },
   button: {
     backgroundColor: '#00bcd4',
     paddingVertical: 14,
     borderRadius: 12,
     alignItems: 'center',
+	  fontFamily: 'Outfit-Regular',
   },
   buttonText: {
     color: '#fff',
     fontSize: 16,
-    fontWeight: 'bold',
+    //fontWeight: 'bold',
+	  fontFamily: 'Outfit-Regular',
   },
+  inputBox: {
+  marginBottom: 24,
+},
+
+inputContainer: {
+  flexDirection: 'row',
+  alignItems: 'center',
+  borderWidth: 1,
+  borderColor: '#00bcd4',
+  borderRadius: 10,
+  paddingHorizontal: 10,
+  backgroundColor: '#fff',
+  height: 44, // reduced height
+},
+
+inputIcon: {
+  marginRight: 8,
+},
+
+input: {
+  flex: 1,
+  fontSize: 14,
+  paddingVertical: 0,
+  color: '#000',
+  fontFamily: 'Outfit-Regular',
+},
+
 });
