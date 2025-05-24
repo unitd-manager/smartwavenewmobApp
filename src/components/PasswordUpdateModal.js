@@ -16,7 +16,7 @@ const PasswordUpdateModal = ({ visible, onClose }) => {
           <Text style={styles.subTitle}>Successfully</Text>
           <Text style={styles.message}>Your password has been updated successfully</Text>
           <TouchableOpacity style={styles.button} onPress={onClose}>
-            <Text style={styles.buttonText}>Sign Up</Text>
+            <Text style={styles.buttonText}>Login</Text>
           </TouchableOpacity>
         </View>
       </View>

@@ -187,12 +187,13 @@ import { View, Button } from 'react-native';
 import PasswordUpdateModal from '../components/PasswordUpdateModal';
 
 const App = () => {
-  const [modalVisible, setModalVisible] = useState(false);
+  const [modalVisible, setModalVisible] = useState(true);
 
   return (
     <View>
-      <Button title="Update Password" onPress={() => setModalVisible(true)} />
-      <PasswordUpdateModal visible={modalVisible} onClose={() => setModalVisible(false)} />
+      {/* <Button title="Update Password" onPress={() => setModalVisible(true)} /> */}
+      <PasswordUpdateModal visible={modalVisible} onClose={() => {setModalVisible(false); Navigation.navigate('LoginPage')}} />
+    
     </View>
   );
 };

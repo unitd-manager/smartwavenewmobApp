@@ -426,7 +426,10 @@ const combinedAddressList = [profileAddress, ...addressList];
         <Text style={styles.label}>Address</Text>
         <Text style={styles.value}>{enquiry?.shipping_address}</Text>
       </View>
-
+<AddressSelector addresses={combinedAddressList} onSelect={handleSelect} />
+      <View style={styles.editButtonWrapper}>
+            <Button mode="contained" onPress={generateOrder} style={styles.button} >Save Address</Button>
+          </View>
        <View style={styles.precontainer}>
       <View style={styles.previewContainer}>{renderPreview()}</View>
       </View>
@@ -451,10 +454,7 @@ const combinedAddressList = [profileAddress, ...addressList];
       receiptUrl={receiptUrl3} 
       // deleteFile={deleteFile} 
       /> */}
-      <AddressSelector addresses={combinedAddressList} onSelect={handleSelect} />
-      <View style={styles.editButtonWrapper}>
-            <Button mode="contained" onPress={generateOrder} style={styles.button} >Save Address</Button>
-          </View>
+      
       <CarrierTrackingCard tracking={tracking} />
     </ScrollView>
   );
@@ -554,7 +554,7 @@ const getStyles = (isDarkMode) =>
     },
     editButtonWrapper: {
       //marginTop: 15,
-      marginBottom:25,
+      marginBottom:5,
       fontFamily: 'Outfit-Regular',
     },
      previewContainer: { marginTop: 20, flex: 1 },
