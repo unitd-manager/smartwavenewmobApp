@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, Button, Image, Alert, StyleSheet,TouchableOpacity } from 'react-native';
 import { pick, types } from '@react-native-documents/picker';
-import { WebView } from 'react-native-webview';
+//import { WebView } from 'react-native-webview';
 
-const FilePickerPreview = ({title,receiptFile,setReceiptFile,handleUpload}) => {
+const FilePickerPreview = ({title,receiptFile,setReceiptFile,handleUpload,updateFile, setUpdateFile}) => {
   const [file, setFile] = useState(null);
-
+console.log('updatefile',updateFile);
   const handlePick = async () => {
     try {
       const res = await pick({
@@ -29,24 +29,27 @@ const FilePickerPreview = ({title,receiptFile,setReceiptFile,handleUpload}) => {
       return <Image source={{ uri }} style={styles.image} />;
     } else if (type === 'application/pdf' || type.includes('msword')) {
       return (
-        <WebView
-          source={{ uri }}
-          style={styles.webview}
-          startInLoadingState={true}
-        />
+        // <WebView
+        //   source={{ uri }}
+        //   style={styles.webview}
+        //   startInLoadingState={true}
+        // />
+        <Text style={styles.text}>Preview not available for: {name}</Text>
       );
     } else {
       return <Text style={styles.text}>Preview not available for: {name}</Text>;
     }
   };
-
+useEffect(()=>{
+setReceiptFile(null);
+},[updateFile])
   return (
     <View style={styles.container}>
       <Text style={[styles.header, { marginTop: 20 }]}>{title}</Text>
     <TouchableOpacity style={styles.uploadBox}  onPress={handlePick} >
             <Text style={styles.uploadText}>Upload your file here</Text>
           </TouchableOpacity>
-      <View style={styles.previewContainer}>{renderPreview()}</View>
+      {receiptFile && <View style={styles.previewContainer}>{renderPreview()}</View>}
       {receiptFile && <TouchableOpacity onPress={handleUpload} >
        <Text style={styles.uploadLink}>Upload </Text>
        </TouchableOpacity>}

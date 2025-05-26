@@ -79,9 +79,9 @@ android {
     buildToolsVersion rootProject.ext.buildToolsVersion
     compileSdk rootProject.ext.compileSdkVersion
 
-    namespace "com.smartwaveapp"
+    namespace "com.smartwavenewmobapp"
     defaultConfig {
-        applicationId "com.smartwaveapp"
+        applicationId "com.smartwavenewmobapp"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1

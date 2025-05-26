@@ -132,14 +132,14 @@
 
 
 
-import React,{useEffect} from 'react';
+import React from 'react';
 import Navigation from './src/Navigation';
 import { Provider } from 'react-redux';
 import store from './src/redux/store';
 import { NavigationContainer } from "@react-navigation/native";
 import { Text } from 'react-native';
 import { AuthProvider } from './src/context/AuthContext';
-import SplashScreen from 'react-native-splash-screen';
+//import SplashScreen from 'react-native-splash-screen';
 
 // Set default font globally
 Text.defaultProps = Text.defaultProps || {};
@@ -147,9 +147,9 @@ Text.defaultProps.style = { fontFamily: 'Outfit-Regular' };
 
 
 export default function App() {
-  useEffect(() => {
-    SplashScreen?.hide(); // hide splash screen after 2s (or immediately)
-  }, []);
+  // useEffect(() => {
+  //   SplashScreen?.hide(); // hide splash screen after 2s (or immediately)
+  // }, []);
   return (
      <Provider store={store}>
       <AuthProvider>

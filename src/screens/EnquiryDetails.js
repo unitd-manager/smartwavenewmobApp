@@ -8,7 +8,7 @@ import { Button } from 'react-native-paper';
 import ProductsLinkedModal from '../components/ProductsLinkedModal';
 import { pick, types } from '@react-native-documents/picker'
 import FilePickerPreview from '../components/FileUpload';
-import { WebView } from 'react-native-webview';
+//import { WebView } from 'react-native-webview';
 import FileList from '../components/FileList';
 
 const addresses = [
@@ -34,7 +34,7 @@ const EnquiryDetails = ({ route }) => {
   const colorScheme = useColorScheme();
   const isDarkMode = colorScheme === 'dark';
 
- 
+ const [updateFile, setUpdateFile] = useState(false);
   const { user, logout } = useContext(AuthContext);
   const [enquiries, setEnquiries] = useState({});
   const [tracking, setTracking] = useState({});
@@ -66,11 +66,12 @@ const EnquiryDetails = ({ route }) => {
       return <Image source={{ uri }} style={styles.image} />;
     } else if (type === 'application/pdf' || type.includes('msword')) {
       return (
-        <WebView
-          source={{ uri }}
-          style={styles.webview}
-          startInLoadingState={true}
-        />
+        // <WebView
+        //   source={{ uri }}
+        //   style={styles.webview}
+        //   startInLoadingState={true}
+        // />
+        <Text style={styles.text}>Preview not available for: {name}</Text>
       );
     } else {
       return <Text style={styles.text}>Preview not available for: {name}</Text>;
@@ -162,7 +163,7 @@ const handleUpload = async () => {
     //   console.log( Math.round((filedata.loaded/filedata.total)*100))
     //   setUploaded( Math.round((filedata.loaded/filedata.total)*100))                 
     // }}
-  ).then(()=>{
+  ).then(()=>{setUpdateFile(!updateFile);
      api.post('/file/getListOfFiles', { record_id: enquiry.enquiry_id, room_name: 'PaymentReceipt' }).then((res) => {
   setReceiptUrl(res.data);
 });
@@ -212,7 +213,7 @@ console.log('receiptFileDoc',receiptFileDoc);
     'Content-Type': 'multipart/form-data',
   },
 }).then(()=>{
-      
+        setUpdateFile(!updateFile);
  api.post('/file/getListOfFiles', { record_id: enquiry.enquiry_id, room_name: 'OnDocPayment' }).then((res) => {
       setReceiptUrl1(res.data);
     });
@@ -259,7 +260,8 @@ console.log('receiptArrival',receiptArrival);
     'Content-Type': 'multipart/form-data',
   },
 }).then(()=>{
- 
+  setUpdateFile(!updateFile);
+ setReceiptArrival(null);
     api.post('/file/getListOfFiles', { record_id: enquiry.enquiry_id, room_name: 'AfterArrival' }).then((res) => {
       setReceiptUrl2(res.data);
     });
@@ -314,7 +316,7 @@ const deleteFile = (fileId, onDeleted) => {
             .then((res) => {
               console.log('File deleted:', res.data);
               setDeletion(!deletion);
-              Alert.alert('Deleted!', 'Media has been deleted.');
+              Alert.alert('Deleted!', 'File has been deleted.');
               if (onDeleted) onDeleted(); // Refresh list or update UI
             })
             .catch((error) => {
@@ -327,6 +329,11 @@ const deleteFile = (fileId, onDeleted) => {
     { cancelable: true }
   );
 };
+useEffect(()=>{
+  setReceiptFile(null);
+  setReceiptArrival(null);
+  setReceiptArrival(null);
+},[updateFile])
 
 useEffect(()=>{
   api.post('/file/getListOfFiles', { record_id: enquiry.enquiry_id, room_name: 'PaymentReceipt' }).then((res) => {
@@ -430,25 +437,26 @@ const combinedAddressList = [profileAddress, ...addressList];
       <View style={styles.editButtonWrapper}>
             <Button mode="contained" onPress={generateOrder} style={styles.button} >Save Address</Button>
           </View>
-       <View style={styles.precontainer}>
+       {/* <View style={styles.precontainer}>
       <View style={styles.previewContainer}>{renderPreview()}</View>
-      </View>
- <FilePickerPreview title='Payment Receipt' setReceiptFile={setReceiptFile} receiptFile={receiptFile} handleUpload={handleUpload} />
+      </View> */}
+ <FilePickerPreview title='Payment Receipt' setReceiptFile={setReceiptFile} updateFile={updateFile} setUpdateFile={setUpdateFile} receiptFile={receiptFile} handleUpload={handleUpload} />
      <FileList
       receiptUrl={receiptUrl} 
       deleteFile={deleteFile} 
       />
-
-<FilePickerPreview title='On documents payment' setReceiptFile={setReceiptFileDoc} receiptFile={receiptFileDoc} handleUpload={handleUploadOnDoc} />
-     <FileList
+{enquiry?.after_arrival != 1 &&<Text style={[styles.header, { marginTop: 20 }]}>On documents payment</Text>}
+ {enquiry?.on_document === 1 && <FilePickerPreview title='On documents payment' setReceiptFile={setReceiptFileDoc} receiptFile={receiptFileDoc} updateFile={updateFile} setUpdateFile={setUpdateFile} handleUpload={handleUploadOnDoc} />}
+    {enquiry?.on_document === 1 &&  <FileList
       receiptUrl={receiptUrl1} 
        deleteFile={deleteFile} 
-      />
-<FilePickerPreview title='After Arrival' setReceiptFile={setReceiptArrival} receiptFile={receiptArrival} handleUpload={handleUploadArrival} />
-     <FileList
+      />}
+      {enquiry?.after_arrival != 1 &&<Text style={[styles.header, { marginTop: 20 }]}>After Arrival</Text>}
+{enquiry?.after_arrival === 1 &&<FilePickerPreview title='After Arrival' setReceiptFile={setReceiptArrival} receiptFile={receiptArrival} updateFile={updateFile} setUpdateFile={setUpdateFile} handleUpload={handleUploadArrival} />}
+    {enquiry?.after_arrival === 1 && <FileList
       receiptUrl={receiptUrl2} 
        deleteFile={deleteFile} 
-      />
+      />}
       {/* <FilePickerPreview title='Buisness Document' setReceiptFile={setReceiptArrival1} receiptFile={receiptArrival1} handleUpload={handleUpload} />
      <FileList
       receiptUrl={receiptUrl3} 

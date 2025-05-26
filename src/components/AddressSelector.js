@@ -53,6 +53,7 @@ const AddressSelector = ({ addresses = [], onSelect }) => {
 
 const styles = StyleSheet.create({
   container: {
+    marginTop:20,
     padding: 16,
     backgroundColor: '#fff',
     fontFamily: 'Outfit-Regular',
