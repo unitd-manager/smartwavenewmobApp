@@ -177,7 +177,7 @@ const isInWishlist = () => {
         <ProductImageGallery images={product.images}/>
         
         <View style={styles.row3}>
-          <Text style={styles.text3}>{product?.product_type}</Text>
+          <Text style={styles.text3}>{product?.category_title}</Text>
           </View>
          
         <View style={styles.row5}>
