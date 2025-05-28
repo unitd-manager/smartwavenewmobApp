@@ -23,6 +23,7 @@ import { AuthContext } from "../context/AuthContext";
 import GradeSelector from "../components/GradePicker";
 import ProductDetailsSection from "../components/ProductDetailsSection";
 import ProductImageGallery from "../components/ProductImageGallery";
+import Divider from "../components/Divider";
 
 export default ({ route }) => {
   const { productId } = route.params || {};
@@ -36,7 +37,7 @@ export default ({ route }) => {
   const [selectedProductGrade, setSelectedProductGrade] = useState(
    
   );
-
+console.log('product',product);
   const{user,logout}=useContext(AuthContext);
 
   const dispatch = useDispatch();
@@ -191,7 +192,7 @@ const isInWishlist = () => {
   </TouchableOpacity>
    */}
   <TouchableOpacity
-    style={styles.cartbuttonRow}
+    style={styles.wishbuttonRow}
     onPress={() => {
       const existingWishItem = wishitems.find(item => item.product_id === product.product_id);
       if (isInWishlist()) {
@@ -206,6 +207,7 @@ const isInWishlist = () => {
     
   </TouchableOpacity>
 </View>
+      <Divider />
 <View style={styles.gradeview}>
 <GradeSelector product={product} selectedProductGrade={selectedProductGrade} setSelectedProductGrade={setSelectedProductGrade} setProductStock={setProductStock} setQuantityCount={setQuantityCount} />  
     </View>
@@ -230,6 +232,7 @@ const isInWishlist = () => {
 
         <Text style={styles.text8}>{product?.description}</Text>
         <Text style={styles.text8}>{product?.product_description}</Text> */}
+        <Divider/>
 <ProductDetailsSection product={product} />
         <View style={styles.view}>
           <TouchableOpacity
@@ -256,6 +259,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#FFFFFF",
+    fontFamily: 'Outfit-Regular',
   },
   button: {
     backgroundColor: "#FFFFFF",
@@ -265,6 +269,7 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     paddingHorizontal: 13,
     marginRight: 15,
+    fontFamily: 'Outfit-Regular',
   },
   buttonRow: {
     flexDirection: "row",
@@ -274,11 +279,13 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     paddingVertical: 11,
     marginHorizontal: 32,
+    fontFamily: 'Outfit-Regular',
   },
   column: {
     alignItems: "center",
     paddingBottom: 19,
     marginBottom: 32,
+    fontFamily: 'Outfit-Regular',
   },
   image2: {
     width: 24,
@@ -327,17 +334,20 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     marginBottom: 215,
     marginHorizontal: 30,
+    fontFamily: 'Outfit-Regular',
   },
   row3: {
     flexDirection: "row",
     alignItems: "center",
     marginBottom: 15,
     marginHorizontal: 32,
+    fontFamily: 'Outfit-Regular',
   },
   row4: {
     flexDirection: 'row',
     alignItems: 'center',
     marginTop: 4, // reduce this
+    fontFamily: 'Outfit-Regular',
   },
   
   row5: {
@@ -345,6 +355,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 20,
+    fontFamily: 'Outfit-Regular',
   },
   
   
@@ -352,6 +363,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     marginBottom: 10,
+    fontFamily: 'Outfit-Regular',
     marginHorizontal: 32,
   },
   scrollView: {
@@ -414,6 +426,7 @@ const styles = StyleSheet.create({
   },
   view: {
     backgroundColor: "#FFFFFF",
+    fontFamily: 'Outfit-Regular',
     borderColor: "#DFF6FB",
     borderTopLeftRadius: 15,
     borderTopRightRadius: 15,
@@ -450,10 +463,21 @@ const styles = StyleSheet.create({
     marginLeft: 10,              // Add left margin to move left
     maxWidth: "85%",             // Reduce width a bit more
   },
-  
+  wishbuttonRow: {
+  width: 40, // or whatever fits your design
+  height: 40,
+  borderRadius: 20,
+  backgroundColor: '#fff',
+  justifyContent: 'center',
+  alignItems: 'center',
+  alignSelf: 'flex-start', // prevents full-width stretch in flex containers
+  padding: 0,
+  margin: 4, // optional spacing
+},
   
   cartIcon: {
     marginRight: 8,
+    fontFamily: 'Outfit-Regular',
   },
   
   carttext9: {
@@ -462,6 +486,7 @@ const styles = StyleSheet.create({
     color: "#1EB1C5",
     flexShrink: 1, // Allow the text to shrink if necessary
   marginRight:10,
+  fontFamily: 'Outfit-Regular',
   },
   
 });
