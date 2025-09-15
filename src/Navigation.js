@@ -29,6 +29,7 @@ import { fetchCartItems } from "./redux/slices/cartSlice";
 import Profile from "./screens/Profile";
 import ContactUs from "./screens/ContactUs";
 import WishlistScreen from "./screens/Wishlist";
+import NotificationList from "./screens/NotificationList";
 
 const Stack = createStackNavigator();
 
@@ -121,6 +122,7 @@ useEffect(() => {
             <Stack.Screen name="LoginPage" component={LoginPage} options={{ title: "Login" }}/>
             <Stack.Screen name="Profile" component={Profile} />
             <Stack.Screen name="ContactUs" component={ContactUs} />
+            <Stack.Screen name="NotificationList" component={NotificationList} options={{ headerShown: false }} />
           {/* </>
         ) : (
           <> */}
