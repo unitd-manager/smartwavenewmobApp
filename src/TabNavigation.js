@@ -3,6 +3,7 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createStackNavigator } from "@react-navigation/stack";
 import Icon from "react-native-vector-icons/Ionicons";
 import { useDispatch, useSelector } from "react-redux";
+import NotificationIcon from "./components/NotificationIcon";
 
 // Screens
 import Home from "./screens/Home";
@@ -17,11 +18,32 @@ import ContactUs from "./screens/ContactUs";
 import WishlistScreen from "./screens/Wishlist";
 import EnquiryHistory from "./screens/EnquiryHistory";
 import EnquiryDetails from "./screens/EnquiryDetails";
+import NotificationList from "./screens/NotificationList";
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
 
 // 🔹 Common header styles
+const getCommonHeaderOptions = (navigation) => ({
+  headerStyle: {
+    backgroundColor: "#1EB1C5",
+    borderBottomLeftRadius: 20,
+    borderBottomRightRadius: 20,
+  },
+  headerTintColor: "#fff",
+  headerTitleAlign: "center",
+  headerTitleStyle: {
+    fontFamily: "Outfit-Regular",
+    fontSize: 18,
+  },
+  headerRight: () => (
+    <NotificationIcon
+      onPress={() => navigation.navigate('NotificationList')}
+      color="#fff"
+    />
+  ),
+});
+
 const commonHeaderOptions = {
   headerStyle: {
     backgroundColor: "#1EB1C5",
@@ -37,8 +59,8 @@ const commonHeaderOptions = {
 };
 
 // 💡 Home Stack
-const HomeStack = () => (
-  <Stack.Navigator screenOptions={commonHeaderOptions}>
+const HomeStack = ({ navigation }) => (
+  <Stack.Navigator screenOptions={getCommonHeaderOptions(navigation)}>
     <Stack.Screen
       name="HomeMain"
       component={Home}
@@ -54,12 +76,17 @@ const HomeStack = () => (
       component={ProductDetails}
       options={{ title: "Product Details" }}
     />
+    <Stack.Screen
+      name="NotificationList"
+      component={NotificationList}
+      options={{ headerShown: false }}
+    />
   </Stack.Navigator>
 );
 
 // 💡 Categories Stack
-const CategoriesStack = () => (
-  <Stack.Navigator screenOptions={commonHeaderOptions}>
+const CategoriesStack = ({ navigation }) => (
+  <Stack.Navigator screenOptions={getCommonHeaderOptions(navigation)}>
     <Stack.Screen
       name="CategoriesMain"
       component={Categories}
@@ -75,12 +102,17 @@ const CategoriesStack = () => (
       component={ProductDetails}
       options={{ title: "Product Details" }}
     />
+    <Stack.Screen
+      name="NotificationList"
+      component={NotificationList}
+      options={{ headerShown: false }}
+    />
   </Stack.Navigator>
 );
 
 // 💡 Cart Stack
-const CartStack = () => (
-  <Stack.Navigator screenOptions={commonHeaderOptions}>
+const CartStack = ({ navigation }) => (
+  <Stack.Navigator screenOptions={getCommonHeaderOptions(navigation)}>
     <Stack.Screen
       name="CartMain"
       component={Cart}
@@ -91,12 +123,17 @@ const CartStack = () => (
       component={ProductDetails}
       options={{ title: "Product Details" }}
     />
+    <Stack.Screen
+      name="NotificationList"
+      component={NotificationList}
+      options={{ headerShown: false }}
+    />
   </Stack.Navigator>
 );
 
 // 💡 Account Stack
-const AccountStack = () => (
-  <Stack.Navigator screenOptions={commonHeaderOptions}>
+const AccountStack = ({ navigation }) => (
+  <Stack.Navigator screenOptions={getCommonHeaderOptions(navigation)}>
     <Stack.Screen
       name="AccountMain"
       component={Account}
@@ -108,6 +145,11 @@ const AccountStack = () => (
              <Stack.Screen name="WishlistScreen" component={WishlistScreen}  options={{ title: "Wishlist" }} />
              <Stack.Screen name="EnquiryHistory" component={EnquiryHistory}  options={{ title: "Enquiries" }} />
              <Stack.Screen name="EnquiryDetails" component={EnquiryDetails}  options={{ title: "Enquiry Details" }} />
+             <Stack.Screen
+               name="NotificationList"
+               component={NotificationList}
+               options={{ headerShown: false }}
+             />
   </Stack.Navigator>
 );
 

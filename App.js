@@ -132,19 +132,56 @@
 
 
 
-import React from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import Navigation from './src/Navigation';
-import { Provider } from 'react-redux';
+import { Provider, useSelector } from 'react-redux';
 import store from './src/redux/store';
 import { NavigationContainer } from "@react-navigation/native";
 import { Text } from 'react-native';
 import { AuthProvider } from './src/context/AuthContext';
+import NotificationModal from './src/components/NotificationModal';
 //import SplashScreen from 'react-native-splash-screen';
 
 // Set default font globally
 Text.defaultProps = Text.defaultProps || {};
 Text.defaultProps.style = { fontFamily: 'Outfit-Regular' };
 
+
+// Main App Wrapper Component
+const AppContent = () => {
+  const [showNotificationModal, setShowNotificationModal] = useState(false);
+  const navigationRef = useRef();
+  const notifications = useSelector(state => state.notifications?.notifications || []);
+  const unreadNotifications = notifications.filter(notification => !notification.read);
+
+  useEffect(() => {
+    // Show notification modal when app opens if there are unread notifications
+    const timer = setTimeout(() => {
+      if (unreadNotifications.length > 0) {
+        setShowNotificationModal(true);
+      }
+    }, 2000); // Show after 2 seconds
+
+    return () => clearTimeout(timer);
+  }, [unreadNotifications.length]);
+
+  const handleCloseModal = () => {
+    setShowNotificationModal(false);
+  };
+
+  return (
+    <>
+      <NavigationContainer ref={navigationRef}>
+        <Navigation />
+      </NavigationContainer>
+      <NotificationModal
+        visible={showNotificationModal}
+        onClose={handleCloseModal}
+        navigation={navigationRef.current}
+      />
+    </>
+  );
+};
 
 export default function App() {
   // useEffect(() => {
@@ -153,10 +190,8 @@ export default function App() {
   return (
      <Provider store={store}>
       <AuthProvider>
-    <NavigationContainer>
-      <Navigation />
-    </NavigationContainer>
-    </AuthProvider>
+        <AppContent />
+      </AuthProvider>
      </Provider>
   );
 }
