@@ -1,15 +1,15 @@
 import React, { useContext, useEffect,useState } from 'react';
 import { View, Text, StyleSheet, useColorScheme, TouchableOpacity,ScrollView, Alert,Image } from 'react-native';
-import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
 import AddressSelector from '../components/AddressSelector';
 import CarrierTrackingCard from '../components/CareerTrackingCard';
 import { AuthContext } from '../context/AuthContext';
 import api from '../constants/api';
 import { Button } from 'react-native-paper';
-
+import ProductsLinkedModal from '../components/ProductsLinkedModal';
+import { pick, types } from '@react-native-documents/picker'
 import FilePickerPreview from '../components/FileUpload';
+//import { WebView } from 'react-native-webview';
 import FileList from '../components/FileList';
-import { useNavigation } from '@react-navigation/native';
 
 const addresses = [
   {
@@ -31,7 +31,6 @@ const addresses = [
 
 const EnquiryDetails = ({ route }) => {
 	const { enquiry } = route.params || {};
-  const navigation = useNavigation();
   const colorScheme = useColorScheme();
   const isDarkMode = colorScheme === 'dark';
 
@@ -51,144 +50,13 @@ const EnquiryDetails = ({ route }) => {
   const [addressList, setAddressList] = useState([]);
   const [productsLinked, setProductsLinked] = useState([]);
   const [selectedAddress, setSelectedAddress] = useState(null);
-  const [profileImage, setProfileImage] = useState(null);
   
   const [deletion, setDeletion] = useState(false);
 
   const [selectedAddressString, setSelectedAddressString] = useState('');
  const [file, setFile] = useState(null);
 
-  const selectImage = () => {
-    Alert.alert(
-      "Select Image",
-      "Choose an option",
-      [
-        {
-          text: "Camera",
-          onPress: () => openCamera(),
-        },
-        {
-          text: "Gallery",
-          onPress: () => openImageLibrary(),
-        },
-        {
-          text: "Cancel",
-          style: "cancel",
-        },
-      ],
-      { cancelable: true }
-    );
-  };
-
-  const openCamera = () => {
-    const options = {
-      mediaType: 'photo',
-      includeBase64: false,
-      maxHeight: 200,
-      maxWidth: 200,
-    };
-    launchCamera(options, (response) => {
-      if (response.didCancel) {
-        console.log('User cancelled image picker');
-      } else if (response.error) {
-        console.log('ImagePicker Error: ', response.error);
-      } else if (response.customButton) {
-        console.log('User tapped custom button: ', response.customButton);
-      } else {
-        const source = { uri: response.assets[0].uri, type: response.assets[0].type, name: response.assets[0].fileName };
-        setProfileImage(source);
-        handleUploadProfileImage(source);
-      }
-    });
-  };
-
-  const openImageLibrary = () => {
-    const options = {
-      mediaType: 'photo',
-      includeBase64: false,
-      maxHeight: 200,
-      maxWidth: 200,
-    };
-    launchImageLibrary(options, (response) => {
-      if (response.didCancel) {
-        console.log('User cancelled image picker');
-      } else if (response.error) {
-        console.log('ImagePicker Error: ', response.error);
-      } else if (response.customButton) {
-        console.log('User tapped custom button: ', response.customButton);
-      } else {
-        const source = { uri: response.assets[0].uri, type: response.assets[0].type, name: response.assets[0].name };
-        setProfileImage(source);
-        handleUploadProfileImage(source);
-      }
-    });
-  };
-
-  const handleUploadProfileImage = async (image) => {
-    if (!image) {
-      Alert.alert("Please select an image first.");
-      return;
-    }
-
-    const formData = new FormData();
-    formData.append("files", {
-      uri: image.uri,
-      type: image.type,
-      name: image.name,
-    });
-    formData.append("enquiry_id", enquiry.enquiry_id);
-    formData.append('record_id', enquiry.enquiry_id)
-    formData.append('room_name', 'ProfileImages')
-    formData.append('alt_tag_data', 'ProfileImage')
-    formData.append('description', 'ProfileImage')
-
-    api.post('/file/uploadFiles', formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-    }).then(() => {
-      setUpdateFile(!updateFile);
-      Alert.alert("Profile Image Uploaded Successfully");
-      // Optionally refresh the profile image from the server
-      api.post('/file/getListOfFiles', { record_id: enquiry.enquiry_id, room_name: 'ProfileImages' }).then((res) => {
-        if (res.data && res.data.length > 0) {
-          console.log('Profile Image URL after upload:', res.data[0].file_url); // Add this line
-          setProfileImage({ uri: res.data[0].file_url });
-        }
-      });
-    }).catch((error) => {
-      console.error("Upload error:", error);
-      Alert.alert("Unable to upload profile image");
-    });
-  };
-
-useEffect(() => {
-  api.post('/file/getListOfFiles', { record_id: enquiry.enquiry_id, room_name: 'ProfileImages' })
-    .then((res) => {
-      if (res.data && res.data.length > 0) {
-        const fileName = res.data[0].name;
-
-        if (fileName) {
-          // Build full URL with your base path
-          const fullUrl = fileName.startsWith('http')
-            ? fileName
-            : `http://66.29.149.122:2013/storage/uploads/${fileName}`;
-
-          console.log('✅ Profile Image URL:', fullUrl);
-
-          setProfileImage({ uri: fullUrl });
-        } else {
-          console.warn("⚠️ No name found in response:", res.data[0]);
-        }
-      } else {
-        console.log("ℹ️ No profile image found for this enquiry.");
-      }
-    })
-    .catch((err) => {
-      console.error("❌ Error fetching profile image:", err);
-    });
-}, [updateFile, enquiry.enquiry_id]);
-
+  
   const renderPreview = () => {
     if (!file) return null;
 
@@ -354,7 +222,7 @@ console.log('receiptFileDoc',receiptFileDoc);
     }).catch(()=>{                  
       Alert.alert("Unable to upload file")                                
     })
-  };
+  }; 
 
   const handleArrival = (e) => {
     const file = e.target.files[0];
@@ -536,38 +404,13 @@ const combinedAddressList = [profileAddress, ...addressList];
   
   return (
     <ScrollView style={styles.container}>
-      {/* <View style={styles.headerContainer}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-          <Image source={require('../assets/images/back-arrow.jpeg')} style={styles.backIcon} />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Enquiry Details</Text>
-      </View> */}
-    <View style={styles.profileContainer}>
-  <TouchableOpacity onPress={selectImage}>
-  <Image
-  source={
-    profileImage && profileImage.uri
-      ? { uri: profileImage.uri }
-      : require('../assets/images/profile-pic.jpeg')
-  }
-  style={styles.profileImage}
-  resizeMode="cover"
-  defaultSource={require('../assets/images/profile-pic.jpeg')} // iOS placeholder
-  onError={(e) => {
-    console.log("❌ Failed to load image:", profileImage?.uri, e.nativeEvent.error);
-    setProfileImage(null); // fallback
-  }}
-/>
-
-  </TouchableOpacity>
-  <Text style={styles.welcome}>Welcome to</Text>
-  <Text style={styles.name}>{enquiry?.title}</Text>
-</View>
+      <Text style={styles.header}>Enquiry Details</Text>
+      <Text style={styles.welcome}>Welcome to</Text>
+      <Text style={styles.name}>{enquiry?.title}</Text>
+{productsLinked.length>0 && <ProductsLinkedModal productsLinked={productsLinked} />}
       <View style={styles.row}>
-   <View style={{ marginBottom: 10 }}>
-  <Text style={styles.label}>Enquiry ID</Text>
-  <Text style={styles.enquiryId}>{enquiry?.enquiry_code}</Text>
-</View>
+        <Text style={styles.label}>Enquiry Code</Text>
+        <Text style={styles.enquiryId}>{enquiry?.enquiry_code}</Text>
         <Text style={styles.status}>{enquiry?.status}</Text>
       </View>
 
@@ -577,7 +420,7 @@ const combinedAddressList = [profileAddress, ...addressList];
       </View>
 
       <View style={styles.row}>
-        <Text style={styles.label}>Enquiry Type :</Text>
+        <Text style={styles.label}>Enquiry Type:</Text>
         <Text style={styles.value}>{enquiry?.enquiry_type}</Text>
       </View>
 
@@ -590,8 +433,13 @@ const combinedAddressList = [profileAddress, ...addressList];
         <Text style={styles.label}>Address</Text>
         <Text style={styles.value}>{enquiry?.shipping_address}</Text>
       </View>
-
-      <Text style={[styles.header, { textAlign: 'left', marginTop: 20, marginBottom: 10 }]}>Payment Receipt</Text>
+<AddressSelector addresses={combinedAddressList} onSelect={handleSelect} />
+      <View style={styles.editButtonWrapper}>
+            <Button mode="contained" onPress={generateOrder} style={styles.button} >Save Address</Button>
+          </View>
+       {/* <View style={styles.precontainer}>
+      <View style={styles.previewContainer}>{renderPreview()}</View>
+      </View> */}
  <FilePickerPreview title='Payment Receipt' setReceiptFile={setReceiptFile} updateFile={updateFile} setUpdateFile={setUpdateFile} receiptFile={receiptFile} handleUpload={handleUpload} />
      <FileList
       receiptUrl={receiptUrl} 
@@ -614,10 +462,7 @@ const combinedAddressList = [profileAddress, ...addressList];
       receiptUrl={receiptUrl3} 
       // deleteFile={deleteFile} 
       /> */}
-      <AddressSelector addresses={combinedAddressList} onSelect={handleSelect} />
-      <View style={styles.editButtonWrapper}>
-            <Button mode="contained" onPress={generateOrder} style={styles.button} >Save Address</Button>
-          </View>
+      
       <CarrierTrackingCard tracking={tracking} />
     </ScrollView>
   );
@@ -626,103 +471,70 @@ const combinedAddressList = [profileAddress, ...addressList];
 const getStyles = (isDarkMode) =>
   StyleSheet.create({
     container: {
-      flex: 1,
-      backgroundColor: '#fff',
-      paddingHorizontal: 20,
-      paddingTop: 20,
-    },
-    headerContainer: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      marginBottom: 20,
-      marginTop: 20,
-    },
-    backButton: {
-      paddingRight: 10,
-     
-    },
-    backIcon: {
-      width: 24,
-      height: 28,
-    
-      
-    },
-    headerTitle: {
-      fontSize: 18,
-      fontWeight: 'bold',
-      color: '#000',
+      padding: 20,
+      backgroundColor:'#fff',
+      minHeight: '100%',
       fontFamily: 'Outfit-Regular',
-      flex: 1,
+    },
+    header: {
+      fontSize: 20,
+      fontWeight: '600',
       textAlign: 'center',
-      marginRight: 34,
-    },
-    profileContainer: {
-      alignItems: 'center',
-      marginBottom: 30,
-    },
-    profileImage: {
-      width: 60,
-      height: 60,
-      borderRadius: 30,
-      marginBottom: 10,
+      color:'#000',
+      marginBottom: 16,
+      fontFamily: 'Outfit-Regular',
     },
     welcome: {
       fontSize: 14,
-      color: '#666',
+      textAlign: 'center',
+      color:'#444',
       fontFamily: 'Outfit-Regular',
     },
     name: {
       fontSize: 16,
-      fontWeight: 'bold',
-      color: '#000',
+      fontWeight: '500',
+      textAlign: 'center',
+      color:'#000',
+      marginBottom: 10,
       fontFamily: 'Outfit-Regular',
     },
     row: {
       flexDirection: 'row',
       justifyContent: 'space-between',
+      marginVertical: 6,
       alignItems: 'center',
-      paddingVertical: 12,
-      borderBottomWidth: 1,
-      borderBottomColor: '#f0f0f0',
+      fontFamily: 'Outfit-Regular',
     },
     label: {
+      color:'#888',
       fontSize: 14,
-      color: '#888',
       fontFamily: 'Outfit-Regular',
     },
     value: {
+      color:'#222',
       fontSize: 14,
-      color: '#222',
       fontFamily: 'Outfit-Regular',
     },
     enquiryId: {
-      fontSize: 15,
       fontWeight: 'bold',
-      color: '#000',
+      color:'#000',
+      fontSize: 15,
       fontFamily: 'Outfit-Regular',
     },
     status: {
-      backgroundColor: '#e6ffe6',
-      paddingHorizontal: 10,
-      paddingVertical: 5,
-      borderRadius: 15,
+      backgroundColor: '#D0F5D7',
+      paddingHorizontal: 8,
+      paddingVertical: 4,
+      borderRadius: 12,
       fontSize: 12,
-      color: '#008000',
-      fontWeight: 'bold',
+      color: '#007F00',
+      marginLeft: 10,
       fontFamily: 'Outfit-Regular',
     },
     budget: {
-      fontSize: 14,
-      fontWeight: 'bold',
       color: '#00C3D2',
-      fontFamily: 'Outfit-Regular',
-    },
-    header: {
-      fontSize: 18,
-      fontWeight: 'bold',
-      color: '#000',
-      marginTop: 20,
-      marginBottom: 15,
+      fontWeight: '600',
+      fontSize: 14,
       fontFamily: 'Outfit-Regular',
     },
     uploadBox: {
@@ -734,39 +546,11 @@ const getStyles = (isDarkMode) =>
       borderStyle: 'dashed',
       alignItems: 'center',
       justifyContent: 'center',
-      backgroundColor: '#f9f9f9',
+      fontFamily: 'Outfit-Regular',
     },
     uploadText: {
       color: '#888',
-      marginTop: 5,
       fontFamily: 'Outfit-Regular',
-    },
-    fileIcon: {
-      width: 20,
-      height: 20,
-      marginRight: 5,
-    },
-    fileName: {
-      fontSize: 14,
-      color: '#000',
-      fontFamily: 'Outfit-Regular',
-    },
-    deleteIcon: {
-      width: 16,
-      height: 16,
-      tintColor: '#ff0000',
-    },
-    fileItem: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'space-between',
-      paddingVertical: 10,
-      borderBottomWidth: 1,
-      borderBottomColor: '#eee',
-    },
-    fileInfo: {
-      flexDirection: 'row',
-      alignItems: 'center',
     },
     button: {
       flex: 1,

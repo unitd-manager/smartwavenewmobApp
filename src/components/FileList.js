@@ -20,7 +20,7 @@ const FileList = ({ receiptUrl, deleteFile }) => {
           </TouchableOpacity>
 
           <TouchableOpacity onPress={() => deleteFile(res.media_id)} style={styles.deleteButton}>
-            <Icon name="trash" size={16} color="red" />
+            <Icon name="times-circle" size={16} color="#ADD8E6" />
           </TouchableOpacity>
         </View>
       ))}
