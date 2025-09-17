@@ -292,7 +292,7 @@ useEffect(()=>{
         <TouchableOpacity
           onPress={() =>{ 
                if(item.grades){
-                Alert.alert('Please select grade before adding to cart');
+                // Alert.alert('Please select grade before adding to cart');
                 navigation.navigate("ProductDetails", { productId: item.product_id })
                } else{
                 addCart(item)}}

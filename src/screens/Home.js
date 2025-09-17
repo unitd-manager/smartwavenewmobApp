@@ -158,11 +158,12 @@ const { wishitems, status } = useSelector((state) => state.wishlist);
         data.contact_id=user.contact_id
       
          dispatch(addToWishlist(data)) 
-                 .then(() => { Alert.alert("Item added to wishlist")
+                 .then(() => { 
+                  //Alert.alert("Item added to wishlist")
                    dispatch(fetchWishlistItems(user));
                  })
                  .catch((error) => {
-                   console.error('Failed to add to cart:', error);
+                   //console.error('Failed to add to wishlist:', error);
                  });
       
         }
@@ -325,7 +326,7 @@ const { wishitems, status } = useSelector((state) => state.wishlist);
     </TouchableOpacity>
     <TouchableOpacity style={styles.addToCartButton}  onPress={() =>{ 
      if(item.grades){
-      Alert.alert('Please select grade before adding to cart');
+      // Alert.alert('Please select grade before adding to cart');
       navigation.navigate("ProductDetails", { productId: item.product_id })
      }else{
       addCart(item)}}
@@ -393,7 +394,7 @@ const { wishitems, status } = useSelector((state) => state.wishlist);
     </TouchableOpacity>
     <TouchableOpacity style={styles.addToCartButton}  onPress={() =>{ 
      if(item.grades){
-      Alert.alert('Please select grade before adding to cart');
+     // Alert.alert('Please select grade before adding to cart');
       navigation.navigate("ProductDetails", { productId: item.product_id })
      }else{
       addCart(item)}}
@@ -461,7 +462,7 @@ const { wishitems, status } = useSelector((state) => state.wishlist);
     </TouchableOpacity>
     <TouchableOpacity style={styles.addToCartButton}  onPress={() =>{ 
      if(item.grades){
-      Alert.alert('Please select grade before adding to cart');
+      //Alert.alert('Please select grade before adding to cart');
       navigation.navigate("ProductDetails", { productId: item.product_id })
      } else{
       addCart(item)}}
@@ -529,7 +530,7 @@ const { wishitems, status } = useSelector((state) => state.wishlist);
     </TouchableOpacity>
     <TouchableOpacity style={styles.addToCartButton} onPress={() =>{ 
      if(item.grades){
-      Alert.alert('Please select grade before adding to cart');
+      //Alert.alert('Please select grade before adding to cart');
       navigation.navigate("ProductDetails", { productId: item.product_id })
      } else{
       addCart(item)}}

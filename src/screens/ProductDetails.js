@@ -10,6 +10,7 @@ import {
   StyleSheet,
   Alert,
 } from "react-native";
+import { Snackbar } from 'react-native-paper';
 import api from "../constants/api";
 import { addToCart, fetchCartItems } from '../redux/slices/cartSlice';
 import { addToWishlist,fetchWishlistItems,deleteWishlistItem } from "../redux/slices/wishlistSlice";
@@ -33,6 +34,8 @@ export default ({ route }) => {
     product.variation ? product.variation[0].size[0].stock : product.qty_in_stock
   );
   const [quantityCount, setQuantityCount] = useState(1);
+  const [toastVisible, setToastVisible] = useState(false);
+  const [toastMessage, setToastMessage] = useState('');
 
   const [selectedProductGrade, setSelectedProductGrade] = useState(
    
@@ -46,6 +49,11 @@ const { wishitems, status } = useSelector((state) => state.wishlist);
 const isInWishlist = () => {
   return wishitems?.some(item => item.product_id === product.product_id);
 };
+
+const showToast = (message) => {
+  setToastMessage(message);
+  setToastVisible(true);
+};
   const addCart = (data) => {
  
     if(user){
@@ -54,14 +62,18 @@ const isInWishlist = () => {
     data.contact_id=user.contact_id
   data.grade=selectedProductGrade;
      dispatch(addToCart(data)) 
-             .then(() => { Alert.alert("Item added to cart")
+             .then(() => { 
+               showToast(`${data?.title} added to cart`);
                dispatch(fetchCartItems(user));
              })
              .catch((error) => {
                console.error('Failed to add to cart:', error);
              });
             } else{
-              Alert.alert("Please Select Grade")
+              Alert.alert(
+                "Alert",
+                "Please select the grade before add to cart"
+              )
             }
     }
     else{
@@ -74,11 +86,12 @@ const isInWishlist = () => {
  
   
      dispatch(deleteWishlistItem(data)) 
-             .then(() => { Alert.alert("Item removed from wishlist")
+             .then(() => { 
+              // Alert.alert("Item removed from wishlist")
                dispatch(fetchWishlistItems(user));
              })
              .catch((error) => {
-               console.error('Failed to remove from wishlist:', error);
+               //console.error('Failed to remove from wishlist:', error);
              });
 
    
@@ -92,11 +105,11 @@ const isInWishlist = () => {
     data.contact_id=user.contact_id
   
      dispatch(addToWishlist(data)) 
-             .then(() => { Alert.alert("Item added to wishlist")
+             .then(() => {
                dispatch(fetchWishlistItems(user));
              })
              .catch((error) => {
-               console.error('Failed to add to cart:', error);
+              // console.error('Failed to add to wishlist:', error);
              });
   
     }
@@ -207,7 +220,7 @@ const isInWishlist = () => {
     
   </TouchableOpacity>
 </View>
-      <Divider />
+      <Divider width="80%" />
 <View style={styles.gradeview}>
 <GradeSelector product={product} selectedProductGrade={selectedProductGrade} setSelectedProductGrade={setSelectedProductGrade} setProductStock={setProductStock} setQuantityCount={setQuantityCount} />  
     </View>
@@ -232,7 +245,7 @@ const isInWishlist = () => {
 
         <Text style={styles.text8}>{product?.description}</Text>
         <Text style={styles.text8}>{product?.product_description}</Text> */}
-        <Divider/>
+        <Divider width="90%" />
 <ProductDetailsSection product={product} />
         <View style={styles.view}>
           <TouchableOpacity
@@ -251,6 +264,14 @@ const isInWishlist = () => {
           </TouchableOpacity>
         </View>
       </ScrollView>
+      <Snackbar
+        visible={toastVisible}
+        onDismiss={() => setToastVisible(false)}
+        duration={3000}
+        style={{ backgroundColor: '#1EB1C5' }}
+      >
+        {toastMessage}
+      </Snackbar>
     </SafeAreaView>
   );
 };

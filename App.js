@@ -134,12 +134,14 @@
 
 import React, { useEffect, useState, useRef } from 'react';
 import Navigation from './src/Navigation';
-import { Provider, useSelector } from 'react-redux';
+import { Provider, useSelector, useDispatch } from 'react-redux';
 import store from './src/redux/store';
 import { NavigationContainer } from "@react-navigation/native";
 import { Text } from 'react-native';
 import { AuthProvider } from './src/context/AuthContext';
 import NotificationModal from './src/components/NotificationModal';
+import { fetchNotifications, fetchUnreadCount } from './src/redux/slices/notificationSlice';
+import useNotificationPolling from './src/hooks/useNotificationPolling';
 //import SplashScreen from 'react-native-splash-screen';
 
 // Set default font globally
@@ -151,8 +153,26 @@ Text.defaultProps.style = { fontFamily: 'Outfit-Regular' };
 const AppContent = () => {
   const [showNotificationModal, setShowNotificationModal] = useState(false);
   const navigationRef = useRef();
+  const dispatch = useDispatch();
   const notifications = useSelector(state => state.notifications?.notifications || []);
   const unreadNotifications = notifications.filter(notification => !notification.read);
+  
+  // Enable real-time notification polling
+  useNotificationPolling(30000); // Poll every 30 seconds
+
+  // Fetch notifications on app startup
+  useEffect(() => {
+    const initializeNotifications = async () => {
+      try {
+        await dispatch(fetchNotifications()).unwrap();
+        await dispatch(fetchUnreadCount()).unwrap();
+      } catch (error) {
+        console.log('Failed to fetch notifications on startup:', error);
+      }
+    };
+
+    initializeNotifications();
+  }, [dispatch]);
 
   useEffect(() => {
     // Show notification modal when app opens if there are unread notifications

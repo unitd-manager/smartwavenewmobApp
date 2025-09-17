@@ -30,20 +30,13 @@ const decodeHtmlEntities = (text) => {
 
 return (
     <View style={styles.container}>
-      {/* Product Detail Section */}
-      <TouchableOpacity style={styles.row} onPress={() => setShowDetails(!showDetails)}>
+      {/* Product Detail Section - Always Visible */}
+      <View style={styles.titleRow}>
         <Text style={styles.title}>Product Detail</Text>
-        <Image
-          source={{ uri: "https://storage.googleapis.com/tagjs-prod.appspot.com/pNd58t8xI9/3h07bbwo.png" }}
-          resizeMode="stretch"
-          style={styles.icon}
-        />
-      </TouchableOpacity>
-      {showDetails && (
-        <View style={styles.content}>
-          <Text style={styles.text}>{product?.description}</Text>
-        </View>
-      )}
+      </View>
+      <View style={styles.content}>
+        <Text style={styles.text}>{product?.description}</Text>
+      </View>
 
       {/* Additional Difference Section */}
       <TouchableOpacity style={styles.row} onPress={() => setShowAdditional(!showAdditional)}>
@@ -67,8 +60,15 @@ return (
 
 const styles = StyleSheet.create({
   container: {
-    padding: 16,
-     fontFamily: 'Outfit-Regular',
+    paddingHorizontal: 16,
+    paddingBottom: 16,
+    paddingTop: 0, // Remove top spacing
+    fontFamily: 'Outfit-Regular',
+  },
+  titleRow: {
+    paddingVertical: 0, // Remove top space from Product Detail Label
+    marginBottom: 8,
+    fontFamily: 'Outfit-Regular',
   },
   row: {
     flexDirection: 'row',

@@ -78,7 +78,13 @@ const Categories = ({navigation}) => {
 
           <View style={styles.subCategoryWrapper}>
             {category?.subcategories?.map((item, subIndex) => (
-              <View key={subIndex} style={styles.subCategoryItem}>
+              <View 
+                key={subIndex} 
+                style={[
+                  styles.subCategoryItem,
+                  (subIndex + 1) % 4 === 0 ? styles.subCategoryItemLast : {}
+                ]}
+              >
             <Image
   source={{
     uri: item.images[0]
@@ -125,13 +131,17 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'flex-start',
-    gap: 20,
+    marginBottom: 5,
   },
   subCategoryItem: {
-    width: '22%',
     alignItems: 'center',
-    marginBottom: 20,
+    marginBottom: 8,
+    width: '22.5%',
+    marginRight: '2.5%',
     fontFamily: 'Outfit-Regular',
+  },
+  subCategoryItemLast: {
+    marginRight: 0,
   },
   image: {
     width: 60,
@@ -147,8 +157,8 @@ const styles = StyleSheet.create({
   categoryRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: 20,
-    marginBottom: 20,
+    marginTop: 5,
+    marginBottom: 5,
     fontFamily: 'Outfit-Regular',
   },
   

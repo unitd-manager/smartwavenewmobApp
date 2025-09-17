@@ -8,6 +8,9 @@ import {
   Alert,
   Image,
   useColorScheme,
+  KeyboardAvoidingView,
+  ScrollView,
+  Platform,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { useNavigation } from '@react-navigation/native';
@@ -102,91 +105,104 @@ const isDarkMode = colorScheme === 'dark';
               AsyncStorage.setItem("token", JSON.stringify(res.data.token));
               login(res.data.data)
                 dispatch(fetchCartItems(res.data.data));
-			  Alert.alert('Success', 'Logged in successfully!');
+			 // Alert.alert('Success', 'Logged in successfully!');
               setTimeout(()=>{
   navigation.navigate(" ")
               },300)
             }
           }).catch((err)=>{
-			Alert.alert("Invalid Username or Password");
+Alert.alert(
+  "Alert",
+  "Invalid email or password. Please check your credentials and try again."
+);
           });
       
     }
   };
 
   return (
-    <View style={styles.container}>
-      {/* 🔽 Image Above Title */}
-      <Image
-        source={require('../assets/signin/logscreen.png')} // Make sure this path is correct
-        style={styles.logo}
-        resizeMode="contain"
-      />
-
-      <Text style={styles.title}>
-        Please <Text style={styles.highlight}>Sign In</Text>
-      </Text>
-      <Text style={styles.subtitle}>
-        Enter your Dipstore account details for a personalised experience
-      </Text>
-
-      {/* Email Input */}
-      <View style={styles.inputContainer}>
-        <Icon name="mail-outline" size={20} color="#9E9E9E" style={styles.icon} />
-        <TextInput
-          style={styles.input}
-          placeholder="Email"
-          placeholderTextColor={isDarkMode ? '#aaa' : '#888'}
-          keyboardType="email-address"
-          value={email}
-          onChangeText={validateEmail}
+    <KeyboardAvoidingView 
+      style={styles.container} 
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
+    >
+      <ScrollView 
+        contentContainerStyle={styles.scrollContainer}
+        showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
+      >
+        {/* 🔽 Image Above Title */}
+        <Image
+          source={require('../assets/signin/logscreen.png')} // Make sure this path is correct
+          style={styles.logo}
+          resizeMode="contain"
         />
-        {emailValid && (
-          <Icon name="checkmark-circle" size={20} color="green" style={styles.iconRight} />
-        )}
-      </View>
-      {emailError !== '' && <Text style={styles.errorText}>{emailError}</Text>}
 
-      {/* Password Input */}
-      <View style={styles.inputContainer}>
-        <Icon name="lock-closed-outline" size={20} color="#9E9E9E" style={styles.icon} />
-        <TextInput
-          style={styles.input}
-          placeholder="Password"
-          placeholderTextColor={isDarkMode ? '#aaa' : '#888'}
-          secureTextEntry={!showPassword}
-          value={password}
-          onChangeText={validatePassword}
-        />
-        <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
-          <Icon
-            name={showPassword ? 'eye-off-outline' : 'eye-outline'}
-            size={20}
-            color="#9E9E9E"
-            style={styles.iconRight}
+        <Text style={styles.title}>
+          Please <Text style={styles.highlight}>Sign In</Text>
+        </Text>
+        <Text style={styles.subtitle}>
+          Enter your Dipstore account details for a personalised experience
+        </Text>
+
+        {/* Email Input */}
+        <View style={styles.inputContainer}>
+          <Icon name="mail-outline" size={20} color="#9E9E9E" style={styles.icon} />
+          <TextInput
+            style={styles.input}
+            placeholder="Email"
+            placeholderTextColor={isDarkMode ? '#aaa' : '#888'}
+            keyboardType="email-address"
+            value={email}
+            onChangeText={validateEmail}
           />
+          {emailValid && (
+            <Icon name="checkmark-circle" size={20} color="green" style={styles.iconRight} />
+          )}
+        </View>
+        {emailError !== '' && <Text style={styles.errorText}>{emailError}</Text>}
+
+        {/* Password Input */}
+        <View style={styles.inputContainer}>
+          <Icon name="lock-closed-outline" size={20} color="#9E9E9E" style={styles.icon} />
+          <TextInput
+            style={styles.input}
+            placeholder="Password"
+            placeholderTextColor={isDarkMode ? '#aaa' : '#888'}
+            secureTextEntry={!showPassword}
+            value={password}
+            onChangeText={validatePassword}
+          />
+          <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
+            <Icon
+              name={showPassword ? 'eye-off-outline' : 'eye-outline'}
+              size={20}
+              color="#9E9E9E"
+              style={styles.iconRight}
+            />
+          </TouchableOpacity>
+        </View>
+        {passwordError !== '' && <Text style={styles.errorText}>{passwordError}</Text>}
+
+        {/* Forgot Password */}
+        <TouchableOpacity onPress={()=>navigation.navigate('ForgotPassword')}>
+          <Text style={styles.forgotPassword}>Forgot Password?</Text>
         </TouchableOpacity>
-      </View>
-      {passwordError !== '' && <Text style={styles.errorText}>{passwordError}</Text>}
 
-      {/* Forgot Password */}
-      <TouchableOpacity onPress={()=>navigation.navigate('ForgotPassword')}>
-        <Text style={styles.forgotPassword}>Forgot Password?</Text>
-      </TouchableOpacity>
-
-      {/* Sign In Button */}
-      <TouchableOpacity style={styles.button} onPress={handleSignIn}>
-        <Text style={styles.buttonText}>Sign In</Text>
-      </TouchableOpacity>
-
-      {/* Sign Up Link */}
-      <View style={styles.footer}>
-        <Text style={{ fontFamily: 'Outfit-Regular'}}>First time here </Text>
-        <TouchableOpacity onPress={() => navigation.navigate('Signup')}>
-          <Text style={styles.highlight}>Sign Up</Text>
+        {/* Sign In Button */}
+        <TouchableOpacity style={styles.button} onPress={handleSignIn}>
+          <Text style={styles.buttonText}>Sign In</Text>
         </TouchableOpacity>
-      </View>
-    </View>
+
+        {/* Sign Up Link */}
+        <View style={styles.footer}>
+          <Text style={{ fontFamily: 'Outfit-Regular'}}>First time here </Text>
+          <TouchableOpacity onPress={() => navigation.navigate('Signup')}>
+            <Text style={styles.highlight}>Sign Up</Text>
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 };
 
@@ -195,9 +211,12 @@ export default SignInScreen;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#fff',
+  },
+  scrollContainer: {
+    flexGrow: 1,
     padding: 20,
     justifyContent: 'center',
-    backgroundColor: '#fff',
   },
   logo: {
     width: 160,

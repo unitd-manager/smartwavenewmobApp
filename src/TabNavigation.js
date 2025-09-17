@@ -116,7 +116,7 @@ const CartStack = ({ navigation }) => (
     <Stack.Screen
       name="CartMain"
       component={Cart}
-      options={{ title: "Your Cart" }}
+      options={{ title: "My Cart" }}
     />
     <Stack.Screen
       name="ProductDetails"

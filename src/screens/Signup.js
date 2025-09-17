@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, ScrollView, Alert, useColorScheme } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, ScrollView, Alert, useColorScheme, KeyboardAvoidingView, Platform } from 'react-native';
 import api from '../constants/api';
 import Icon from 'react-native-vector-icons/Ionicons';
 
@@ -12,7 +12,7 @@ const SignUpScreen = ({navigation}) => {
   });
 
   const colorScheme = useColorScheme();
-const isDarkMode = colorScheme === 'dark';
+  const isDarkMode = colorScheme === 'dark';
 
   const [formErrors, setFormErrors] = useState({});
   const [passwordVisible, setPasswordVisible] = useState(false);
@@ -61,14 +61,14 @@ const isDarkMode = colorScheme === 'dark';
     }
 
     // Password Validation
-  const passwordPattern = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*]).{8,}$/;
-  if (!signupData.password.trim()) {
-    errors.password = 'Password is required';
-  } else if (signupData.password.length < 8) {
-    errors.password = 'Password should be at least 8 characters';
-  } else if (!passwordPattern.test(signupData.password)) {
-    errors.password = 'Password must contain at least one uppercase letter, one lowercase letter, one digit, and one special character';
-  }
+    const passwordPattern = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*]).{8,}$/;
+    if (!signupData.password.trim()) {
+      errors.password = 'Password is required';
+    } else if (signupData.password.length < 8) {
+      errors.password = 'Password should be at least 8 characters';
+    } else if (!passwordPattern.test(signupData.password)) {
+      errors.password = 'Password must contain at least one uppercase letter, one lowercase letter, one digit, and one special character';
+    }
 
     setFormErrors(errors);
     return Object.keys(errors).length === 0;
@@ -82,15 +82,19 @@ const isDarkMode = colorScheme === 'dark';
       .post("/commonApi/sendUseremail", { to, subject })
       .then((res) => {
         console.log(res.data.data);
-        Alert.alert("Registration Email has been sent successfully");
-
-        setTimeout(() => {
-          navigation.navigate('LoginPage');
-        }, 500);
-        
+        Alert.alert(
+          "Registration Success",
+          "Registration successful. A confirmation email has been sent to your registered email address. Click OK to proceed to login.",
+          [
+            {
+              text: "OK",
+              onPress: () => navigation.navigate('LoginPage')
+            }
+          ]
+        );
       })
       .catch((err) => {
-        Alert.alert("Registration Email already exists");
+        Alert.alert("Alert", "This email address is already registered. Please log in or use a different email to create a new account.");
       });
 
     const adminTo = mailId.email;
@@ -124,7 +128,6 @@ const isDarkMode = colorScheme === 'dark';
         .then((res) => {
           console.log(res.data.data);
           console.log('OTP:', otp);
-          Alert.alert("Registered Successfully");
           sendMail();
         })
         .catch((err) => {
@@ -143,7 +146,16 @@ const isDarkMode = colorScheme === 'dark';
   }, []);
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
+    <KeyboardAvoidingView 
+      style={styles.keyboardContainer} 
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
+    >
+      <ScrollView 
+        contentContainerStyle={styles.container}
+        showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
+      >
       <Text style={styles.title}>
         Create <Text style={styles.titleHighlight}>New Account</Text>
       </Text>
@@ -218,25 +230,28 @@ const isDarkMode = colorScheme === 'dark';
         <Text style={styles.buttonText}>Sign Up</Text>
       </TouchableOpacity>
 
-      {/* <Text style={styles.loginText}>
-        Already have an account? <TouchableOpacity style={styles.button} onPress={()=>navigation.navigate('LoginPage')}><Text style={styles.loginLink}>Login</Text></TouchableOpacity>      </Text> */}
-    <View style={styles.footer}>
-            <Text style={{ fontFamily: 'Outfit-Regular'}}> Already have an account?</Text>
-            <TouchableOpacity onPress={() => navigation.navigate('LoginPage')}>
-              <Text style={styles.loginLink}>Login</Text>
-            </TouchableOpacity>
-          </View>
-    </ScrollView>
+      <View style={styles.footer}>
+        <Text style={{ fontFamily: 'Outfit-Regular'}}> Already have an account?</Text>
+        <TouchableOpacity onPress={() => navigation.navigate('LoginPage')}>
+          <Text style={styles.loginLink}>Login</Text>
+        </TouchableOpacity>
+      </View>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 };
 
 const styles = StyleSheet.create({
+  keyboardContainer: {
+    flex: 1,
+    backgroundColor: '#fff',
+  },
   container: {
     padding: 24,
     paddingTop: 60,
     backgroundColor: '#fff',
     flexGrow: 1,
-    fontFamily: 'Outfit-Regular',
+    fontFamily: 'Outfit-Regular'
   },
   title: {
     fontSize: 26,
@@ -324,7 +339,6 @@ const styles = StyleSheet.create({
   },
   loginLink: {
     color: '#00B4D8',
-    //fontWeight: '500',
     fontFamily: 'Outfit-Regular',
   },
   footer: {
@@ -333,8 +347,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     fontFamily: 'Outfit-Regular',
   },
-
-
 });
 
 export default SignUpScreen;
