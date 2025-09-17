@@ -117,7 +117,7 @@ const EnquiryDetails = ({ route }) => {
       } else if (response.customButton) {
         console.log('User tapped custom button: ', response.customButton);
       } else {
-        const source = { uri: response.assets[0].uri, type: response.assets[0].type, name: response.assets[0].name };
+        const source = { uri: response.assets[0].uri, type: response.assets[0].type, name: response.assets[0].fileName };
         setProfileImage(source);
         handleUploadProfileImage(source);
       }
@@ -166,19 +166,19 @@ useEffect(() => {
   api.post('/file/getListOfFiles', { record_id: enquiry.enquiry_id, room_name: 'ProfileImages' })
     .then((res) => {
       if (res.data && res.data.length > 0) {
-        const fileName = res.data[0].name;
+        // Get the LAST uploaded image
+        const lastFile = res.data[res.data.length - 1];
+        const fileName = lastFile.name;
 
         if (fileName) {
-          // Build full URL with your base path
           const fullUrl = fileName.startsWith('http')
             ? fileName
             : `http://66.29.149.122:2013/storage/uploads/${fileName}`;
 
-          console.log('✅ Profile Image URL:', fullUrl);
-
+          console.log('✅ Latest Profile Image URL:', fullUrl);
           setProfileImage({ uri: fullUrl });
         } else {
-          console.warn("⚠️ No name found in response:", res.data[0]);
+          console.warn("⚠️ No name found in last file:", lastFile);
         }
       } else {
         console.log("ℹ️ No profile image found for this enquiry.");
@@ -188,6 +188,7 @@ useEffect(() => {
       console.error("❌ Error fetching profile image:", err);
     });
 }, [updateFile, enquiry.enquiry_id]);
+
 
   const renderPreview = () => {
     if (!file) return null;
