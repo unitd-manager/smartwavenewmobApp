@@ -15,7 +15,6 @@ import {
   useColorScheme,
   View,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 
 import {
   Colors,
@@ -60,7 +59,6 @@ function App(): React.JSX.Element {
 
   const backgroundStyle = {
     backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
-    flex: 1,
   };
 
   /*
@@ -75,21 +73,21 @@ function App(): React.JSX.Element {
   const safePadding = '5%';
 
   return (
-    <SafeAreaView style={backgroundStyle}>
+    <View style={backgroundStyle}>
       <StatusBar
         barStyle={isDarkMode ? 'light-content' : 'dark-content'}
         backgroundColor={backgroundStyle.backgroundColor}
       />
       <ScrollView
         style={backgroundStyle}>
-        <View style={{flex: 1}}>
+        <View style={{paddingRight: safePadding}}>
           <Header/>
         </View>
         <View
           style={{
             backgroundColor: isDarkMode ? Colors.black : Colors.white,
-            flex: 1,
-            paddingHorizontal: 24,
+            paddingHorizontal: safePadding,
+            paddingBottom: safePadding,
           }}>
           <Section title="Step One">
             Edit <Text style={styles.highlight}>App.tsx</Text> to change this
@@ -107,7 +105,7 @@ function App(): React.JSX.Element {
           <LearnMoreLinks />
         </View>
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 }
 

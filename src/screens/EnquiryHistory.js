@@ -65,14 +65,29 @@ export default function EnquiryHistory({navigation}) {
       <View
         style={[
           styles.statusBadge,
-          item.status === 'Approved'
+          item.status === 'Completed'
             ? styles.approved
-            : item.status === 'Rejected'
+            : item.status === 'Cancelled'
             ? styles.rejected
-            : styles.pending,
+            : item.status === 'Pending'
+            ? styles.pending
+            : item.status === 'In Progress'
+            ? styles.inProgress
+            : styles.new,
         ]}
       >
-        <Text style={styles.statusText}>{item.status}</Text>
+        <Text style={[
+          styles.statusText,
+          item.status === 'Completed'
+            ? styles.approvedText
+            : item.status === 'Cancelled'
+            ? styles.rejectedText
+            : item.status === 'Pending'
+            ? styles.pendingText
+            : item.status === 'In Progress'
+            ? styles.inProgressText
+            : styles.newText,
+        ]}>{item.status}</Text>
       </View>
       </TouchableOpacity>
     </View>
@@ -188,10 +203,32 @@ const styles = StyleSheet.create({
     backgroundColor: '#fef2c0',
     fontFamily: 'Outfit-Regular',
   },
+  inProgress: {
+    backgroundColor: '#e0f7fa',
+    fontFamily: 'Outfit-Regular',
+  },
+  new: {
+    backgroundColor: '#f0f0f0',
+    fontFamily: 'Outfit-Regular',
+  },
   statusText: {
     fontSize: 12,
     fontWeight: '500',
-    color: '#333',
     fontFamily: 'Outfit-Regular',
+  },
+  approvedText: {
+    color: '#008000',
+  },
+  rejectedText: {
+    color: '#FF0000',
+  },
+  pendingText: {
+    color: '#FFA500',
+  },
+  inProgressText: {
+    color: '#0000FF',
+  },
+  newText: {
+    color: '#808080',
   },
 });
