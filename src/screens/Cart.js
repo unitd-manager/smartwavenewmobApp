@@ -1,6 +1,6 @@
 
 import React, { useEffect, useState,useCallback, useContext } from "react";
-import { SafeAreaView, View, ScrollView, Text, Image, TouchableOpacity, StyleSheet, ActivityIndicator, ImageBackground, Alert } from "react-native";
+import { SafeAreaView, View, ScrollView, Text, Image, TouchableOpacity, StyleSheet, ActivityIndicator, ImageBackground, Alert, TextInput } from "react-native";
 import api from '../constants/api';
 import imageBase from "../constants/imageBase";
 import { useSelector, useDispatch } from 'react-redux';
@@ -14,6 +14,7 @@ import { AuthContext } from "../context/AuthContext";
  const CartScreen = ({navigation}) => {
   const [cartItems, setCartItems] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [remarks, setRemarks] = useState("");
   //const [user, setUser] = useState();
 
 
@@ -34,11 +35,11 @@ import { AuthContext } from "../context/AuthContext";
 
 const clearCartItems=()=>{
 	dispatch(clearCart(user)).then(()=>{
-		Alert.alert('Cart cleared')
+		
 	 dispatch(fetchCartItems(user));
 				 })
 				 .catch((error) => {
-				   console.error('Failed to clear cart:', error);
+				   //console.error('Failed to clear cart:', error);
 				 });
 }
 
@@ -247,126 +248,130 @@ api
 
 	return (
 		<SafeAreaView style={styles.container}>
-			<ScrollView  style={styles.scrollView}>
-				<View style={styles.row2}>
-					{/* <BackButton/>
-					<Text style={styles.text2}>
-						{"My Cart"}
-					</Text> */}
-				</View>
+			{/* Header */}
+			<View style={styles.header}>
+				<TouchableOpacity 
+					style={styles.backButton}
+					onPress={() => navigation.goBack()}
+				>
+					<Icon name="arrow-back" size={24} color="#000" />
+				</TouchableOpacity>
+				<Text style={styles.headerTitle}>My Cart</Text>
+				<View style={styles.headerSpacer} />
+			</View>
+
+			<ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
 
 			
           {loading ? (
-			        <ActivityIndicator size="large" color="#1EB1C5" />
+		        <ActivityIndicator size="large" color="#1EB1C5" />
      ): items.length === 0 ? (
-		<View style={styles.emptyContainer}>
-		<Icon name="cart-outline" size={100} color="#1EB1C5" style={{ marginBottom: 20 }} />
-		<Text style={styles.emptyText}>Your cart is empty</Text>
-		<TouchableOpacity
-  style={styles.homeButton}
-  onPress={() => navigation.navigate("Home")}
->
-  <View style={styles.homeButtonContent}>
-    <Icon name="home-outline" size={20} color="#fff" style={{ marginRight: 8 }} />
-    <Text style={styles.homeButtonText}>Go Home</Text>
-  </View>
-</TouchableOpacity>
-
-	  </View>
-	  )  : (items.map((item, index) => (
-				<View style={styles.row3}>
-					<Image
-						source = {{uri: `${imageBase}${item.images[0]}`}} 
-						resizeMode = {"stretch"}
-						style={styles.image3}
-					/>
-					<View style={styles.view}>
-						<View style={styles.column}>
-						<TouchableOpacity
-      onPress={() => navigation.navigate("ProductDetails", { productId: item.product_id })}
-    >
-							<View style={styles.column2}  >
-								<Text style={styles.text3}>
+        <View style={[styles.emptyContainer, {flex: 1, justifyContent: 'center', alignItems: 'center'}]}>
+          <View style={{alignItems: 'center'}}>
+            <Icon 
+              name="cart-outline" 
+              size={100} 
+              color="#1EB1C5" 
+              style={{marginBottom: 20, alignSelf: 'center'}} 
+            />
+            <Text style={[styles.emptyText, {textAlign: 'center'}]}>Your cart is empty</Text>
+            <TouchableOpacity
+              style={styles.homeButton}
+              onPress={() => navigation.navigate("Home")}
+            >
+              <View style={styles.homeButtonContent}>
+                <Icon name="home-outline" size={20} color="#fff" style={{marginRight: 8}} />
+                <Text style={styles.homeButtonText}>Go Home</Text>
+              </View>
+            </TouchableOpacity>
+          </View>
+        </View>
+      ) : (items.map((item, index) => (
+				<View key={index} style={styles.cartItem}>
+					<View style={styles.itemContent}>
+						<Image
+							source={{ uri: `${imageBase}${item.images[0]}` }}
+							resizeMode={"cover"}
+							style={styles.itemImage}
+						/>
+						<View style={styles.itemDetails}>
+							<TouchableOpacity
+								onPress={() => navigation.navigate("ProductDetails", { productId: item.product_id })}
+							>
+								<Text style={styles.itemName}>
 									{item.title}
 								</Text>
-								<Text style={styles.text4}>
+								<Text style={styles.itemCategory}>
 									{item.product_type}
 								</Text>
-							</View>
 							</TouchableOpacity>
-							
-<View style={styles.row4}>
-  <TouchableOpacity onPress={() => handleDecreaseQuantity(item)}>
-    <Icon name="remove-circle-outline" size={15} color="#1EB1C5" />
-  </TouchableOpacity>
-
-  <TouchableOpacity style={styles.button}>
-    <Text style={styles.text5}>
-      {item?.qty}
-    </Text>
-  </TouchableOpacity>
-
-  <TouchableOpacity onPress={() => handleIncreaseQuantity(item)}>
-    <Icon name="add-circle-outline" size={15} color="#1EB1C5" />
-  </TouchableOpacity>
-</View>
+							<View style={styles.quantityContainer}>
+								<TouchableOpacity 
+									style={styles.quantityButton}
+									onPress={() => handleDecreaseQuantity(item)}
+								>
+									<Icon name="remove-circle-outline" size={15} color="#1EB1C5" />
+								</TouchableOpacity>
+								<Text style={styles.quantityText}>
+									{item?.qty}
+								</Text>
+								<TouchableOpacity 
+									style={styles.quantityButton}
+									onPress={() => handleIncreaseQuantity(item)}
+								>
+									<Icon name="add-circle-outline" size={15} color="#1EB1C5" />
+								</TouchableOpacity>
+							</View>
 						</View>
+						<TouchableOpacity 
+							style={styles.deleteButton}
+							onPress={() => handleDelete(item)}
+						>
+							<Icon name="trash-outline" size={20} color="#999" />
+						</TouchableOpacity>
 					</View>
-					<TouchableOpacity onPress={() => handleDelete(item)}>
-  <Icon name="trash" size={24} color="red" style={{ marginLeft: 10 }} />
-</TouchableOpacity>
-
 				</View>
 				
 				)))}
+				
+				{items.length > 0 && (
+					<>
+						{/* Remarks Section */}
+						<View style={styles.remarksSection}>
+							<View style={styles.remarksHeader}>
+								<Icon name="create-outline" size={20} color="#000" />
+								<Text style={styles.remarksTitle}>Remarks</Text>
+							</View>
+							<TextInput
+								style={styles.remarksInput}
+								placeholder="Enter here to add some remarks..."
+								placeholderTextColor="#999"
+								value={remarks}
+								onChangeText={setRemarks}
+								multiline={true}
+								numberOfLines={4}
+								textAlignVertical="top"
+							/>
+						</View>
+					</>
+				)}
+			</ScrollView>
 
-{items.length>0 &&<View style={styles.view4}>
-					<TouchableOpacity style={styles.button4} onPress={()=>clearCartItems()}>
-						<Text style={styles.text9}>
+			{/* Fixed Bottom Buttons */}
+			{items.length > 0 && (
+				<View style={styles.fixedButtonContainer}>
+					<TouchableOpacity style={styles.clearCartButton} onPress={()=>clearCartItems()}>
+						<Text style={styles.clearCartButtonText}>
 							{"Clear Cart"}
 						</Text>
 					</TouchableOpacity>
-				</View>}
-				{/* <View style={styles.row8}>
-					<View style={styles.column5}>
-						<ImageBackground
-							source={{uri: "https://storage.googleapis.com/tagjs-prod.appspot.com/pNd58t8xI9/hm42p68t.png"}} 
-							resizeMode = {'stretch'}
-							style={styles.view2}
-							>
-							<View style={styles.box}>
-							</View>
-						</ImageBackground>
-						<Image
-							source = {{uri: "https://storage.googleapis.com/tagjs-prod.appspot.com/pNd58t8xI9/dsjcgiz3.png"}} 
-							resizeMode = {"stretch"}
-							style={styles.image10}
-						/>
-					</View>
-					<Text style={styles.text7}>
-						{"Remarks"}
-					</Text>
-				</View> */}
-				{/* <View style={styles.column6}>
-					<Text style={styles.text8}>
-						{"Enter here to add some remarks"}
-					</Text>
-					<View style={styles.view3}>
-						<Image
-							source = {{uri: "https://storage.googleapis.com/tagjs-prod.appspot.com/pNd58t8xI9/kkpvbb7n.png"}} 
-							resizeMode = {"stretch"}
-							style={styles.image11}
-						/>
-					</View>
-				</View> */}
-				{items.length>0 &&<View style={styles.view4}>
-					<TouchableOpacity style={styles.button4} onPress={()=>generateCode()}>
-						<Text style={styles.text9}>
+					<TouchableOpacity style={styles.enquireButton} onPress={()=>generateCode()}>
+						<Text style={styles.enquireButtonText}>
 							{"Enquire Now"}
 						</Text>
 					</TouchableOpacity>
-				</View>}
-			</ScrollView>
+				</View>
+			)}
 		</SafeAreaView>
 	)
 }
@@ -671,86 +676,140 @@ api
 // });
 const styles = StyleSheet.create({
 	container: {
-	  flex: 1,
-	  backgroundColor: '#F9F9F9',
+		flex: 1,
+		backgroundColor: "#FFFFFF",
+	},
+	header: {
+		flexDirection: "row",
+		alignItems: "center",
+		paddingHorizontal: 16,
+		paddingVertical: 12,
+		backgroundColor: "#FFFFFF",
+		borderBottomWidth: 1,
+		borderBottomColor: "#F0F0F0",
+	},
+	backButton: {
+		padding: 8,
+	},
+	headerTitle: {
+		flex: 1,
+		fontSize: 18,
+		fontWeight: "600",
+		color: "#000",
+		textAlign: "center",
+		marginRight: 32,
+	},
+	headerSpacer: {
+		width: 32,
 	},
 	scrollView: {
-	  padding: 16,
+		flex: 1,
+		backgroundColor: "#FFFFFF",
+		paddingHorizontal: 16,
 	},
-	row3: {
-	  flexDirection: 'row',
-	  alignItems: 'center',
-	  backgroundColor: '#fff',
-	  borderRadius: 12,
-	  padding: 12,
-	  marginBottom: 12,
-	  //shadowColor: '#000',
-	  //shadowOpacity: 0.1,
-	  //shadowRadius: 8,
-	  //elevation: 4,
+	cartItem: {
+		backgroundColor: "#FFFFFF",
+		borderRadius: 12,
+		padding: 16,
+		marginBottom: 12,
+		shadowColor: "#000",
+		shadowOffset: { width: 0, height: 2 },
+		shadowOpacity: 0.1,
+		shadowRadius: 4,
+		elevation: 3,
 	},
-	image3: {
-	  width: 80,
-	  height: 80,
-	  borderRadius: 10,
-	  marginRight: 12,
+	itemContent: {
+		flexDirection: "row",
+		alignItems: "center",
 	},
-	view: {
-	  flex: 1,
+	itemImage: {
+		width: 80,
+		height: 80,
+		borderRadius: 8,
+		marginRight: 12,
 	},
-	column2: {
-	  justifyContent: 'center',
-	  alignItems: 'center',
-	  marginBottom: 4,
+	itemDetails: {
+		flex: 1,
 	},
-	text3: {
-	  fontSize: 16,
-	  fontWeight: '600',
-	  color: '#333',
-	  textAlign: 'center',
-	  alignSelf: 'center',
+	itemName: {
+		fontSize: 16,
+		fontWeight: "600",
+		color: "#333",
+		marginBottom: 4,
 	},
-	text4: {
-	  fontSize: 14,
-	  color: '#666',
-	  textAlign: 'center',
+	itemCategory: {
+		fontSize: 14,
+		color: "#666",
+		marginBottom: 8,
 	},
-	row4: {
-	  flexDirection: 'row',
-	  justifyContent: 'center',
-	  alignItems: 'center',
-	  marginTop: 8,
+	quantityContainer: {
+		flexDirection: "row",
+		alignItems: "center",
 	},
-	button: {
-	  paddingHorizontal: 12,
-	  paddingVertical: 6,
-	  borderRadius: 6,
-	  backgroundColor: '#1EB1C5',
-	  marginHorizontal: 6,
+	quantityButton: {
+		padding: 4,
 	},
-	text5: {
-	  color: '#fff',
-	  fontWeight: 'bold',
+	quantityText: {
+		fontSize: 16,
+		fontWeight: "600",
+		marginHorizontal: 12,
+		color: "#333",
+	},
+	deleteButton: {
+		padding: 8,
+	},
+	remarksSection: {
+		backgroundColor: "#FFFFFF",
+		borderRadius: 12,
+		padding: 16,
+		marginBottom: 16,
+		shadowColor: "#000",
+		shadowOffset: { width: 0, height: 2 },
+		shadowOpacity: 0.1,
+		shadowRadius: 4,
+		elevation: 3,
+	},
+	remarksHeader: {
+		flexDirection: "row",
+		alignItems: "center",
+		marginBottom: 12,
+	},
+	remarksTitle: {
+		fontSize: 16,
+		fontWeight: "600",
+		color: "#333",
+		marginLeft: 8,
+	},
+	remarksInput: {
+		borderWidth: 1,
+		borderColor: "#E0E0E0",
+		borderRadius: 8,
+		padding: 12,
+		fontSize: 14,
+		color: "#333",
+		minHeight: 80,
 	},
 	view4: {
-	  marginVertical: 20,
-	  alignItems: 'center',
+		marginVertical: 20,
+		alignItems: 'center',
 	},
 	button4: {
-	  backgroundColor: '#1EB1C5',
-	  paddingVertical: 12,
-	  paddingHorizontal: 28,
-	  borderRadius: 8,
-	  shadowColor: '#1EB1C5',
-	  shadowOffset: { width: 0, height: 4 },
-	  shadowOpacity: 0.3,
-	  shadowRadius: 6,
-	  elevation: 5,
+		backgroundColor: '#1EB1C5',
+		paddingVertical: 15,
+		paddingHorizontal: 40,
+		borderRadius: 25,
+		shadowColor: '#1EB1C5',
+		shadowOffset: { width: 0, height: 4 },
+		shadowOpacity: 0.3,
+		shadowRadius: 6,
+		elevation: 5,
+		marginHorizontal: 16,
 	},
 	text9: {
-	  color: '#fff',
-	  fontSize: 16,
-	  fontWeight: '600',
+		color: '#fff',
+		fontSize: 16,
+		fontWeight: '600',
+		textAlign: 'center',
 	},
 	emptyContainer: {
 	  flex: 1,
@@ -779,8 +838,69 @@ const styles = StyleSheet.create({
 	  fontSize: 16,
 	  fontWeight: '500',
 	},
+	scrollContent: {
+	  paddingBottom: 100, // Add padding to prevent overlap with fixed button
+	},
+	fixedButtonContainer: {
+	  position: 'absolute',
+	  bottom: 0,
+	  left: 0,
+	  right: 0,
+	  backgroundColor: '#fff',
+	  paddingHorizontal: 20,
+	  paddingVertical: 15,
+	  borderTopWidth: 1,
+	  borderTopColor: '#eee',
+	  shadowColor: '#000',
+	  shadowOffset: { width: 0, height: -2 },
+	  shadowOpacity: 0.1,
+	  shadowRadius: 4,
+	  elevation: 5,
+	  flexDirection: 'row',
+	  justifyContent: 'space-between',
+	  gap: 10,
+	},
+	clearCartButton: {
+	  backgroundColor: '#FF6B6B',
+	  paddingVertical: 16,
+	  paddingHorizontal: 30,
+	  borderRadius: 12,
+	  shadowColor: '#FF6B6B',
+	  shadowOffset: { width: 0, height: 4 },
+	  shadowOpacity: 0.3,
+	  shadowRadius: 6,
+	  elevation: 5,
+	  alignItems: 'center',
+	  justifyContent: 'center',
+	  flex: 1,
+	},
+	clearCartButtonText: {
+	  color: '#fff',
+	  fontSize: 16,
+	  fontWeight: '600',
+	  textAlign: 'center',
+	},
+	enquireButton: {
+	  backgroundColor: '#1EB1C5',
+	  paddingVertical: 16,
+	  paddingHorizontal: 30,
+	  borderRadius: 12,
+	  shadowColor: '#1EB1C5',
+	  shadowOffset: { width: 0, height: 4 },
+	  shadowOpacity: 0.3,
+	  shadowRadius: 6,
+	  elevation: 5,
+	  alignItems: 'center',
+	  justifyContent: 'center',
+	  flex: 1,
+	},
+	enquireButtonText: {
+	  color: '#fff',
+	  fontSize: 16,
+	  fontWeight: '600',
+	  textAlign: 'center',
+	},
   });
-  
 
 export default CartScreen;
 // import React, { useEffect, useState } from "react";

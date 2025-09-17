@@ -1,43 +1,50 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image } from 'react-native';
+import React, { useState, useRef } from 'react';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, Alert } from 'react-native';
 import api from '../constants/api';
 
 const EmailVerificationScreen = ({route,navigation}) => {
   const [otp, setOtp] = useState(['', '', '', '']);
-const { email } = route.params;
+  const otpRefs = useRef([]);
+  const { email } = route.params;
+
   const handleOtpChange = (value, index) => {
+    // Only allow digits
+    const numericValue = value.replace(/[^0-9]/g, '');
     const newOtp = [...otp];
-    newOtp[index] = value;
+    newOtp[index] = numericValue;
     setOtp(newOtp);
+
+    // Auto-focus next input if current input has value and not the last input
+    if (numericValue && index < 3) {
+      otpRefs.current[index + 1]?.focus();
+    }
   };
 
   const handleContinue = () => {
-   
-  
     api
       .post("api/forgotpass", { email: email })
       .then((res) => {
         Alert.alert("otp to reset password is sent to the mail.");
-
       })
       .catch(() => {
         console.log("error");
       });
   };
 
-
   const verifyEmail = () => {
     const enteredOtp = otp.join('');
     
-      api.post('api/checkMailOtp', { email, otp_no:enteredOtp },{
-        headers: { 'Content-Type': 'application/json' }
-      }).then((res)=>{
-        Alert.alert('OTP verified Successfully');
-navigation.navigate('NewPassword', { email });
-      }).catch((err)=>{
-
+    api.post('api/checkMailOtp', { email, otp_no:enteredOtp },{
+      headers: { 'Content-Type': 'application/json' }
+    }).then((res)=>{
+      Alert.alert('OTP verified Successfully');
+      navigation.navigate('NewPassword', { email });
+    }).catch((err)=>{
       console.error(err);
-      Alert.alert('Error verifying OTP');
+      Alert.alert(
+        'OTP',
+        'Incorrect OTP, please enter correct OPT or click Send again for a new OTP'
+      );
     }) 
   };
 
@@ -58,6 +65,7 @@ navigation.navigate('NewPassword', { email });
         {otp.map((digit, index) => (
           <TextInput
             key={index}
+            ref={(ref) => (otpRefs.current[index] = ref)}
             style={styles.otpBox}
             maxLength={1}
             keyboardType="numeric"
@@ -66,17 +74,20 @@ navigation.navigate('NewPassword', { email });
           />
         ))}
       </View>
-
-      <TouchableOpacity style={styles.verifyButton} onPress={verifyEmail}>
+      <TouchableOpacity 
+        style={[
+          styles.verifyButton,
+          {opacity: otp.every(digit => digit !== '') ? 1 : 0.5}
+        ]} 
+        onPress={verifyEmail}
+        disabled={!otp.every(digit => digit !== '')}
+      >
         <Text style={styles.verifyText}>Verify Email</Text>
       </TouchableOpacity>
 
       <View style={styles.footer}>
-        
-        <Text style={styles.changeEmail} onPress={()=>navigation.navigate('ForgotPassword')}>Change email id ? </Text>
-       
-          <Text style={styles.sendAgain} onPress={()=>handleContinue}>Send again</Text>
-     
+        <Text style={styles.changeEmail} onPress={()=>navigation.navigate('ForgotPassword')}>OTP not received ? </Text>
+        <Text style={styles.sendAgain} onPress={handleContinue}>Send again</Text>
       </View>
     </View>
   );
@@ -92,45 +103,36 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     fontFamily: 'Outfit-Regular',
-
   },
   image: {
     width: 200,
     height: 200,
     marginBottom: 30,
     fontFamily: 'Outfit-Regular',
-
   },
   title: {
     fontSize: 24,
     marginBottom: 8,
     fontFamily: 'Outfit-Regular',
-
   },
   titleBold: {
-    //fontWeight: 'bold',
     fontFamily: 'Outfit-Regular',
-
   },
   titleBlue: {
     color: '#00B4D8',
-    //fontWeight: 'bold',
     fontFamily: 'Outfit-Regular',
-
   },
   subtitle: {
     color: '#777',
     textAlign: 'center',
     marginBottom: 30,
     fontFamily: 'Outfit-Regular',
-
   },
   otpContainer: {
     flexDirection: 'row',
     justifyContent: 'center',
     marginBottom: 30,
     fontFamily: 'Outfit-Regular',
-
   },
   otpBox: {
     width: 50,
@@ -142,7 +144,6 @@ const styles = StyleSheet.create({
     fontSize: 22,
     marginHorizontal: 8,
     fontFamily: 'Outfit-Regular',
-
   },
   verifyButton: {
     backgroundColor: '#00B4D8',
@@ -151,33 +152,27 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     marginBottom: 20,
     fontFamily: 'Outfit-Regular',
-
   },
   verifyText: {
     color: '#fff',
     fontSize: 16,
-    //fontWeight: 'bold',
     fontFamily: 'Outfit-Regular',
-
   },
   footer: {
-  flexDirection: 'row',
-  justifyContent: 'space-between', // Left and right alignment
-  width: '100%', // Take full width of screen
-  paddingHorizontal: 24, // Add horizontal padding
-  marginTop: 20,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '100%',
+    paddingHorizontal: 24,
+    marginTop: 20,
     fontFamily: 'Outfit-Regular',
-},
-
+  },
   changeEmail: {
     color: '#555',
     fontFamily: 'Outfit-Regular',
-
   },
   sendAgain: {
     color: '#00B4D8',
     fontWeight: '500',
     fontFamily: 'Outfit-Regular',
-
   },
 });

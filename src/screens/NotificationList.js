@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -7,22 +7,58 @@ import {
   StyleSheet,
   SafeAreaView,
   Alert,
+  RefreshControl,
+  ActivityIndicator,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { useSelector, useDispatch } from 'react-redux';
-import { markAsRead, markAllAsRead, deleteNotification } from '../redux/slices/notificationSlice';
+import { 
+  fetchNotifications,
+  markNotificationAsRead, 
+  markAllNotificationsAsRead, 
+  deleteNotificationAsync,
+  clearError 
+} from '../redux/slices/notificationSlice';
 
 const NotificationList = ({ navigation }) => {
   const dispatch = useDispatch();
-  const notifications = useSelector(state => state.notifications?.notifications || []);
-  const unreadCount = notifications.filter(notification => !notification.read).length;
+  const { 
+    notifications, 
+    unreadCount, 
+    loading, 
+    error,
+    lastFetched 
+  } = useSelector(state => state.notifications);
+  
+  const [refreshing, setRefreshing] = useState(false);
+
+  useEffect(() => {
+    // Fetch notifications when component mounts
+    dispatch(fetchNotifications());
+  }, [dispatch]);
+
+  useEffect(() => {
+    // Clear error after 5 seconds
+    if (error) {
+      const timer = setTimeout(() => {
+        dispatch(clearError());
+      }, 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [error, dispatch]);
+
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    await dispatch(fetchNotifications());
+    setRefreshing(false);
+  };
 
   const handleMarkAsRead = (id) => {
-    dispatch(markAsRead(id));
+    dispatch(markNotificationAsRead(id));
   };
 
   const handleMarkAllAsRead = () => {
-    dispatch(markAllAsRead());
+    dispatch(markAllNotificationsAsRead());
   };
 
   const handleDeleteNotification = (id) => {
@@ -31,7 +67,7 @@ const NotificationList = ({ navigation }) => {
       'Are you sure you want to delete this notification?',
       [
         { text: 'Cancel', style: 'cancel' },
-        { text: 'Delete', onPress: () => dispatch(deleteNotification(id)), style: 'destructive' },
+        { text: 'Delete', onPress: () => dispatch(deleteNotificationAsync(id)), style: 'destructive' },
       ]
     );
   };
@@ -83,13 +119,43 @@ const NotificationList = ({ navigation }) => {
     </TouchableOpacity>
   );
 
-  const renderEmptyState = () => (
-    <View style={styles.emptyContainer}>
-      <Icon name="notifications-off-outline" size={64} color="#ccc" />
-      <Text style={styles.emptyText}>No notifications yet</Text>
-      <Text style={styles.emptySubText}>You'll see your notifications here when you receive them</Text>
-    </View>
-  );
+  const renderEmptyState = () => {
+    if (loading && notifications.length === 0) {
+      return (
+        <View style={styles.emptyContainer}>
+          <ActivityIndicator size="large" color="#1EB1C5" />
+          <Text style={styles.emptyText}>Loading notifications...</Text>
+        </View>
+      );
+    }
+    
+    return (
+      <View style={styles.emptyContainer}>
+        <Icon name="notifications-off-outline" size={64} color="#ccc" />
+        <Text style={styles.emptyText}>No notifications yet</Text>
+        <Text style={styles.emptySubText}>You'll see your notifications here when you receive them</Text>
+        {error && (
+          <TouchableOpacity onPress={handleRefresh} style={styles.retryButton}>
+            <Text style={styles.retryText}>Retry</Text>
+          </TouchableOpacity>
+        )}
+      </View>
+    );
+  };
+
+  const renderErrorBanner = () => {
+    if (!error) return null;
+    
+    return (
+      <View style={styles.errorBanner}>
+        <Icon name="warning-outline" size={16} color="#FF4444" />
+        <Text style={styles.errorText}>{error}</Text>
+        <TouchableOpacity onPress={() => dispatch(clearError())}>
+          <Icon name="close" size={16} color="#FF4444" />
+        </TouchableOpacity>
+      </View>
+    );
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -105,6 +171,8 @@ const NotificationList = ({ navigation }) => {
         )}
       </View>
       
+      {renderErrorBanner()}
+      
       {notifications.length === 0 ? (
         renderEmptyState()
       ) : (
@@ -114,6 +182,14 @@ const NotificationList = ({ navigation }) => {
           keyExtractor={(item) => item.id.toString()}
           showsVerticalScrollIndicator={false}
           contentContainerStyle={styles.listContainer}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={handleRefresh}
+              colors={['#1EB1C5']}
+              tintColor="#1EB1C5"
+            />
+          }
         />
       )}
     </SafeAreaView>
@@ -245,6 +321,36 @@ const styles = StyleSheet.create({
     color: '#999',
     textAlign: 'center',
     lineHeight: 20,
+    fontFamily: 'Outfit-Regular',
+  },
+  errorBanner: {
+    backgroundColor: '#ffebee',
+    borderColor: '#FF4444',
+    borderWidth: 1,
+    borderRadius: 8,
+    padding: 12,
+    margin: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  errorText: {
+    flex: 1,
+    fontSize: 14,
+    color: '#FF4444',
+    marginLeft: 8,
+    fontFamily: 'Outfit-Regular',
+  },
+  retryButton: {
+    backgroundColor: '#1EB1C5',
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 6,
+    marginTop: 12,
+  },
+  retryText: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: '600',
     fontFamily: 'Outfit-Regular',
   },
 });
