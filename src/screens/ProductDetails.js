@@ -220,7 +220,7 @@ const showToast = (message) => {
     
   </TouchableOpacity>
 </View>
-      <Divider width="80%" />
+      <Divider width="90%" />
 <View style={styles.gradeview}>
 <GradeSelector product={product} selectedProductGrade={selectedProductGrade} setSelectedProductGrade={setSelectedProductGrade} setProductStock={setProductStock} setQuantityCount={setQuantityCount} />  
     </View>

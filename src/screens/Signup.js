@@ -131,7 +131,10 @@ const SignUpScreen = ({navigation}) => {
           sendMail();
         })
         .catch((err) => {
-          Alert.alert("This Email is already Registered");
+          Alert.alert(
+            "Alert",
+            "This email address is already registered. Please log in or use a different email to create a new account."
+          );
         });
 
       setSignupData({ first_name: '', mobile: '', email: '', password: '' });

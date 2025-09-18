@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, Alert } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, Alert, KeyboardAvoidingView, ScrollView, Platform } from 'react-native';
 import api from '../constants/api';
 
 const EmailVerificationScreen = ({route,navigation}) => {
@@ -17,6 +17,13 @@ const EmailVerificationScreen = ({route,navigation}) => {
     // Auto-focus next input if current input has value and not the last input
     if (numericValue && index < 3) {
       otpRefs.current[index + 1]?.focus();
+    }
+  };
+
+  const handleKeyPress = (e, index) => {
+    // Handle backspace to move to previous input
+    if (e.nativeEvent.key === 'Backspace' && !otp[index] && index > 0) {
+      otpRefs.current[index - 1]?.focus();
     }
   };
 
@@ -49,47 +56,63 @@ const EmailVerificationScreen = ({route,navigation}) => {
   };
 
   return (
-    <View style={styles.container}>
-      <Image
-        source={require('../assets/images/banner/verify.png')}  // Replace with your image path
-        style={styles.image}
-        resizeMode="contain"
-      />
-      <Text style={styles.title}>
-        <Text style={styles.titleBold}>Email </Text>
-        <Text style={styles.titleBlue}>Verification</Text>
-      </Text>
-      <Text style={styles.subtitle}>We need to register your mail before getting started!</Text>
-
-      <View style={styles.otpContainer}>
-        {otp.map((digit, index) => (
-          <TextInput
-            key={index}
-            ref={(ref) => (otpRefs.current[index] = ref)}
-            style={styles.otpBox}
-            maxLength={1}
-            keyboardType="numeric"
-            value={digit}
-            onChangeText={(value) => handleOtpChange(value, index)}
-          />
-        ))}
-      </View>
-      <TouchableOpacity 
-        style={[
-          styles.verifyButton,
-          {opacity: otp.every(digit => digit !== '') ? 1 : 0.5}
-        ]} 
-        onPress={verifyEmail}
-        disabled={!otp.every(digit => digit !== '')}
+    <KeyboardAvoidingView 
+      style={styles.container} 
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      keyboardVerticalOffset={Platform.OS === 'ios' ? 64 : 0}
+    >
+      <ScrollView 
+        contentContainerStyle={styles.scrollContainer}
+        showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
       >
-        <Text style={styles.verifyText}>Verify Email</Text>
-      </TouchableOpacity>
+        <Image
+          source={require('../assets/images/banner/verify.png')}  // Replace with your image path
+          style={styles.image}
+          resizeMode="contain"
+        />
+        <Text style={styles.title}>
+          <Text style={styles.titleBold}>Email </Text>
+          <Text style={styles.titleBlue}>Verification</Text>
+        </Text>
+        <Text style={styles.subtitle}>We need to register your mail before getting started!</Text>
 
-      <View style={styles.footer}>
-        <Text style={styles.changeEmail} onPress={()=>navigation.navigate('ForgotPassword')}>OTP not received ? </Text>
-        <Text style={styles.sendAgain} onPress={handleContinue}>Send again</Text>
-      </View>
-    </View>
+        <View style={styles.otpContainer}>
+          {otp.map((digit, index) => (
+            <TextInput
+              key={index}
+              ref={(ref) => (otpRefs.current[index] = ref)}
+              style={styles.otpBox}
+              maxLength={1}
+              keyboardType="numeric"
+              value={digit}
+              onChangeText={(value) => handleOtpChange(value, index)}
+              onKeyPress={(e) => handleKeyPress(e, index)}
+              selectTextOnFocus={true}
+              autoCorrect={false}
+              autoCapitalize="none"
+            />
+          ))}
+        </View>
+        <TouchableOpacity 
+          style={[
+            styles.verifyButton,
+            {opacity: otp.every(digit => digit !== '') ? 1 : 0.5}
+          ]} 
+          onPress={verifyEmail}
+          disabled={!otp.every(digit => digit !== '')}
+        >
+          <Text style={styles.verifyText}>Verify Email</Text>
+        </TouchableOpacity>
+
+        <View style={styles.footer}>
+          <Text style={styles.changeEmail} onPress={()=>navigation.navigate('ForgotPassword')}>OTP not received ? </Text>
+          <TouchableOpacity onPress={handleContinue}>
+            <Text style={styles.sendAgain}>Send again</Text>
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 };
 
@@ -98,8 +121,11 @@ export default EmailVerificationScreen;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 24,
     backgroundColor: '#fff',
+  },
+  scrollContainer: {
+    flexGrow: 1,
+    padding: 24,
     justifyContent: 'center',
     alignItems: 'center',
     fontFamily: 'Outfit-Regular',

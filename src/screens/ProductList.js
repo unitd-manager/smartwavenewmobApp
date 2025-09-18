@@ -22,7 +22,7 @@ import { addToWishlist, deleteWishlistItem, fetchWishlistItems } from '../redux/
 //import BackButton from '../components/BackButton';
 
 const ProductListScreen = ({ route, navigation }) => {
-  const { categoryId,categoryName } = route.params || {};
+  const { categoryId, categoryName, initialSubcategoryId, subcategoryName } = route.params || {};
   const [searchQuery, setSearchQuery] = useState('');
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -236,6 +236,20 @@ useEffect(()=>{
     fetchProducts();
     fetchSubcategories();
   }, []);
+
+  // Handle initial subcategory selection when navigating from Categories
+  useEffect(() => {
+    if (initialSubcategoryId && subcategories.length > 0) {
+      const subcategoryToSelect = subcategories.find(
+        sub => sub.sub_category_id === initialSubcategoryId
+      );
+      if (subcategoryToSelect) {
+        setSelectedSubcategories([subcategoryToSelect.sub_category_id]);
+        // Also fetch subcategory types for the selected subcategory
+        fetchSubcategoryTypes(subcategoryToSelect.sub_category_id);
+      }
+    }
+  }, [initialSubcategoryId, subcategories]);
 
   const renderItem = ({ item }) => (
     <View style={styles.card}>
