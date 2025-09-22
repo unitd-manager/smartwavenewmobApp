@@ -288,7 +288,7 @@ const { wishitems, status } = useSelector((state) => state.wishlist);
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#0000ff" />
+        <ActivityIndicator size="large" color="#1EB1C5" />
         <Text style={styles.loadingText}>Loading...</Text>
       </View>
     );
