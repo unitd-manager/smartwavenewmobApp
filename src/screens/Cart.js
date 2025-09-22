@@ -118,6 +118,8 @@ const generateCode = () => {
         enquiry_date : new Date().toISOString().split('T')[0],
         enquiry_type : 'Enquiry and order for Retail products.',
         status : 'New',
+		email : user.email,
+		first_name : user.first_name,
         title : 'Enquiry from ' + user.first_name,      
         enquiry_code: code,
         creation_date : new Date().toISOString().split('T')[0],
@@ -128,13 +130,14 @@ const generateCode = () => {
         .then((res) => {
           const insertedId = res.data.data.insertId;
           items.forEach((item) => {
-            item.enquiry_id = insertedId;
-            item.quantity = item.qty;
-            item.product_id = item.product_id;
-            item.category_id = item.category_id;
-            item.created_by = user.first_name;
+            const newItem = { ...item };
+            newItem.enquiry_id = insertedId;
+            newItem.quantity = newItem.qty;
+            newItem.product_id = newItem.product_id;
+            newItem.category_id = newItem.category_id;
+            newItem.created_by = user.first_name;
             api
-              .post("/enquiry/insertQuoteItems", item)
+              .post("/enquiry/insertQuoteItems", newItem)
               .then(() => {
                 console.log("order placed");
               })
@@ -244,6 +247,7 @@ api
 	initialize();
   }, []);
   
+
 
 
 	return (
@@ -934,87 +938,3 @@ const styles = StyleSheet.create({
   });
 
 export default CartScreen;
-// import React, { useEffect, useState } from "react";
-// import { SafeAreaView, View, ScrollView, Text, Image, TouchableOpacity, StyleSheet, ActivityIndicator } from "react-native";
-// import api from '../constants/api';
-// import imageBase from "../constants/imageBase";
-
-// const CartScreen = () => {
-//   const [cartItems, setCartItems] = useState([]);
-//   const [loading, setLoading] = useState(false);
-
-  
-// console.log('cartpage')
-//   const fetchCartItems = () => {
-// 	console.log('cartpagefunction called')
-// 	api.post('/contact/getCartProductsByContactId',{contact_id:454})
-// 	.then((res) => {
-// 	  res.data.data.forEach(element => {
-// 		element.images=String(element.images).split(',')
-// 	  });
-// 	  console.log('respcart',res.data.data)
-// 	  setCartItems(res.data.data)
-// 	  setLoading(false);
-// 	  })
-// 	.catch((error) => {console.log('error',error)});
-//   };
-
-//   useEffect(() => {
-// 	console.log('useeffect running')
-// 	api.post('/contact/getCartProductsByContactId',{contact_id:468})
-// 	.then((res) => {
-// 	  res.data.data.forEach(element => {
-// 		element.images=String(element.images).split(',')
-// 	  });
-// 	  console.log('respcart',res.data.data)
-// 	  setCartItems(res.data.data)
-// 	  setLoading(false);
-// 	  })
-// 	.catch((error) => {});
-//     fetchCartItems();
-//   }, []);
-
-//   return (
-//     <SafeAreaView style={styles.container}>
-//       <ScrollView style={styles.scrollView}>
-//         {loading ? (
-//           <ActivityIndicator size="large" color="#1EB1C5" />
-//         ) : (
-//           cartItems?.map((item, index) => (
-//             <View key={index} style={styles.row}>
-//               <Image source={{uri: item.images[0] }} style={styles.image} />
-//               <View style={styles.details}>
-//                 <Text style={styles.text}>{item.title}</Text>
-//                 <Text style={styles.text2}>{item.category}</Text>
-//                 <View style={styles.quantityContainer}>
-//                   <TouchableOpacity onPress={() => alert("Decrease Quantity")}>
-//                     <Text style={styles.button}>-</Text>
-//                   </TouchableOpacity>
-//                   <Text style={styles.quantity}>{item.qty}</Text>
-//                   <TouchableOpacity onPress={() => alert("Increase Quantity")}>
-//                     <Text style={styles.button}>+</Text>
-//                   </TouchableOpacity>
-//                 </View>
-//               </View>
-//             </View>
-//           ))
-//         )}
-//       </ScrollView>
-//     </SafeAreaView>
-//   );
-// };
-
-// const styles = StyleSheet.create({
-//   container: { flex: 1, backgroundColor: "#FFFFFF" },
-//   scrollView: { flex: 1, backgroundColor: "#FFFFFF" },
-//   row: { flexDirection: "row", alignItems: "center", padding: 15, backgroundColor: "#fff", marginBottom: 10 },
-//   image: { width: 80, height: 80, marginRight: 20 },
-//   details: { flex: 1 },
-//   text: { fontSize: 16, fontWeight: "bold", color: "#000" },
-//   text2: { fontSize: 14, color: "#9CA7B7" },
-//   quantityContainer: { flexDirection: "row", alignItems: "center", marginTop: 10 },
-//   button: { fontSize: 18, paddingHorizontal: 10, backgroundColor: "#eee", borderRadius: 5 },
-//   quantity: { fontSize: 16, marginHorizontal: 10 },
-// });
-
-// export default CartScreen;
