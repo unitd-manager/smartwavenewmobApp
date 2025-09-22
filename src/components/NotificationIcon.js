@@ -5,7 +5,7 @@ import { useSelector } from 'react-redux';
 
 const NotificationIcon = ({ onPress, color = '#fff' }) => {
   const notifications = useSelector(state => state.notifications?.notifications || []);
-  const unreadCount = notifications.filter(notification => !notification.read).length;
+  const unreadCount = notifications.filter(notification => notification.is_read === 0).length;
 
   return (
     <TouchableOpacity onPress={onPress} style={styles.container}>

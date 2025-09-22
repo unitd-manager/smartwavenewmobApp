@@ -45,7 +45,7 @@ const clearCartItems=()=>{
 
   const handleDelete = (item) => {
     dispatch(deleteCartItem(item)).then(()=>{
-		Alert.alert('Item deleted')
+		
 	 dispatch(fetchCartItems(user));
 				 })
 				 .catch((error) => {
@@ -275,11 +275,11 @@ api
               style={{marginBottom: 20, alignSelf: 'center'}} 
             />
             <Text style={[styles.emptyText, {textAlign: 'center'}]}>Your cart is empty</Text>
-            <TouchableOpacity
+            <TouchableOpacity 
               style={styles.homeButton}
               onPress={() => navigation.navigate("Home")}
             >
-              <View style={styles.homeButtonContent}>
+              <View style={styles.homeButtonContent}>  
                 <Icon name="home-outline" size={20} color="#fff" style={{marginRight: 8}} />
                 <Text style={styles.homeButtonText}>Go Home</Text>
               </View>
@@ -678,6 +678,7 @@ const styles = StyleSheet.create({
 	container: {
 		flex: 1,
 		backgroundColor: "#FFFFFF",
+		  fontFamily: 'Outfit-Regular',
 	},
 	header: {
 		flexDirection: "row",
@@ -687,6 +688,7 @@ const styles = StyleSheet.create({
 		backgroundColor: "#FFFFFF",
 		borderBottomWidth: 1,
 		borderBottomColor: "#F0F0F0",
+		  fontFamily: 'Outfit-Regular',
 	},
 	backButton: {
 		padding: 8,
@@ -698,6 +700,7 @@ const styles = StyleSheet.create({
 		color: "#000",
 		textAlign: "center",
 		marginRight: 32,
+		  fontFamily: 'Outfit-Regular',
 	},
 	headerSpacer: {
 		width: 32,
@@ -706,6 +709,7 @@ const styles = StyleSheet.create({
 		flex: 1,
 		backgroundColor: "#FFFFFF",
 		paddingHorizontal: 16,
+		  fontFamily: 'Outfit-Regular',
 	},
 	cartItem: {
 		backgroundColor: "#FFFFFF",
@@ -717,10 +721,12 @@ const styles = StyleSheet.create({
 		shadowOpacity: 0.1,
 		shadowRadius: 4,
 		elevation: 3,
+		  fontFamily: 'Outfit-Regular',
 	},
 	itemContent: {
 		flexDirection: "row",
 		alignItems: "center",
+		  fontFamily: 'Outfit-Regular',
 	},
 	itemImage: {
 		width: 80,
@@ -730,33 +736,40 @@ const styles = StyleSheet.create({
 	},
 	itemDetails: {
 		flex: 1,
+		  fontFamily: 'Outfit-Regular',
 	},
 	itemName: {
 		fontSize: 16,
 		fontWeight: "600",
 		color: "#333",
 		marginBottom: 4,
+		  fontFamily: 'Outfit-Regular',
 	},
 	itemCategory: {
 		fontSize: 14,
 		color: "#666",
 		marginBottom: 8,
+		  fontFamily: 'Outfit-Regular',
 	},
 	quantityContainer: {
 		flexDirection: "row",
 		alignItems: "center",
+		  fontFamily: 'Outfit-Regular',
 	},
 	quantityButton: {
 		padding: 4,
+		  fontFamily: 'Outfit-Regular',
 	},
 	quantityText: {
 		fontSize: 16,
 		fontWeight: "600",
 		marginHorizontal: 12,
 		color: "#333",
+		  fontFamily: 'Outfit-Regular',
 	},
 	deleteButton: {
 		padding: 8,
+		  fontFamily: 'Outfit-Regular',
 	},
 	remarksSection: {
 		backgroundColor: "#FFFFFF",
@@ -768,17 +781,20 @@ const styles = StyleSheet.create({
 		shadowOpacity: 0.1,
 		shadowRadius: 4,
 		elevation: 3,
+		  fontFamily: 'Outfit-Regular',
 	},
 	remarksHeader: {
 		flexDirection: "row",
 		alignItems: "center",
 		marginBottom: 12,
+		  fontFamily: 'Outfit-Regular',
 	},
 	remarksTitle: {
 		fontSize: 16,
 		fontWeight: "600",
 		color: "#333",
 		marginLeft: 8,
+		  fontFamily: 'Outfit-Regular',
 	},
 	remarksInput: {
 		borderWidth: 1,
@@ -788,10 +804,12 @@ const styles = StyleSheet.create({
 		fontSize: 14,
 		color: "#333",
 		minHeight: 80,
+		  fontFamily: 'Outfit-Regular',
 	},
 	view4: {
 		marginVertical: 20,
 		alignItems: 'center',
+		  fontFamily: 'Outfit-Regular',
 	},
 	button4: {
 		backgroundColor: '#1EB1C5',
@@ -804,42 +822,50 @@ const styles = StyleSheet.create({
 		shadowRadius: 6,
 		elevation: 5,
 		marginHorizontal: 16,
+		  fontFamily: 'Outfit-Regular',
 	},
 	text9: {
 		color: '#fff',
 		fontSize: 16,
 		fontWeight: '600',
 		textAlign: 'center',
+		  fontFamily: 'Outfit-Regular',
 	},
 	emptyContainer: {
 	  flex: 1,
 	  alignItems: 'center',
 	  justifyContent: 'center',
 	  paddingVertical: 40,
+	    fontFamily: 'Outfit-Regular',
 	},
 	emptyText: {
 	  fontSize: 18,
 	  color: '#555',
 	  marginBottom: 16,
 	  textAlign: 'center',
+	    fontFamily: 'Outfit-Regular',
 	},
 	homeButton: {
 	  backgroundColor: '#1EB1C5',
 	  borderRadius: 8,
 	  padding: 12,
 	  marginTop: 10,
+	    fontFamily: 'Outfit-Regular',
 	},
 	homeButtonContent: {
 	  flexDirection: 'row',
 	  alignItems: 'center',
+	    fontFamily: 'Outfit-Regular',
 	},
 	homeButtonText: {
 	  color: '#fff',
 	  fontSize: 16,
 	  fontWeight: '500',
+	    fontFamily: 'Outfit-Regular',
 	},
 	scrollContent: {
 	  paddingBottom: 100, // Add padding to prevent overlap with fixed button
+	    fontFamily: 'Outfit-Regular',
 	},
 	fixedButtonContainer: {
 	  position: 'absolute',
@@ -859,6 +885,7 @@ const styles = StyleSheet.create({
 	  flexDirection: 'row',
 	  justifyContent: 'space-between',
 	  gap: 10,
+	    fontFamily: 'Outfit-Regular',
 	},
 	clearCartButton: {
 	  backgroundColor: '#FF6B6B',
@@ -873,12 +900,14 @@ const styles = StyleSheet.create({
 	  alignItems: 'center',
 	  justifyContent: 'center',
 	  flex: 1,
+	    fontFamily: 'Outfit-Regular',
 	},
 	clearCartButtonText: {
 	  color: '#fff',
 	  fontSize: 16,
 	  fontWeight: '600',
 	  textAlign: 'center',
+	    fontFamily: 'Outfit-Regular',
 	},
 	enquireButton: {
 	  backgroundColor: '#1EB1C5',
@@ -893,12 +922,14 @@ const styles = StyleSheet.create({
 	  alignItems: 'center',
 	  justifyContent: 'center',
 	  flex: 1,
+	    fontFamily: 'Outfit-Regular',
 	},
 	enquireButtonText: {
 	  color: '#fff',
 	  fontSize: 16,
 	  fontWeight: '600',
 	  textAlign: 'center',
+	    fontFamily: 'Outfit-Regular',
 	},
   });
 

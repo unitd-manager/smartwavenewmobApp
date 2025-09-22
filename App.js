@@ -142,7 +142,6 @@ import { AuthProvider } from './src/context/AuthContext';
 import NotificationModal from './src/components/NotificationModal';
 import { fetchNotifications, fetchUnreadCount } from './src/redux/slices/notificationSlice';
 import useNotificationPolling from './src/hooks/useNotificationPolling';
-//import SplashScreen from 'react-native-splash-screen';
 
 // Set default font globally
 Text.defaultProps = Text.defaultProps || {};
@@ -152,42 +151,95 @@ Text.defaultProps.style = { fontFamily: 'Outfit-Regular' };
 // Main App Wrapper Component
 const AppContent = () => {
   const [showNotificationModal, setShowNotificationModal] = useState(false);
+  const [hasViewedNotifications, setHasViewedNotifications] = useState(false);
   const navigationRef = useRef();
   const dispatch = useDispatch();
   const notifications = useSelector(state => state.notifications?.notifications || []);
-  const unreadNotifications = notifications.filter(notification => !notification.read);
+  const unreadNotifications = notifications.filter(notification => notification.is_read === 0);
   
   // Enable real-time notification polling
   useNotificationPolling(30000); // Poll every 30 seconds
 
   // Fetch notifications on app startup
   useEffect(() => {
-    const initializeNotifications = async () => {
-      try {
-        await dispatch(fetchNotifications()).unwrap();
-        await dispatch(fetchUnreadCount()).unwrap();
-      } catch (error) {
-        console.log('Failed to fetch notifications on startup:', error);
-      }
-    };
-
-    initializeNotifications();
+    console.log('App starting - fetching notifications');
+    dispatch(fetchNotifications()).then(() => {
+      console.log('Notifications fetched successfully');
+    }).catch(error => {
+      console.error('Error fetching notifications:', error);
+    });
   }, [dispatch]);
 
+  // Show notification modal when app opens if there are unread notifications
   useEffect(() => {
-    // Show notification modal when app opens if there are unread notifications
+    console.log('=== NOTIFICATION DEBUG ===');
+    console.log('Total notifications:', notifications.length);
+    console.log('Unread count:', unreadNotifications.length);
+    console.log('Notifications array:', notifications);
+    console.log('Modal visible state:', showNotificationModal);
+    console.log('Has viewed notifications:', hasViewedNotifications);
+    console.log('===========================');
+    
+    // Expose counts globally for debugging
+    global.notificationCount = notifications.length;
+    global.unreadCount = unreadNotifications.length;
+    
     const timer = setTimeout(() => {
-      if (unreadNotifications.length > 0) {
+      console.log('NotificationModal Debug - Timer triggered, unread count:', unreadNotifications.length);
+      
+      // Check current route to avoid showing modal on NotificationList screen
+      const currentRoute = navigationRef.current?.getCurrentRoute();
+      const isOnNotificationList = currentRoute?.name === 'NotificationList';
+      
+      console.log('Current route:', currentRoute?.name);
+      console.log('Is on NotificationList:', isOnNotificationList);
+      
+      // Only show modal on app startup, not when navigating between screens
+      // Check if modal hasn't been shown yet, there are unread notifications, 
+      // user hasn't viewed notifications, and not currently on NotificationList screen
+      if (unreadNotifications.length > 0 && !showNotificationModal && !hasViewedNotifications && !isOnNotificationList) {
+        console.log('NotificationModal Debug - Showing modal!');
         setShowNotificationModal(true);
+      } else {
+        console.log('NotificationModal Debug - Conditions not met, will not show');
       }
-    }, 2000); // Show after 2 seconds
+    }, 3000); // Show after 3 seconds to ensure navigation is ready
 
     return () => clearTimeout(timer);
-  }, [unreadNotifications.length]);
+  }, [unreadNotifications.length, notifications, hasViewedNotifications]); // Add hasViewedNotifications to dependencies
 
   const handleCloseModal = () => {
     setShowNotificationModal(false);
   };
+
+  // Function to mark notifications as viewed (called when user opens NotificationList)
+  const markNotificationsAsViewed = () => {
+    console.log('Marking notifications as viewed');
+    setHasViewedNotifications(true);
+    setShowNotificationModal(false); // Hide modal if it's showing
+  };
+
+  // Function to reset viewed state (called when user leaves NotificationList)
+  const resetNotificationsViewed = () => {
+    console.log('Resetting notifications viewed state');
+    setHasViewedNotifications(false);
+  };
+
+  // Test function to manually show notification modal
+  const showTestNotificationModal = () => {
+    console.log('Test: Manually triggering notification modal');
+    setShowNotificationModal(true);
+  };
+
+  // Expose test function globally for development
+  useEffect(() => {
+    global.showTestNotificationModal = showTestNotificationModal;
+    global.markNotificationsAsViewed = markNotificationsAsViewed;
+    global.resetNotificationsViewed = resetNotificationsViewed;
+    console.log('Test function exposed: global.showTestNotificationModal()');
+    console.log('View function exposed: global.markNotificationsAsViewed()');
+    console.log('Reset function exposed: global.resetNotificationsViewed()');
+  }, []);
 
   return (
     <>
@@ -197,7 +249,7 @@ const AppContent = () => {
       <NotificationModal
         visible={showNotificationModal}
         onClose={handleCloseModal}
-        navigation={navigationRef.current}
+        navigation={navigationRef.current?.getRootState() ? navigationRef.current : null}
       />
     </>
   );

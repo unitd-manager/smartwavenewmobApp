@@ -38,6 +38,15 @@ const { wishitems, status } = useSelector((state) => state.wishlist);
       .then((res) => {
         res.data.data.forEach((element) => {
           element.images = String(element.images).split(",");
+          // Process grades field
+          if (element.grades != null) {
+            element.grades = String(element.grades)
+              .split(",")
+              .map(grade => grade.trim())
+              .filter(el => el !== null && el !== '');
+          } else {
+            element.grades = [];
+          }
         });
         setNewProducts(res.data.data);
       })
@@ -52,6 +61,15 @@ const { wishitems, status } = useSelector((state) => state.wishlist);
       .then((res) => {
         res.data.data.forEach((element) => {
           element.images = String(element.images).split(",");
+          // Process grades field
+          if (element.grades != null) {
+            element.grades = String(element.grades)
+              .split(",")
+              .map(grade => grade.trim())
+              .filter(el => el !== null && el !== '');
+          } else {
+            element.grades = [];
+          }
         });
         setOfferProducts(res.data.data);
       })
@@ -68,6 +86,15 @@ const { wishitems, status } = useSelector((state) => state.wishlist);
       .then((res) => {
         res.data.data.forEach((element) => {
           element.images = String(element.images).split(",");
+          // Process grades field
+          if (element.grades != null) {
+            element.grades = String(element.grades)
+              .split(",")
+              .map(grade => grade.trim())
+              .filter(el => el !== null && el !== '');
+          } else {
+            element.grades = [];
+          }
         });
         setBestSellingProducts(res.data.data);
       })
@@ -83,6 +110,15 @@ const { wishitems, status } = useSelector((state) => state.wishlist);
       .then((res) => {
         res.data.data.forEach((element) => {
           element.images = String(element.images).split(",");
+          // Process grades field
+          if (element.grades != null) {
+            element.grades = String(element.grades)
+              .split(",")
+              .map(grade => grade.trim())
+              .filter(el => el !== null && el !== '');
+          } else {
+            element.grades = [];
+          }
         });
         setMostPopularProducts(res.data.data);
       })
@@ -325,8 +361,8 @@ const { wishitems, status } = useSelector((state) => state.wishlist);
       : "Add to Wishlist"}</Text>
     </TouchableOpacity>
     <TouchableOpacity style={styles.addToCartButton}  onPress={() =>{ 
-     if(item.grades){
-      // Alert.alert('Please select grade before adding to cart');
+     if(item.grades && item.grades.length > 0){
+      // Navigate to ProductDetails for grade selection
       navigation.navigate("ProductDetails", { productId: item.product_id })
      }else{
       addCart(item)}}
@@ -393,8 +429,8 @@ const { wishitems, status } = useSelector((state) => state.wishlist);
       : "Add to Wishlist"}</Text>
     </TouchableOpacity>
     <TouchableOpacity style={styles.addToCartButton}  onPress={() =>{ 
-     if(item.grades){
-     // Alert.alert('Please select grade before adding to cart');
+     if(item.grades && item.grades.length > 0){
+      // Navigate to ProductDetails for grade selection
       navigation.navigate("ProductDetails", { productId: item.product_id })
      }else{
       addCart(item)}}
@@ -461,8 +497,8 @@ const { wishitems, status } = useSelector((state) => state.wishlist);
       : "Add to Wishlist"}</Text>
     </TouchableOpacity>
     <TouchableOpacity style={styles.addToCartButton}  onPress={() =>{ 
-     if(item.grades){
-      //Alert.alert('Please select grade before adding to cart');
+     if(item.grades && item.grades.length > 0){
+      // Navigate to ProductDetails for grade selection
       navigation.navigate("ProductDetails", { productId: item.product_id })
      } else{
       addCart(item)}}
@@ -529,8 +565,8 @@ const { wishitems, status } = useSelector((state) => state.wishlist);
       : "Add to Wishlist"}</Text>
     </TouchableOpacity>
     <TouchableOpacity style={styles.addToCartButton} onPress={() =>{ 
-     if(item.grades){
-      //Alert.alert('Please select grade before adding to cart');
+     if(item.grades && item.grades.length > 0){
+      // Navigate to ProductDetails for grade selection
       navigation.navigate("ProductDetails", { productId: item.product_id })
      } else{
       addCart(item)}}
@@ -545,6 +581,28 @@ const { wishitems, status } = useSelector((state) => state.wishlist);
   />
 </View>}
 
+      {/* Test Notification Modal Button */}
+      <View style={styles.section}>
+        <TouchableOpacity 
+          style={styles.testButton}
+          onPress={() => {
+            // Test notification modal
+            if (global.showTestNotificationModal) {
+              global.showTestNotificationModal();
+              Alert.alert('Test Notification', 'Notification modal triggered! Check if it appears.');
+            } else {
+              Alert.alert('Test Error', 'Test function not available');
+            }
+          }}
+        >
+          <Text style={styles.testButtonText}>Test Notification Modal</Text>
+        </TouchableOpacity>
+        
+        {/* Show notification count for debugging */}
+        <Text style={styles.debugText}>
+          Notifications: {global.notificationCount || 0} | Unread: {global.unreadCount || 0}
+        </Text>
+      </View>
     </ScrollView>
   );
 };
@@ -586,6 +644,7 @@ const styles = StyleSheet.create({
   row: {
     justifyContent: 'space-between',
     marginBottom: 15,
+      fontFamily: 'Outfit-Regular',
   },
   
   seeAll: { color: '#1EB1C5',fontFamily: 'Outfit-Regular' },
@@ -670,6 +729,7 @@ addToCartButton: {
   paddingVertical: 6,
   marginTop:8,
   alignItems: 'center',
+    fontFamily: 'Outfit-Regular',
 },
 
 addToCartText: {

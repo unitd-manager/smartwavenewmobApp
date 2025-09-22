@@ -57,30 +57,42 @@ const showToast = (message) => {
   const addCart = (data) => {
  
     if(user){
-      if(selectedProductGrade){
-     
-    data.contact_id=user.contact_id
-  data.grade=selectedProductGrade;
-     dispatch(addToCart(data)) 
-             .then(() => { 
-               showToast(`${data?.title} added to cart`);
-               dispatch(fetchCartItems(user));
-             })
-             .catch((error) => {
-               console.error('Failed to add to cart:', error);
-             });
-            } else{
-              Alert.alert(
-                "Alert",
-                "Please select the grade before add to cart"
-              )
-            }
+      // Only require grade selection if product has valid grades
+      if(product.grades && product.grades.length > 0){
+        if(selectedProductGrade){
+        
+          data.contact_id=user.contact_id
+          data.grade=selectedProductGrade;
+          dispatch(addToCart(data)) 
+            .then(() => { 
+              showToast(`${data?.title} added to cart`);
+              dispatch(fetchCartItems(user));
+            })
+            .catch((error) => {
+              console.error('Failed to add to cart:', error);
+            });
+        } else{
+          Alert.alert(
+            "Alert",
+            "Please select the grade before add to cart"
+          )
+        }
+      } else {
+        // Product has no grades, add to cart directly
+        data.contact_id=user.contact_id;
+        dispatch(addToCart(data)) 
+          .then(() => { 
+            showToast(`${data?.title} added to cart`);
+            dispatch(fetchCartItems(user));
+          })
+          .catch((error) => {
+            console.error('Failed to add to cart:', error);
+          });
+      }
     }
     else{
       Alert.alert("Please Login")
-     
     }
-   
   };
   const deleteWishlist = (data) => {
  

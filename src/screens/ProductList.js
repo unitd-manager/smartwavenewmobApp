@@ -305,8 +305,8 @@ useEffect(()=>{
       </TouchableOpacity>
         <TouchableOpacity
           onPress={() =>{ 
-               if(item.grades){
-                // Alert.alert('Please select grade before adding to cart');
+               if(item.grades && item.grades.length > 0){
+                // Navigate to ProductDetails for grade selection
                 navigation.navigate("ProductDetails", { productId: item.product_id })
                } else{
                 addCart(item)}}
@@ -336,6 +336,7 @@ useEffect(()=>{
       {showSearch && (
         <TextInput
           placeholder="Search products..."
+          placeholderTextColor="#666"
           style={styles.searchBar}
           value={searchQuery}
           onChangeText={setSearchQuery}
@@ -466,7 +467,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     fontSize: 18,
-    fontWeight: 'bold',
     fontFamily: 'Outfit-Regular',
   },
   searchBar: {
@@ -511,7 +511,6 @@ const styles = StyleSheet.create({
   
   name: {
     marginTop: 10,
-    fontWeight: 'bold',
     fontFamily: 'Outfit-Regular',
     fontSize: 14,
     paddingHorizontal: 8,
@@ -556,7 +555,6 @@ const styles = StyleSheet.create({
   discountText: {
     color: '#fff',
     fontSize: 10,
-    fontWeight: 'bold',
     fontFamily: 'Outfit-Regular',
   },
 
@@ -574,13 +572,11 @@ const styles = StyleSheet.create({
   qtyBtn: {
     fontSize: 18,
     paddingHorizontal: 10,
-    fontWeight: 'bold',
     color: '#00AA88',
     fontFamily: 'Outfit-Regular',
   },
   qtyNumber: {
     fontSize: 14,
-    fontWeight: 'bold',
     fontFamily: 'Outfit-Regular',
   },
   sectionTitle: {

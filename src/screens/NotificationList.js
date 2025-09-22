@@ -5,10 +5,11 @@ import {
   FlatList,
   TouchableOpacity,
   StyleSheet,
-  SafeAreaView,
   Alert,
   RefreshControl,
   ActivityIndicator,
+  StatusBar,
+  Platform,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { useSelector, useDispatch } from 'react-redux';
@@ -35,6 +36,19 @@ const NotificationList = ({ navigation }) => {
   useEffect(() => {
     // Fetch notifications when component mounts
     dispatch(fetchNotifications());
+    
+    // Mark notifications as viewed when user opens this screen
+    if (global.markNotificationsAsViewed) {
+      global.markNotificationsAsViewed();
+    }
+    
+    // Cleanup function to reset viewed state when component unmounts
+    return () => {
+      // Reset the viewed state so modal can show again on app restart
+      if (global.resetNotificationsViewed) {
+        global.resetNotificationsViewed();
+      }
+    };
   }, [dispatch]);
 
   useEffect(() => {
@@ -47,14 +61,32 @@ const NotificationList = ({ navigation }) => {
     }
   }, [error, dispatch]);
 
+  useEffect(() => {
+    console.log('Notifications state changed:', notifications.length, 'notifications');
+    console.log('Unread count:', unreadCount);
+    notifications.forEach(n => {
+      console.log('Notification:', n.id, 'read:', n.read || n.is_read, 'title:', n.title);
+    });
+  }, [notifications, unreadCount]);
+
   const handleRefresh = async () => {
     setRefreshing(true);
     await dispatch(fetchNotifications());
     setRefreshing(false);
   };
 
-  const handleMarkAsRead = (id) => {
-    dispatch(markNotificationAsRead(id));
+  const handleMarkAsRead = async (id, item) => {
+    console.log('Marking notification as read:', id);
+    await dispatch(markNotificationAsRead(id));
+    
+      console.log('Navigation to:', item.action.screen, 'with params:', item.action.params);
+      try {
+        navigation.navigate("EnquiryDetails", { enquiry: item })
+      } catch (error) {
+        console.log('Navigation failed:', error);
+        // Silently handle navigation errors - don't interrupt the user
+      }
+    
   };
 
   const handleMarkAllAsRead = () => {
@@ -62,62 +94,144 @@ const NotificationList = ({ navigation }) => {
   };
 
   const handleDeleteNotification = (id) => {
+    console.log('Delete notification requested for ID:', id);
+    console.log('Current notifications available:', notifications.map(n => ({ 
+      notification_id: n.notification_id, 
+      id: n.id, 
+      title: n.title 
+    })));
+    
+    if (!id) {
+      console.log('No valid ID provided for deletion');
+      Alert.alert('Error', 'Cannot delete notification - no valid ID provided');
+      return;
+    }
+    
     Alert.alert(
       'Delete Notification',
       'Are you sure you want to delete this notification?',
       [
         { text: 'Cancel', style: 'cancel' },
-        { text: 'Delete', onPress: () => dispatch(deleteNotificationAsync(id)), style: 'destructive' },
+        { 
+          text: 'Delete', 
+          onPress: async () => {
+            try {
+              console.log('Dispatching delete notification for ID:', id);
+              const result = await dispatch(deleteNotificationAsync(id));
+              console.log('Delete result:', result);
+              console.log('Result type - fulfilled:', deleteNotificationAsync.fulfilled.match(result));
+              console.log('Result type - rejected:', deleteNotificationAsync.rejected.match(result));
+              
+              if (deleteNotificationAsync.fulfilled.match(result)) {
+                console.log('Notification deleted successfully');
+               
+              } else if (deleteNotificationAsync.rejected.match(result)) {
+                console.log('Notification deletion failed:', result.payload);
+                Alert.alert('Error', result.payload || 'Failed to delete notification');
+              }
+            } catch (error) {
+              console.error('Error in delete operation:', error);
+              Alert.alert('Error', 'An error occurred while deleting the notification');
+            }
+          }, 
+          style: 'destructive' 
+        },
       ]
     );
   };
 
+  const handleTestNotification = () => {
+    console.log('Triggering test notification');
+    dispatch(simulateNotification());
+  };
+
+  
+
   const formatTime = (timestamp) => {
-    const date = new Date(timestamp);
-    const now = new Date();
-    const diffInHours = (now - date) / (1000 * 60 * 60);
+    if (!timestamp) return 'Just now';
     
-    if (diffInHours < 1) {
+    try {
+      const date = new Date(timestamp);
+      const now = new Date();
+      
+      // Check if date is valid
+      if (isNaN(date.getTime())) {
+        return 'Just now';
+      }
+      
+      const diffInHours = (now - date) / (1000 * 60 * 60);
+      
+      if (diffInHours < 1) {
+        return 'Just now';
+      } else if (diffInHours < 24) {
+        return `${Math.floor(diffInHours)}h ago`;
+      } else {
+        return date.toLocaleDateString();
+      }
+    } catch (error) {
+      console.log('Error formatting time in NotificationList:', error, 'timestamp:', timestamp);
       return 'Just now';
-    } else if (diffInHours < 24) {
-      return `${Math.floor(diffInHours)}h ago`;
-    } else {
-      return date.toLocaleDateString();
     }
   };
 
-  const renderNotificationItem = ({ item }) => (
-    <TouchableOpacity
-      style={[styles.notificationItem, !item.read && styles.unreadItem]}
-      onPress={() => handleMarkAsRead(item.id)}
-    >
-      <View style={styles.notificationContent}>
-        <View style={styles.iconContainer}>
-          <Icon 
-            name={item.type === 'order' ? 'bag-outline' : item.type === 'promotion' ? 'gift-outline' : 'information-circle-outline'} 
-            size={24} 
-            color={item.type === 'order' ? '#4CAF50' : item.type === 'promotion' ? '#FF9800' : '#2196F3'} 
-          />
-        </View>
-        <View style={styles.textContainer}>
-          <Text style={[styles.title, !item.read && styles.unreadTitle]}>
-            {item.title}
-          </Text>
-          <Text style={styles.message} numberOfLines={2}>
-            {item.message}
-          </Text>
-          <Text style={styles.time}>{formatTime(item.timestamp)}</Text>
-        </View>
-        {!item.read && <View style={styles.unreadDot} />}
-      </View>
+  const renderNotificationItem = ({ item }) => {
+    if (!item) return null;
+    
+    // Use the most reliable ID field - prioritize notification_id, then id
+    // Never use timestamp as ID since it's not unique/reliable for deletion
+    const notificationId = item.notification_id || item.id;
+    const isRead = item.is_read === 1;
+    const title = item.title || 'Notification';
+    const message = item.message || item.body || 'No message';
+    const type = item.type || 'info';
+    const timestamp = item.timestamp || item.created_at || new Date().toISOString();
+    
+    console.log('Rendering notification:', notificationId, 'isRead:', isRead, 'title:', title);
+    console.log('Available ID fields - notification_id:', item.notification_id, 'id:', item.id, 'timestamp:', item.timestamp);
+    
+    return (
       <TouchableOpacity
-        style={styles.deleteButton}
-        onPress={() => handleDeleteNotification(item.id)}
+        style={[styles.notificationItem, !isRead && styles.unreadItem]}
+        onPress={() => notificationId && handleMarkAsRead(notificationId, item)}
       >
-        <Icon name="trash-outline" size={20} color="#FF4444" />
+        <View style={styles.notificationContent}>
+          <View style={styles.iconContainer}>
+            <Icon 
+              name="cash-outline"
+              size={24} 
+              color="#4CAF50"
+            />
+          </View>
+          <View style={styles.textContainer}>
+            <Text style={[styles.title, !isRead && styles.unreadTitle]}>
+              {title}
+            </Text>
+            <Text style={styles.message} numberOfLines={2}>
+              {message}
+            </Text>
+            <Text style={styles.time}>{formatTime(timestamp)}</Text>
+          </View>
+          {!isRead && <View style={styles.unreadDot} />}
+        </View>
+        <TouchableOpacity
+          style={styles.deleteButton}
+          onPress={(event) => {
+            // Stop the event from bubbling up to the parent TouchableOpacity
+            event.stopPropagation();
+            if (notificationId) {
+              console.log('Delete button pressed for notificationId:', notificationId);
+              handleDeleteNotification(notificationId);
+            } else {
+              console.log('No valid notificationId found for deletion');
+              Alert.alert('Error', 'Cannot delete notification - no valid ID found');
+            }
+          }}
+        >
+          <Icon name="trash-outline" size={20} color="#FF4444" />
+        </TouchableOpacity>
       </TouchableOpacity>
-    </TouchableOpacity>
-  );
+    );
+  };
 
   const renderEmptyState = () => {
     if (loading && notifications.length === 0) {
@@ -158,17 +272,21 @@ const NotificationList = ({ navigation }) => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
+      <StatusBar backgroundColor="#1EB1C5" barStyle="light-content" />
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
           <Icon name="arrow-back" size={24} color="#fff" />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Notifications</Text>
-        {unreadCount > 0 && (
-          <TouchableOpacity onPress={handleMarkAllAsRead} style={styles.markAllButton}>
-            <Text style={styles.markAllText}>Mark All Read</Text>
-          </TouchableOpacity>
-        )}
+        <Text style={[styles.headerTitle, { textAlign: 'center', alignSelf: 'center' }]}>Notifications</Text>
+        <View style={styles.headerButtons}>
+          
+          {unreadCount > 0 && (
+            <TouchableOpacity onPress={handleMarkAllAsRead} style={styles.markAllButton}>
+              <Text style={styles.markAllText}>Mark All Read</Text>
+            </TouchableOpacity>
+          )}
+        </View>
       </View>
       
       {renderErrorBanner()}
@@ -177,9 +295,13 @@ const NotificationList = ({ navigation }) => {
         renderEmptyState()
       ) : (
         <FlatList
-          data={notifications}
+          data={notifications.filter(item => item != null)}
           renderItem={renderNotificationItem}
-          keyExtractor={(item) => item.id.toString()}
+          keyExtractor={(item) => {
+            const key = item.notification_id?.toString() || item.id?.toString() || item.timestamp;
+            console.log('KeyExtractor - notification_id:', item.notification_id, 'id:', item.id, 'timestamp:', item.timestamp, 'final key:', key);
+            return key;
+          }}
           showsVerticalScrollIndicator={false}
           contentContainerStyle={styles.listContainer}
           refreshControl={
@@ -192,7 +314,7 @@ const NotificationList = ({ navigation }) => {
           }
         />
       )}
-    </SafeAreaView>
+    </View>
   );
 };
 
@@ -206,11 +328,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 16,
-    paddingVertical: 12,
-    paddingTop: 40,
+    paddingVertical: 16,
+    paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight + 16 : 48,
   },
   backButton: {
-    padding: 8,
+    padding: 12,
+    marginRight: 8,
   },
   headerTitle: {
     flex: 1,
@@ -220,8 +343,16 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontFamily: 'Outfit-Regular',
   },
+  headerButtons: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  testButton: {
+    padding: 12,
+    marginRight: 8,
+  },
   markAllButton: {
-    padding: 8,
+    padding: 12,
   },
   markAllText: {
     color: '#fff',

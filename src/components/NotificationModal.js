@@ -17,61 +17,119 @@ const { width, height } = Dimensions.get('window');
 const NotificationModal = ({ visible, onClose, navigation }) => {
   const dispatch = useDispatch();
   const notifications = useSelector(state => state.notifications?.notifications || []);
-  const unreadNotifications = notifications.filter(notification => !notification.read).slice(0, 3); // Show only first 3 unread
+  const unreadNotifications = notifications.filter(notification => {
+    const isUnread = notification.is_read === 0;
+    console.log('NotificationModal Debug - Notification:', notification.title, 'is_read:', notification.is_read, 'read:', notification.read, 'unread:', isUnread);
+    return isUnread;
+  }).slice(0, 3); // Show only first 3 unread
+  const { isDarkMode = false } = useSelector(state => state.theme || {});
+
+  console.log('NotificationModal Debug - Component rendered');
+  console.log('NotificationModal Debug - Visible prop:', visible);
+  console.log('NotificationModal Debug - Total notifications:', notifications.length);
+  console.log('NotificationModal Debug - Unread notifications (filtered):', unreadNotifications.length);
+  console.log('NotificationModal Debug - First notification:', notifications[0]);
+
+  // Debug: Always show if visible is true for testing
+  if (visible) {
+    console.log('Modal should be visible - rendering modal content');
+  }
 
   const handleNotificationPress = (notification) => {
-    dispatch(markAsRead(notification.id));
+    console.log('Notification pressed:', notification);
+    // Mark notification as read
+    const notificationId = notification.notification_id || notification.id;
+    if (notificationId) {
+      dispatch(markAsRead(notificationId));
+    }
     onClose();
-    // Navigate to specific screen based on notification type if needed
-    if (notification.action) {
-      navigation.navigate(notification.action.screen, notification.action.params);
+    // Always navigate to NotificationList page when notification is clicked
+    if (navigation) {
+      try {
+        navigation.navigate('NotificationList');
+      } catch (error) {
+        console.log('Navigation error:', error);
+      }
     }
   };
 
   const handleViewAll = () => {
     onClose();
-    navigation.navigate('NotificationList');
-  };
-
-  const formatTime = (timestamp) => {
-    const date = new Date(timestamp);
-    const now = new Date();
-    const diffInMinutes = (now - date) / (1000 * 60);
-    
-    if (diffInMinutes < 1) {
-      return 'Just now';
-    } else if (diffInMinutes < 60) {
-      return `${Math.floor(diffInMinutes)}m ago`;
-    } else {
-      const diffInHours = diffInMinutes / 60;
-      return `${Math.floor(diffInHours)}h ago`;
+    if (navigation) {
+      try {
+        navigation.navigate('NotificationList');
+      } catch (error) {
+        console.log('Navigation error:', error);
+      }
     }
   };
 
-  const renderNotificationItem = ({ item }) => (
-    <TouchableOpacity
-      style={styles.notificationItem}
-      onPress={() => handleNotificationPress(item)}
-    >
-      <View style={styles.iconContainer}>
-        <Icon 
-          name={item.type === 'order' ? 'bag-outline' : item.type === 'promotion' ? 'gift-outline' : 'information-circle-outline'} 
-          size={20} 
-          color={item.type === 'order' ? '#4CAF50' : item.type === 'promotion' ? '#FF9800' : '#2196F3'} 
-        />
-      </View>
-      <View style={styles.textContainer}>
-        <Text style={styles.title} numberOfLines={1}>
-          {item.title}
-        </Text>
-        <Text style={styles.message} numberOfLines={2}>
-          {item.message}
-        </Text>
-        <Text style={styles.time}>{formatTime(item.timestamp)}</Text>
-      </View>
-      <View style={styles.unreadDot} />
-    </TouchableOpacity>
-  );
+  const formatTime = (timestamp) => {
+    if (!timestamp) {
+      console.log('No timestamp provided, returning "Just now"');
+      return 'Just now';
+    }
+    
+    try {
+      const date = new Date(timestamp);
+      const now = new Date();
+      
+      // Check if date is valid
+      if (isNaN(date.getTime())) {
+        console.log('Invalid timestamp:', timestamp);
+        return 'Just now';
+      }
+      
+      const diffInMinutes = (now - date) / (1000 * 60);
+      
+      if (diffInMinutes < 1) {
+        return 'Just now';
+      } else if (diffInMinutes < 60) {
+        return `${Math.floor(diffInMinutes)}m ago`;
+      } else {
+        const diffInHours = diffInMinutes / 60;
+        return `${Math.floor(diffInHours)}h ago`;
+      }
+    } catch (error) {
+      console.log('Error formatting time:', error, 'timestamp:', timestamp);
+      return 'Just now';
+    }
+  };
+
+  const renderNotificationItem = ({ item }) => {
+    console.log('Rendering notification item:', {
+      title: item.title,
+      timestamp: item.timestamp,
+      type: item.type,
+      hasTimestamp: !!item.timestamp,
+      timestampType: typeof item.timestamp
+    });
+    
+    return (
+      <TouchableOpacity
+        style={[styles.notificationItem, isDarkMode && styles.notificationItemDark]}
+        onPress={() => handleNotificationPress(item)}
+      >
+        <View style={styles.iconContainer}>
+          <Icon 
+            name={item.type === 'order' ? 'bag-outline' : item.type === 'promotion' ? 'gift-outline' : 'information-circle-outline'} 
+            size={20} 
+            color={item.type === 'order' ? '#4CAF50' : item.type === 'promotion' ? '#FF9800' : '#2196F3'} 
+          />
+        </View>
+        <View style={styles.textContainer}>
+          <Text style={[styles.title, isDarkMode && styles.titleDark]} numberOfLines={1}>
+            {item.title}
+          </Text>
+          <Text style={[styles.message, isDarkMode && styles.messageDark]} numberOfLines={2}>
+            {item.message}
+          </Text>
+          <Text style={[styles.time, isDarkMode && styles.timeDark]}>{formatTime(item.timestamp)}</Text>
+        </View>
+        <View style={styles.unreadDot} />
+      </TouchableOpacity>
+    );
+  };
 
   if (!visible || unreadNotifications.length === 0) {
     return null;
@@ -84,29 +142,33 @@ const NotificationModal = ({ visible, onClose, navigation }) => {
       animationType="fade"
       onRequestClose={onClose}
     >
-      <View style={styles.overlay}>
-        <View style={styles.modalContainer}>
-          <View style={styles.header}>
+      <View style={[styles.overlay, isDarkMode && styles.overlayDark]}>
+        <View style={[styles.modalContainer, isDarkMode && styles.modalContainerDark]}>
+          <View style={[styles.header, isDarkMode && styles.headerDark]}>
             <View style={styles.headerLeft}>
               <Icon name="notifications" size={24} color="#1EB1C5" />
-              <Text style={styles.headerTitle}>New Notifications</Text>
+              <Text style={[styles.headerTitle, isDarkMode && styles.headerTitleDark]}>New Notifications</Text>
             </View>
             <TouchableOpacity onPress={onClose} style={styles.closeButton}>
-              <Icon name="close" size={24} color="#666" />
+              <Icon name="close" size={24} color={isDarkMode ? '#aaa' : '#666'} />
             </TouchableOpacity>
           </View>
           
           <FlatList
             data={unreadNotifications}
             renderItem={renderNotificationItem}
-            keyExtractor={(item) => item.id.toString()}
+            keyExtractor={(item) => {
+              // Handle different ID field names
+              const id = item.notification_id || item.id || item.timestamp || Date.now().toString();
+              return id.toString();
+            }}
             showsVerticalScrollIndicator={false}
             style={styles.notificationsList}
           />
           
-          <View style={styles.footer}>
-            <TouchableOpacity onPress={handleViewAll} style={styles.viewAllButton}>
-              <Text style={styles.viewAllText}>View All Notifications</Text>
+          <View style={[styles.footer, isDarkMode && styles.footerDark]}>
+            <TouchableOpacity onPress={handleViewAll} style={[styles.viewAllButton, isDarkMode && styles.viewAllButtonDark]}>
+              <Text style={[styles.viewAllText, isDarkMode && styles.viewAllTextDark]}>View All Notifications</Text>
               <Icon name="arrow-forward" size={16} color="#1EB1C5" />
             </TouchableOpacity>
           </View>
@@ -124,6 +186,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 20,
   },
+  overlayDark: {
+    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+  },
   modalContainer: {
     backgroundColor: '#fff',
     borderRadius: 16,
@@ -138,6 +203,9 @@ const styles = StyleSheet.create({
     shadowRadius: 10,
     elevation: 10,
   },
+  modalContainerDark: {
+    backgroundColor: '#2a2a2a',
+  },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -145,6 +213,9 @@ const styles = StyleSheet.create({
     padding: 20,
     borderBottomWidth: 1,
     borderBottomColor: '#f0f0f0',
+  },
+  headerDark: {
+    borderBottomColor: '#444',
   },
   headerLeft: {
     flexDirection: 'row',
@@ -156,6 +227,9 @@ const styles = StyleSheet.create({
     color: '#333',
     marginLeft: 8,
     fontFamily: 'Outfit-Regular',
+  },
+  headerTitleDark: {
+    color: '#fff',
   },
   closeButton: {
     padding: 4,
@@ -169,6 +243,9 @@ const styles = StyleSheet.create({
     padding: 16,
     borderBottomWidth: 1,
     borderBottomColor: '#f5f5f5',
+  },
+  notificationItemDark: {
+    borderBottomColor: '#444',
   },
   iconContainer: {
     width: 32,
@@ -189,6 +266,9 @@ const styles = StyleSheet.create({
     marginBottom: 2,
     fontFamily: 'Outfit-Regular',
   },
+  titleDark: {
+    color: '#fff',
+  },
   message: {
     fontSize: 12,
     color: '#666',
@@ -196,10 +276,16 @@ const styles = StyleSheet.create({
     marginBottom: 2,
     fontFamily: 'Outfit-Regular',
   },
+  messageDark: {
+    color: '#ccc',
+  },
   time: {
     fontSize: 10,
     color: '#999',
     fontFamily: 'Outfit-Regular',
+  },
+  timeDark: {
+    color: '#aaa',
   },
   unreadDot: {
     width: 6,
@@ -213,6 +299,9 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: '#f0f0f0',
   },
+  footerDark: {
+    borderTopColor: '#444',
+  },
   viewAllButton: {
     flexDirection: 'row',
     justifyContent: 'center',
@@ -224,12 +313,18 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#1EB1C5',
   },
+  viewAllButtonDark: {
+    backgroundColor: '#3a3a3a',
+  },
   viewAllText: {
     fontSize: 14,
     color: '#1EB1C5',
     fontWeight: '600',
     marginRight: 8,
     fontFamily: 'Outfit-Regular',
+  },
+  viewAllTextDark: {
+    color: '#1EB1C5',
   },
 });
 

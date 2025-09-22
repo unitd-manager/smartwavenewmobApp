@@ -78,12 +78,27 @@ const Categories = ({navigation}) => {
 
           <View style={styles.subCategoryWrapper}>
             {category?.subcategories?.map((item, subIndex) => (
-              <View 
+              <TouchableOpacity 
                 key={subIndex} 
                 style={[
                   styles.subCategoryItem,
                   (subIndex + 1) % 4 === 0 ? styles.subCategoryItemLast : {}
                 ]}
+                onPress={() => {
+                  // Find the subcategory ID from the subCategories array
+                  const subcategoryData = subCategories.find(
+                    sub => sub.sub_category_title === item.name && sub.category_id === category.category_id
+                  );
+                  
+                  if (subcategoryData) {
+                    navigation.navigate('ProductList', {
+                      categoryId: category.category_id,
+                      categoryName: category.title,
+                      initialSubcategoryId: subcategoryData.sub_category_id,
+                      subcategoryName: item.name
+                    });
+                  }
+                }}
               >
             <Image
   source={{
@@ -100,7 +115,7 @@ const Categories = ({navigation}) => {
 
 
                 <Text style={styles.subCategoryText}>{item.name}</Text>
-              </View>
+              </TouchableOpacity>
             ))}
           </View>
         </View>
@@ -139,6 +154,8 @@ const styles = StyleSheet.create({
     width: '22.5%',
     marginRight: '2.5%',
     fontFamily: 'Outfit-Regular',
+    padding: 8,
+    borderRadius: 8,
   },
   subCategoryItemLast: {
     marginRight: 0,
@@ -153,6 +170,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
     textAlign: 'center',
     fontFamily: 'Outfit-Regular',
+    color: '#333',
   },
   categoryRow: {
     flexDirection: 'row',

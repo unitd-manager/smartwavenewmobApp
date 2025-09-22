@@ -54,13 +54,19 @@ export const deleteNotificationAsync = createAsyncThunk(
   'notifications/deleteNotification',
   async (notificationId, { rejectWithValue }) => {
     try {
+      console.log('deleteNotificationAsync: Starting deletion for ID:', notificationId);
       const result = await notificationService.deleteNotification(notificationId);
+      console.log('deleteNotificationAsync: Service result:', result);
+      
       if (result.success) {
+        console.log('deleteNotificationAsync: Success - returning ID:', notificationId);
         return notificationId;
       } else {
+        console.log('deleteNotificationAsync: Failed - rejecting with:', result.message);
         return rejectWithValue(result.message);
       }
     } catch (error) {
+      console.log('deleteNotificationAsync: Exception caught:', error);
       return rejectWithValue(error.message);
     }
   }
@@ -104,7 +110,7 @@ const sampleNotifications = [
     title: 'Order Confirmed',
     message: 'Your order #12345 has been confirmed and is being processed.',
     type: 'order',
-    read: false,
+    is_read: 0,
     timestamp: new Date(Date.now() - 30 * 60 * 1000).toISOString(),
     action: {
       screen: 'EnquiryHistory',
@@ -116,7 +122,7 @@ const sampleNotifications = [
     title: 'Special Offer!',
     message: 'Get 20% off on all electronics. Limited time offer!',
     type: 'promotion',
-    read: false,
+    is_read: 0,
     timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
     action: {
       screen: 'Categories',
@@ -128,7 +134,7 @@ const sampleNotifications = [
     title: 'Welcome to Smart Wave!',
     message: 'Thank you for joining us. Explore our wide range of products.',
     type: 'info',
-    read: true,
+    is_read: 1,
     timestamp: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
     action: {
       screen: 'Home',
@@ -156,11 +162,11 @@ const notificationSlice = createSlice({
       const newNotification = {
         id: Date.now(),
         timestamp: new Date().toISOString(),
-        read: false,
+        is_read: 0,
         ...action.payload,
       };
       state.notifications.unshift(newNotification);
-      state.unreadCount = state.notifications.filter(n => !n.read).length;
+      state.unreadCount = state.notifications.filter(n => n.is_read === 0).length;
     },
     clearAllNotifications: (state) => {
       state.notifications = [];
@@ -174,7 +180,7 @@ const notificationSlice = createSlice({
       // If going offline and no notifications, use sample data
       if (!action.payload && state.notifications.length === 0) {
         state.notifications = sampleNotifications;
-        state.unreadCount = sampleNotifications.filter(n => !n.read).length;
+        state.unreadCount = sampleNotifications.filter(n => n.is_read === 0).length;
       }
     },
     clearError: (state) => {
@@ -215,7 +221,7 @@ const notificationSlice = createSlice({
         title: randomTitle,
         message: randomMessage,
         type: randomType,
-        read: false,
+        is_read: 0,
         timestamp: new Date().toISOString(),
         action: {
           screen: randomType === 'order' ? 'EnquiryHistory' : randomType === 'promotion' ? 'Categories' : 'Home',
@@ -224,7 +230,7 @@ const notificationSlice = createSlice({
       };
       
       state.notifications.unshift(newNotification);
-      state.unreadCount = state.notifications.filter(n => !n.read).length;
+      state.unreadCount = state.notifications.filter(n => n.is_read === 0).length;
     },
   },
   extraReducers: (builder) => {
@@ -236,8 +242,10 @@ const notificationSlice = createSlice({
       })
       .addCase(fetchNotifications.fulfilled, (state, action) => {
         state.loading = false;
-        state.notifications = action.payload;
-        state.unreadCount = action.payload.filter(n => !n.read).length;
+        // Handle both direct array and object with data property
+        const notifications = Array.isArray(action.payload) ? action.payload : (action.payload?.data || []);
+        state.notifications = notifications;
+        state.unreadCount = notifications.filter(n => n.is_read === 0).length;
         state.lastFetched = new Date().toISOString();
         state.error = null;
         state.lastFetchTimestamp = new Date().toISOString();
@@ -248,7 +256,7 @@ const notificationSlice = createSlice({
         // If fetch fails and no notifications exist, use sample data
         if (state.notifications.length === 0) {
           state.notifications = sampleNotifications;
-          state.unreadCount = sampleNotifications.filter(n => !n.read).length;
+          state.unreadCount = sampleNotifications.filter(n => n.is_read === 0).length;
         }
       })
       
@@ -284,17 +292,25 @@ const notificationSlice = createSlice({
       
       // Mark notification as read
       .addCase(markNotificationAsRead.pending, (state) => {
+        console.log('markNotificationAsRead.pending: Clearing error state');
         state.error = null;
       })
       .addCase(markNotificationAsRead.fulfilled, (state, action) => {
-        const notification = state.notifications.find(n => n.id === action.payload);
-        if (notification && !notification.read) {
-          notification.read = true;
-          state.unreadCount = state.notifications.filter(n => !n.read).length;
+        console.log('markNotificationAsRead.fulfilled: Marking notification as read:', action.payload);
+        const notification = state.notifications.find(n => 
+          n.id === action.payload || 
+          n.notification_id === action.payload
+        );
+        if (notification && notification.is_read === 0) {
+          console.log('Found unread notification, marking as read');
+          notification.is_read = 1;
+          state.unreadCount = state.notifications.filter(n => n.is_read === 0).length;
+          console.log('Updated unread count:', state.unreadCount);
         }
         state.error = null;
       })
       .addCase(markNotificationAsRead.rejected, (state, action) => {
+        console.log('markNotificationAsRead.rejected: Setting error:', action.payload);
         state.error = action.payload;
       })
       
@@ -304,7 +320,7 @@ const notificationSlice = createSlice({
       })
       .addCase(markAllNotificationsAsRead.fulfilled, (state) => {
         state.notifications.forEach(notification => {
-          notification.read = true;
+          notification.is_read = 1;
         });
         state.unreadCount = 0;
         state.error = null;
@@ -314,21 +330,46 @@ const notificationSlice = createSlice({
       })
       
       // Delete notification
-      .addCase(deleteNotificationAsync.pending, (state) => {
+      .addCase(deleteNotificationAsync.pending, (state, action) => {
+        console.log('deleteNotificationAsync.pending: Clearing error state, attempting to delete ID:', action.meta.arg);
         state.error = null;
       })
       .addCase(deleteNotificationAsync.fulfilled, (state, action) => {
-        const index = state.notifications.findIndex(n => n.id === action.payload);
+        console.log('deleteNotificationAsync.fulfilled: Deleting notification with ID:', action.payload);
+        console.log('Current notifications before delete:', state.notifications.map(n => ({ 
+          id: n.id, 
+          notification_id: n.notification_id, 
+          title: n.title 
+        })));
+        
+        // Find notification by checking both id and notification_id fields
+        const index = state.notifications.findIndex(n => 
+          n.id === action.payload || 
+          n.notification_id === action.payload
+        );
+        console.log('Found notification index:', index);
+        
         if (index !== -1) {
-          const wasUnread = !state.notifications[index].read;
+          const wasUnread = state.notifications[index].is_read === 0;
+          console.log('Notification was unread:', wasUnread);
           state.notifications.splice(index, 1);
           if (wasUnread) {
-            state.unreadCount = state.notifications.filter(n => !n.read).length;
+            state.unreadCount = state.notifications.filter(n => n.is_read === 0).length;
           }
+          console.log('Notification deleted successfully');
+        } else {
+          console.log('Notification not found in state with ID:', action.payload);
         }
+        
+        console.log('Notifications after delete:', state.notifications.map(n => ({ 
+          id: n.id, 
+          notification_id: n.notification_id, 
+          title: n.title 
+        })));
         state.error = null;
       })
       .addCase(deleteNotificationAsync.rejected, (state, action) => {
+        console.log('deleteNotificationAsync.rejected: Setting error:', action.payload);
         state.error = action.payload;
       });
   },

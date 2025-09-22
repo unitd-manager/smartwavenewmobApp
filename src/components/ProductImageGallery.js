@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { View, Image, FlatList, TouchableOpacity, StyleSheet, Dimensions } from "react-native";
+import Swiper from 'react-native-swiper';
 import ImageViewing from "react-native-image-viewing";
 import imageBase from "../constants/imageBase";
 
@@ -8,8 +9,16 @@ const { width } = Dimensions.get("window");
 const ProductImageGallery = ({ images = [] }) => {
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [isViewerVisible, setIsViewerVisible] = useState(false);
+  const swiperRef = useRef(null);
 
-  const onThumbnailPress = (index) => setSelectedImageIndex(index);
+  const onThumbnailPress = (index) => {
+    setSelectedImageIndex(index);
+    swiperRef.current?.scrollBy(index - selectedImageIndex);
+  };
+
+  const onIndexChanged = (index) => {
+    setSelectedImageIndex(index);
+  };
 
   const renderPaginationDots = () => {
     if (images.length <= 1) return null;
@@ -23,7 +32,7 @@ const ProductImageGallery = ({ images = [] }) => {
               styles.paginationDot,
               selectedImageIndex === index && styles.activePaginationDot,
             ]}
-            onPress={() => setSelectedImageIndex(index)}
+            onPress={() => onThumbnailPress(index)}
           />
         ))}
       </View>
@@ -32,19 +41,32 @@ const ProductImageGallery = ({ images = [] }) => {
 
   return (
     <View style={styles.container}>
-      {/* Main Image Container */}
+      {/* Main Image Container with Swipe */}
       <View style={styles.mainImageContainer}>
-        <TouchableOpacity onPress={() => setIsViewerVisible(true)}>
-          <Image
-            source={{ 
-              uri: images?.[selectedImageIndex]
-                ? imageBase + images[selectedImageIndex]
-                : "https://storage.googleapis.com/tagjs-prod.appspot.com/pNd58t8xI9/yp2hw732.png"
-            }}
-            style={styles.mainImage}
-            resizeMode="contain"
-          />
-        </TouchableOpacity>
+        <Swiper
+          ref={swiperRef}
+          style={styles.swiperContainer}
+          showsPagination={false}
+          loop={false}
+          index={selectedImageIndex}
+          onIndexChanged={onIndexChanged}
+        >
+          {images.map((image, index) => (
+            <View key={index} style={styles.slideContainer}>
+              <TouchableOpacity onPress={() => setIsViewerVisible(true)}>
+                <Image
+                  source={{ 
+                    uri: image
+                      ? imageBase + image
+                      : "https://storage.googleapis.com/tagjs-prod.appspot.com/pNd58t8xI9/yp2hw732.png"
+                  }}
+                  style={styles.mainImage}
+                  resizeMode="contain"
+                />
+              </TouchableOpacity>
+            </View>
+          ))}
+        </Swiper>
         
         {/* Pagination Dots */}
         {renderPaginationDots()}
@@ -94,6 +116,15 @@ const styles = StyleSheet.create({
   },
   mainImageContainer: {
     position: "relative",
+    height: 300,
+  },
+  swiperContainer: {
+    height: 300,
+  },
+  slideContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   mainImage: {
     width: width,
@@ -117,7 +148,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 4,
   },
   activePaginationDot: {
-    backgroundColor: "#007bff",
+    backgroundColor: "#1EB1C5",
   },
   thumbnailList: {
     paddingVertical: 10,
@@ -133,7 +164,7 @@ const styles = StyleSheet.create({
     borderColor: "transparent",
   },
   selectedThumbnail: {
-    borderColor: "#007bff",
+    borderColor: "#1EB1C5",
     borderWidth: 2,
   },
 });
