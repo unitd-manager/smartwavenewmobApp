@@ -581,28 +581,6 @@ const { wishitems, status } = useSelector((state) => state.wishlist);
   />
 </View>}
 
-      {/* Test Notification Modal Button */}
-      <View style={styles.section}>
-        <TouchableOpacity 
-          style={styles.testButton}
-          onPress={() => {
-            // Test notification modal
-            if (global.showTestNotificationModal) {
-              global.showTestNotificationModal();
-              Alert.alert('Test Notification', 'Notification modal triggered! Check if it appears.');
-            } else {
-              Alert.alert('Test Error', 'Test function not available');
-            }
-          }}
-        >
-          <Text style={styles.testButtonText}>Test Notification Modal</Text>
-        </TouchableOpacity>
-        
-        {/* Show notification count for debugging */}
-        <Text style={styles.debugText}>
-          Notifications: {global.notificationCount || 0} | Unread: {global.unreadCount || 0}
-        </Text>
-      </View>
     </ScrollView>
   );
 };

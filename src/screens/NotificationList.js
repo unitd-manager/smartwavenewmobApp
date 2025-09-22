@@ -13,6 +13,7 @@ import {
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { useSelector, useDispatch } from 'react-redux';
+import { useNavigation } from '@react-navigation/native';
 import { 
   fetchNotifications,
   markNotificationAsRead, 
@@ -21,8 +22,9 @@ import {
   clearError 
 } from '../redux/slices/notificationSlice';
 
-const NotificationList = ({ navigation }) => {
+const NotificationList = ({ navigation: propNavigation }) => {
   const dispatch = useDispatch();
+  const navigation = propNavigation || useNavigation();
   const { 
     notifications, 
     unreadCount, 
@@ -74,20 +76,61 @@ const NotificationList = ({ navigation }) => {
     await dispatch(fetchNotifications());
     setRefreshing(false);
   };
-
-  const handleMarkAsRead = async (id, item) => {
-    console.log('Marking notification as read:', id);
+const handleMarkAsRead = async (id, item) => {
+  console.log('Marking notification as read:', id);
+  console.log('Notification item data:', JSON.stringify(item, null, 2));
+  
+  try {
     await dispatch(markNotificationAsRead(id));
     
-      console.log('Navigation to:', item.action.screen, 'with params:', item.action.params);
-      try {
-        navigation.navigate("EnquiryDetails", { enquiry: item })
-      } catch (error) {
-        console.log('Navigation failed:', error);
-        // Silently handle navigation errors - don't interrupt the user
-      }
+    // Add delay to ensure mark as read completes
+    await new Promise(resolve => setTimeout(resolve, 100));
     
-  };
+    console.log('Navigation to EnquiryDetails with item:', item);
+    
+    if (item) {
+      // Ensure we have the proper enquiry data structure
+      const enquiryData = {
+        ...item,
+        enquiry_id: item.enquiry_id || item.id || item.notification_id,
+        id: item.enquiry_id || item.id || item.notification_id,
+        // Add any other required fields that EnquiryDetails might need
+        title: item.title || 'Enquiry Details',
+        message: item.message || item.body || ''
+      };
+      
+      console.log('Prepared enquiry data for navigation:', JSON.stringify(enquiryData, null, 2));
+      
+      // Check if navigation is available and EnquiryDetails screen exists
+      if (navigation && navigation.navigate) {
+        try {
+          navigation.navigate('EnquiryDetails', { 
+            enquiry: enquiryData
+          });
+          console.log('Navigation to EnquiryDetails initiated successfully');
+        } catch (navError) {
+          console.error('Navigation error:', navError);
+         
+        }
+      } else {
+        console.error('Navigation object not available');
+       
+      }
+    } else {
+      console.log('No item data available for navigation');
+      Alert.alert(
+        'Error',
+        'No enquiry data available to display details.'
+      );
+    }
+  } catch (error) {
+    console.log('Operation failed:', error);
+    Alert.alert(
+      'Error',
+      'Failed to process notification. Please try again.'
+    );
+  }
+};
 
   const handleMarkAllAsRead = () => {
     dispatch(markAllNotificationsAsRead());
@@ -143,6 +186,24 @@ const NotificationList = ({ navigation }) => {
   const handleTestNotification = () => {
     console.log('Triggering test notification');
     dispatch(simulateNotification());
+  };
+
+  const testNavigation = () => {
+    console.log('Testing navigation to EnquiryDetails...');
+    try {
+      navigation.navigate('EnquiryDetails', { 
+        enquiry: {
+          enquiry_id: 999,
+          id: 999,
+          title: 'Test Enquiry',
+          message: 'This is a test navigation'
+        }
+      });
+      console.log('Test navigation successful');
+    } catch (error) {
+      console.error('Test navigation failed:', error);
+      Alert.alert('Navigation Test Failed', error.message);
+    }
   };
 
   
@@ -280,6 +341,10 @@ const NotificationList = ({ navigation }) => {
         </TouchableOpacity>
         <Text style={[styles.headerTitle, { textAlign: 'center', alignSelf: 'center' }]}>Notifications</Text>
         <View style={styles.headerButtons}>
+          {/* Test navigation button for debugging */}
+          <TouchableOpacity onPress={testNavigation} style={styles.testButton}>
+            <Icon name="bug-outline" size={20} color="#fff" />
+          </TouchableOpacity>
           
           {unreadCount > 0 && (
             <TouchableOpacity onPress={handleMarkAllAsRead} style={styles.markAllButton}>
