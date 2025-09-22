@@ -1,5 +1,5 @@
 import React,{useEffect,useState,useCallback, useContext} from 'react';
-import { View, Text, ScrollView, Image, FlatList, StyleSheet, TouchableOpacity, Dimensions, Alert } from 'react-native';
+import { View, Text, ScrollView, Image, FlatList, StyleSheet, TouchableOpacity, Dimensions, Alert, ActivityIndicator } from 'react-native';
 import BannerCarousel from '../components/BannerCarousel';
 import { useNavigation,useFocusEffect } from '@react-navigation/native';
 import api from '../constants/api';
@@ -26,6 +26,7 @@ const[categories,setCategories]=useState([]);
   const [bestSellingProducts, setBestSellingProducts] = useState([]);
   const [mostPopularProducts, setMostPopularProducts] = useState([]);
   const [userData, setUserData] = useState({});
+  const [loading, setLoading] = useState(true);
 
 const { wishitems, status } = useSelector((state) => state.wishlist);
   const dispatch = useDispatch();
@@ -253,30 +254,45 @@ const { wishitems, status } = useSelector((state) => state.wishlist);
 
 
   useEffect(() => {
+    const loadData = async () => {
+      setLoading(true);
+      try {
+        await Promise.all([
+          getBanner(),
+          getOfferProducts(),
+          getBestSellingProducts(),
+          getMostPopularProducts(),
+          getNewProducts(),
+          api.get("/category/getAllCategory").then((res) => {
+            res.data.data.forEach((element) => {
+              element.images = String(element.images).split(",");
+            });
+            console.log("categories", res.data.data);
+            setCategories(res.data.data);
+          })
+        ]);
+      } catch (error) {
+        console.log("Error loading data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-    getBanner();
-	getOfferProducts();
-  getBestSellingProducts();
-  getMostPopularProducts();
-  getNewProducts();
-	api
-	.get("/category/getAllCategory")
-	.then((res) => {
-    res.data.data.forEach((element) => {
-      element.images = String(element.images).split(",");
-    });
-    console.log("categories", res.data.data);
-	  setCategories(res.data.data);
-	})
-	.catch(() => {
-	  console.log("error");
-	});
-    // getDataFromApi()
+    loadData();
   }, []);
 
   const renderBanner = ({ item }) => (
     <Image source={{ uri: item.image }} style={styles.banner} resizeMode="cover" />
   );
+
+  if (loading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#0000ff" />
+        <Text style={styles.loadingText}>Loading...</Text>
+      </View>
+    );
+  }
 
   return (
     <ScrollView style={styles.container}>
@@ -587,6 +603,18 @@ const { wishitems, status } = useSelector((state) => state.wishlist);
 
 const styles = StyleSheet.create({
   container: { flex: 1,paddingTop: 20,  backgroundColor: '#fff' },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#fff',
+  },
+  loadingText: {
+    marginTop: 10,
+    fontSize: 16,
+    color: '#666',
+    fontFamily: 'Outfit-Regular',
+  },
   banner: { width: '100%', height: 150, borderRadius: 10 },
   section: {
     paddingHorizontal: 15,
