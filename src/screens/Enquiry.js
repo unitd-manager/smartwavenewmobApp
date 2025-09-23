@@ -26,7 +26,7 @@ export default (props) => {
 				</View>
 				
 				<View style={styles.column2}>
-					<TouchableOpacity style={styles.button} onPress={()=>navigation.navigate("home")}>
+					<TouchableOpacity style={styles.button} onPress={()=>navigation.navigate("Home")}>
 						<Text style={styles.text5}>
 							{"Go To Home"}
 						</Text>

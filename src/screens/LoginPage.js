@@ -107,7 +107,7 @@ const isDarkMode = colorScheme === 'dark';
                 dispatch(fetchCartItems(res.data.data));
 			 // Alert.alert('Success', 'Logged in successfully!');
               setTimeout(()=>{
-  navigation.navigate(" ")
+  navigation.navigate("Home")
               },300)
             }
           }).catch((err)=>{
