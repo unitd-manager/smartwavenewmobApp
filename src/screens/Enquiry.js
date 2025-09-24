@@ -1,6 +1,6 @@
 import React from "react";
 import { SafeAreaView, View, Text, Image, TouchableOpacity, StyleSheet } from "react-native";
-
+ 
 export default (props) => {
 	return (
 		<SafeAreaView style={styles.container}>
