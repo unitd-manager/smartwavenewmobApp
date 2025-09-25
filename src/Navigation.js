@@ -64,7 +64,7 @@ const Navigation = () => {
 
   return (
     <Stack.Navigator 
-      initialRouteName="MainApp"
+      initialRouteName={isLoggedIn ? "MainApp" : "Intro"}
       screenOptions={{
         headerTitleStyle: {
           fontFamily: 'Outfit-Regular',
@@ -77,45 +77,49 @@ const Navigation = () => {
         headerTitleAlign: "center",
       }}
     >
-      {/* Main App - Always accessible */}
-      <Stack.Screen 
-        name="MainApp" 
-        component={TabNavigator}  
-        options={{ headerShown: false }} 
-      />
-      <Stack.Screen name="Home" component={Home}  options={{ title: "Home" }} />
-      <Stack.Screen name="Account" component={Account}  options={{ title: "Account" }} />
-      <Stack.Screen name="ProductList" component={ProductList} options={({ route }) => ({
-        title: route.params?.categoryName || "Products",
-        headerStyle: {
-          backgroundColor: "#1EB1C5",
-          fontFamily: 'Outfit-Regular',
-        },
-        headerTintColor: "#fff",
-        headerTitleAlign: "center",
-      })} />
-      <Stack.Screen name="ProductDetails" component={ProductDetails}  options={{ title: "ProductDetails" }}/>
-      <Stack.Screen name="Cart" component={Cart} />
-      <Stack.Screen name="Categories" component={Categories}  options={{ title: "Categories" }}/>
-      <Stack.Screen name="AboutUs" component={AboutUs} />
-      <Stack.Screen name="Enquiry" component={Enquiry} />
-      <Stack.Screen name="EnquiryDetails" component={EnquiryDetails} />
-      <Stack.Screen name="EnquiryHistory" component={EnquiryHistory} />
-      <Stack.Screen name="ShippingDetails" component={ShippingDetails} />
-      <Stack.Screen name="ShippingAddress" component={ShippingAddress} />
-      <Stack.Screen name="Frame" component={Frame} />
-      <Stack.Screen name="Profile" component={Profile} />
-      <Stack.Screen name="ContactUs" component={ContactUs} />
-      <Stack.Screen name="NotificationList" component={NotificationList} options={{ headerShown: false }} />
-      
-      {/* Authentication screens */}
-      <Stack.Screen name="LoginPage" component={LoginPage} options={{ title: "Login" }}/>
-      <Stack.Screen name="Signup" component={Signup} />
-      <Stack.Screen name="ForgotPassword" component={ForgotPassword} />
-      <Stack.Screen name="Intro" component={Intro} />
-      <Stack.Screen name="Verification" component={Verification} />
-      <Stack.Screen name="NewPassword" component={NewPassword} />
-      <Stack.Screen name="NewPasswordPopup" component={NewPasswordPopup} />
+      {isLoggedIn ? (
+        <Stack.Group>
+          <Stack.Screen 
+            name="MainApp" 
+            component={TabNavigator}  
+            options={{ headerShown: false }} 
+          />
+          <Stack.Screen name="HomeScreen" component={Home}  options={{ title: "Home" }} />
+          <Stack.Screen name="Account" component={Account}  options={{ title: "Account" }} />
+          <Stack.Screen name="ProductList" component={ProductList} options={({ route }) => ({
+            title: route.params?.categoryName || "Products",
+            headerStyle: {
+              backgroundColor: "#1EB1C5",
+              fontFamily: 'Outfit-Regular',
+            },
+            headerTintColor: "#fff",
+            headerTitleAlign: "center",
+          })} />
+          <Stack.Screen name="ProductDetails" component={ProductDetails}  options={{ title: "ProductDetails" }}/>
+          <Stack.Screen name="Cart" component={Cart} />
+          <Stack.Screen name="Categories" component={Categories}  options={{ title: "Categories" }}/>
+          <Stack.Screen name="AboutUs" component={AboutUs} />
+          <Stack.Screen name="Enquiry" component={Enquiry} />
+          <Stack.Screen name="EnquiryDetails" component={EnquiryDetails} />
+          <Stack.Screen name="EnquiryHistory" component={EnquiryHistory} />
+          <Stack.Screen name="ShippingDetails" component={ShippingDetails} />
+          <Stack.Screen name="ShippingAddress" component={ShippingAddress} />
+          <Stack.Screen name="Frame" component={Frame} />
+          <Stack.Screen name="Profile" component={Profile} />
+          <Stack.Screen name="ContactUs" component={ContactUs} />
+          <Stack.Screen name="NotificationList" component={NotificationList} options={{ headerShown: false }} />
+        </Stack.Group>
+      ) : (
+        <Stack.Group>
+          <Stack.Screen name="Intro" component={Intro} options={{ headerShown: false }} />
+          <Stack.Screen name="LoginPage" component={LoginPage} options={{ title: "Login" }}/>
+          <Stack.Screen name="Signup" component={Signup} />
+          <Stack.Screen name="ForgotPassword" component={ForgotPassword} />
+          <Stack.Screen name="Verification" component={Verification} />
+          <Stack.Screen name="NewPassword" component={NewPassword} />
+          <Stack.Screen name="NewPasswordPopup" component={NewPasswordPopup} />
+        </Stack.Group>
+      )}
     </Stack.Navigator>
     
   );

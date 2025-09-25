@@ -165,26 +165,48 @@ const { wishitems, status } = useSelector((state) => state.wishlist);
    
   };
   const addCart = (data) => {
- console.log('user in home',user);
-    if(user && user?.contact_id){
-      const updatedItem = { ...data, contact_id: user?.contact_id}; 
+    console.log('user in home', user);
+    if (user && user?.contact_id) {
+      const updatedItem = { ...data, contact_id: user?.contact_id };
 
-    // data.contact_id=user?.contact_id
-  
-     dispatch(addToCart(updatedItem)) 
-             .then(() => { Alert.alert("Item added to cart")
-               dispatch(fetchCartItems(user));
-             })
-             .catch((error) => {
-               console.error('Failed to add to cart:', error);
-             });
-  
+      // Check if the product with the same product_id and selected grade already exists in the cart
+      const existingCartItem = cartItems.find(
+        (item) =>
+          item.product_id === updatedItem.product_id &&
+          item.selectedGrade === updatedItem.selectedGrade
+      );
+
+      if (existingCartItem) {
+        // If it exists, update the quantity
+        const newQuantity = existingCartItem.quantity + 1;
+        dispatch(
+          updateCart({
+            cart_id: existingCartItem.cart_id,
+            quantity: newQuantity,
+            contact_id: user?.contact_id,
+          })
+        )
+          .then(() => {
+            Alert.alert('Item quantity updated in cart');
+            dispatch(fetchCartItems(user));
+          })
+          .catch((error) => {
+            console.error('Failed to update cart item quantity:', error);
+          });
+      } else {
+        // If it doesn't exist, add it as a new item
+        dispatch(addToCart(updatedItem))
+          .then(() => {
+            Alert.alert('Item added to cart');
+            dispatch(fetchCartItems(user));
+          })
+          .catch((error) => {
+            console.error('Failed to add to cart:', error);
+          });
+      }
+    } else {
+      Alert.alert('Please Login');
     }
-    else{
-      Alert.alert("Please Login")
-     
-    }
-   
   };
 
   

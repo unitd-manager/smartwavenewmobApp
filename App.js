@@ -144,8 +144,8 @@ import { fetchNotifications, fetchUnreadCount } from './src/redux/slices/notific
 import useNotificationPolling from './src/hooks/useNotificationPolling';
 
 // Set default font globally
-Text.defaultProps = Text.defaultProps || {};
-Text.defaultProps.style = { fontFamily: 'Outfit-Regular' };
+// Text.defaultProps = Text.defaultProps || {};
+// Text.defaultProps.style = { fontFamily: 'Outfit-Regular' };
 
 
 // Main App Wrapper Component

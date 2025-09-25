@@ -26,16 +26,16 @@ export default (props) => {
 				</View>
 				
 				<View style={styles.column2}>
-					<TouchableOpacity style={styles.button} onPress={()=>navigation.navigate("Home")}>
+					<TouchableOpacity style={styles.button} onPress={()=>navigation.navigate("MainApp", { screen: "Home", params: { screen: "HomeMain" } })}>
 						<Text style={styles.text5}>
 							{"Go To Home"}
 						</Text>
 					</TouchableOpacity>
-					<TouchableOpacity style={styles.button2} onPress={()=>alert('Pressed!')}>
+					{/* <TouchableOpacity style={styles.button2} onPress={()=>alert('Pressed!')}>
 						<Text style={styles.text6}>
 							{"View -E- Receipt"}
 						</Text>
-					</TouchableOpacity>
+					</TouchableOpacity> */}
 				</View>
 			</View>
 		</SafeAreaView>

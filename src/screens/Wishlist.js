@@ -113,7 +113,7 @@ const handleIncreaseQuantity = useCallback(
         <Text style={styles.emptyText}>Your wishlist is empty</Text>
         <TouchableOpacity
   style={styles.homeButton}
-  onPress={() => navigation.navigate("Home")}
+  onPress={() => navigation.navigate("MainApp", { screen: "Home", params: { screen: "HomeMain" } })}
 >
   <View style={styles.homeButtonContent}>
     <Icon name="home-outline" size={20} color="#fff" style={{ marginRight: 8 }} />

@@ -12,7 +12,7 @@ import {
 } from "react-native";
 import { Snackbar } from 'react-native-paper';
 import api from "../constants/api";
-import { addToCart, fetchCartItems } from '../redux/slices/cartSlice';
+import { addToCart, fetchCartItems,updateCart } from '../redux/slices/cartSlice';
 import { addToWishlist,fetchWishlistItems,deleteWishlistItem } from "../redux/slices/wishlistSlice";
 import imageBase from "../constants/imageBase";
 import { useDispatch, useSelector } from "react-redux";
@@ -45,6 +45,7 @@ console.log('product',product);
 
   const dispatch = useDispatch();
 const { wishitems, status } = useSelector((state) => state.wishlist);
+const { items: cartItems } = useSelector((state) => state.cart);
   
 const isInWishlist = () => {
   return wishitems?.some(item => item.product_id === product.product_id);
@@ -54,15 +55,52 @@ const showToast = (message) => {
   setToastMessage(message);
   setToastVisible(true);
 };
+
+
   const addCart = (data) => {
  
     if(user){
-      // Only require grade selection if product has valid grades
-      if(product.grades && product.grades.length > 0){
-        if(selectedProductGrade){
-        
-          data.contact_id=user.contact_id
-          data.grade=selectedProductGrade;
+      const existingCartItem = cartItems.find(
+        (item) =>
+          item.product_id === data.product_id &&
+          (data.grade ? item.grade === data.grade : true)
+      );
+
+      if (existingCartItem) {
+        // If item exists, increment quantity and update cart
+        const updatedQuantity = existingCartItem.qty + quantityCount;
+        dispatch(updateCart({ ...existingCartItem, qty: updatedQuantity }))
+          .then(() => {
+            showToast(`${data?.title} quantity updated in cart`);
+            dispatch(fetchCartItems(user));
+          })
+          .catch((error) => {
+            console.error('Failed to update cart item quantity:', error);
+          });
+      } else {
+        // Only require grade selection if product has valid grades
+        if(product.grades && product.grades.length > 0){
+          if(selectedProductGrade){
+          
+            data.contact_id=user.contact_id
+            data.grade=selectedProductGrade;
+            dispatch(addToCart(data)) 
+              .then(() => { 
+                showToast(`${data?.title} added to cart`);
+                dispatch(fetchCartItems(user));
+              })
+              .catch((error) => {
+                console.error('Failed to add to cart:', error);
+              });
+          } else{
+            Alert.alert(
+              "Alert",
+              "Please select the grade before add to cart"
+            )
+          }
+        } else {
+          // Product has no grades, add to cart directly
+          data.contact_id=user.contact_id;
           dispatch(addToCart(data)) 
             .then(() => { 
               showToast(`${data?.title} added to cart`);
@@ -71,23 +109,7 @@ const showToast = (message) => {
             .catch((error) => {
               console.error('Failed to add to cart:', error);
             });
-        } else{
-          Alert.alert(
-            "Alert",
-            "Please select the grade before add to cart"
-          )
         }
-      } else {
-        // Product has no grades, add to cart directly
-        data.contact_id=user.contact_id;
-        dispatch(addToCart(data)) 
-          .then(() => { 
-            showToast(`${data?.title} added to cart`);
-            dispatch(fetchCartItems(user));
-          })
-          .catch((error) => {
-            console.error('Failed to add to cart:', error);
-          });
       }
     }
     else{
