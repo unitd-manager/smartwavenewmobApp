@@ -64,7 +64,7 @@ const Navigation = () => {
 
   return (
     <Stack.Navigator 
-      initialRouteName={isLoggedIn ? "MainApp" : "Intro"}
+      initialRouteName={isLoggedIn ? "MainApp" : "MainApp"}
       screenOptions={{
         headerTitleStyle: {
           fontFamily: 'Outfit-Regular',
@@ -111,7 +111,12 @@ const Navigation = () => {
         </Stack.Group>
       ) : (
         <Stack.Group>
-          <Stack.Screen name="Intro" component={Intro} options={{ headerShown: false }} />
+            <Stack.Screen 
+            name="MainApp" 
+            component={TabNavigator}  
+            options={{ headerShown: false }} 
+          />
+          <Stack.Screen name="HomeScreen" component={Home}  options={{ title: "Home" }} />
           <Stack.Screen name="LoginPage" component={LoginPage} options={{ title: "Login" }}/>
           <Stack.Screen name="Signup" component={Signup} />
           <Stack.Screen name="ForgotPassword" component={ForgotPassword} />
