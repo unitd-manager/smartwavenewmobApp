@@ -59,44 +59,10 @@ class NotificationService {
       console.error('Error fetching notifications:', error);
       console.log('Using sample notifications due to API error');
       
-      // Return sample data for development/testing when API fails
-      const sampleData = [
-        {
-          id: 1,
-          notification_id: 1,
-          title: 'Welcome to Smart Wave!',
-          message: 'Thank you for joining our platform.',
-          type: 'info',
-          read: false,
-          is_read: false,
-          timestamp: new Date().toISOString(),
-        },
-        {
-          id: 2,
-          notification_id: 2,
-          title: 'Order Update',
-          message: 'Your order has been processed successfully.',
-          type: 'order',
-          read: false,
-          is_read: false,
-          timestamp: new Date(Date.now() - 3600000).toISOString(),
-        },
-        {
-          id: 3,
-          notification_id: 3,
-          title: 'Special Offer!',
-          message: 'Get 20% off on all electronics this week.',
-          type: 'promotion',
-          read: false,
-          is_read: false,
-          timestamp: new Date(Date.now() - 7200000).toISOString(),
-        }
-      ];
-      
       return {
         success: true,
-        data: sampleData,
-        message: 'Using sample data for development'
+        data: [],
+        message: 'No Notifications'
       };
     }
   }
