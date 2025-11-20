@@ -134,7 +134,8 @@ Alert.alert(
       >
         {/* 🔽 Image Above Title */}
         <Image
-          source={require('../assets/signin/logscreen.png')} // Make sure this path is correct
+          source={require('../assets/signin/logscreen.png')}
+          defaultSource={require('../assets/signin/logscreen.png')}
           style={styles.logo}
           resizeMode="contain"
         />

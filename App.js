@@ -142,6 +142,7 @@ import { AuthProvider } from './src/context/AuthContext';
 import NotificationModal from './src/components/NotificationModal';
 import { fetchNotifications, fetchUnreadCount } from './src/redux/slices/notificationSlice';
 import useNotificationPolling from './src/hooks/useNotificationPolling';
+import Toast from 'react-native-toast-message';
 
 // Set default font globally
 // Text.defaultProps = Text.defaultProps || {};
@@ -260,11 +261,14 @@ export default function App() {
   //   SplashScreen?.hide(); // hide splash screen after 2s (or immediately)
   // }, []);
   return (
+    <>
      <Provider store={store}>
       <AuthProvider>
         <AppContent />
       </AuthProvider>
      </Provider>
+     <Toast />
+    </>
   );
 }
 

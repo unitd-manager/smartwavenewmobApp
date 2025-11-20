@@ -5,10 +5,11 @@ import { useNavigation,useFocusEffect } from '@react-navigation/native';
 import api from '../constants/api';
 import imageBase from '../constants/imageBase';
 import { useSelector, useDispatch } from 'react-redux';
-import { addToCart, fetchCartItems } from '../redux/slices/cartSlice';
+import { addToCart, fetchCartItems,updateCart } from '../redux/slices/cartSlice';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { AuthContext } from '../context/AuthContext';
 import { addToWishlist, deleteWishlistItem, fetchWishlistItems } from '../redux/slices/wishlistSlice';
+import Toast from 'react-native-toast-message';
 
 
 const { width } = Dimensions.get('window');
@@ -29,8 +30,16 @@ const[categories,setCategories]=useState([]);
   const [loading, setLoading] = useState(true);
 
 const { wishitems, status } = useSelector((state) => state.wishlist);
+
+const { items: cartItems } = useSelector((state) => state.cart);
   const dispatch = useDispatch();
 
+//   const [toastVisible, setToastVisible] = useState(false);
+//   const [toastMessage, setToastMessage] = useState('');
+// const showToast = (message) => {
+//   setToastMessage(message);
+//   setToastVisible(true);
+// };
 
 
   const getNewProducts = () => {
@@ -47,6 +56,22 @@ const { wishitems, status } = useSelector((state) => state.wishlist);
               .filter(el => el !== null && el !== '');
           } else {
             element.grades = [];
+          }
+            if (element.count != null) {
+            element.count = String(element.count)
+              .split(",")
+              .map(grade => grade.trim())
+              .filter(el => el !== null && el !== '');
+          } else {
+            element.count = [];
+          }
+           if (element.origin != null) {
+            element.origin = String(element.origin)
+              .split(",")
+              .map(grade => grade.trim())
+              .filter(el => el !== null && el !== '');
+          } else {
+            element.origin = [];
           }
         });
         setNewProducts(res.data.data);
@@ -70,6 +95,22 @@ const { wishitems, status } = useSelector((state) => state.wishlist);
               .filter(el => el !== null && el !== '');
           } else {
             element.grades = [];
+          }
+           if (element.count != null) {
+            element.count = String(element.count)
+              .split(",")
+              .map(grade => grade.trim())
+              .filter(el => el !== null && el !== '');
+          } else {
+            element.count = [];
+          }
+           if (element.origin != null) {
+            element.origin = String(element.origin)
+              .split(",")
+              .map(grade => grade.trim())
+              .filter(el => el !== null && el !== '');
+          } else {
+            element.origin = [];
           }
         });
         setOfferProducts(res.data.data);
@@ -96,6 +137,22 @@ const { wishitems, status } = useSelector((state) => state.wishlist);
           } else {
             element.grades = [];
           }
+           if (element.count != null) {
+            element.count = String(element.count)
+              .split(",")
+              .map(grade => grade.trim())
+              .filter(el => el !== null && el !== '');
+          } else {
+            element.count = [];
+          }
+           if (element.origin != null) {
+            element.origin = String(element.origin)
+              .split(",")
+              .map(grade => grade.trim())
+              .filter(el => el !== null && el !== '');
+          } else {
+            element.origin = [];
+          }
         });
         setBestSellingProducts(res.data.data);
       })
@@ -119,6 +176,22 @@ const { wishitems, status } = useSelector((state) => state.wishlist);
               .filter(el => el !== null && el !== '');
           } else {
             element.grades = [];
+          }
+           if (element.count != null) {
+            element.count = String(element.count)
+              .split(",")
+              .map(grade => grade.trim())
+              .filter(el => el !== null && el !== '');
+          } else {
+            element.count = [];
+          }
+           if (element.origin != null) {
+            element.origin = String(element.origin)
+              .split(",")
+              .map(grade => grade.trim())
+              .filter(el => el !== null && el !== '');
+          } else {
+            element.origin = [];
           }
         });
         setMostPopularProducts(res.data.data);
@@ -155,7 +228,7 @@ const { wishitems, status } = useSelector((state) => state.wishlist);
  
   
      dispatch(deleteWishlistItem(data)) 
-             .then(() => { Alert.alert("Item removed from wishlist")
+             .then(() => { 
                dispatch(fetchWishlistItems(user));
              })
              .catch((error) => {
@@ -178,16 +251,21 @@ const { wishitems, status } = useSelector((state) => state.wishlist);
 
       if (existingCartItem) {
         // If it exists, update the quantity
-        const newQuantity = existingCartItem.quantity + 1;
+        const newQuantity = existingCartItem.qty + 1;
         dispatch(
           updateCart({
-            cart_id: existingCartItem.cart_id,
-            quantity: newQuantity,
+            basket_id: existingCartItem.basket_id,
+            qty: newQuantity,
             contact_id: user?.contact_id,
           })
         )
           .then(() => {
-            Alert.alert('Item quantity updated in cart');
+           // showToast(`${data?.title} quantity updated in cart`);
+             Toast.show({
+              type: 'success',
+              text1: `${data?.title} quantity updated in cart`,
+              position: 'bottom'
+            });
             dispatch(fetchCartItems(user));
           })
           .catch((error) => {
@@ -197,7 +275,12 @@ const { wishitems, status } = useSelector((state) => state.wishlist);
         // If it doesn't exist, add it as a new item
         dispatch(addToCart(updatedItem))
           .then(() => {
-            Alert.alert('Item added to cart');
+           // showToast(`${data?.title} added to cart`);
+            Toast.show({
+              type: 'success',
+              text1: `${data?.title} added to cart`,
+              position: 'bottom'
+            });
             dispatch(fetchCartItems(user));
           })
           .catch((error) => {
@@ -218,7 +301,11 @@ const { wishitems, status } = useSelector((state) => state.wishlist);
       
          dispatch(addToWishlist(data)) 
                  .then(() => { 
-                  //Alert.alert("Item added to wishlist")
+                  // Toast.show({
+                  //   type: 'success',
+                  //   text1: 'Item added to wishlist',
+                  //   position: 'bottom'
+                  // });
                    dispatch(fetchWishlistItems(user));
                  })
                  .catch((error) => {
@@ -227,7 +314,11 @@ const { wishitems, status } = useSelector((state) => state.wishlist);
       
         }
         else{
-          Alert.alert("Please Login")
+          Toast.show({
+            type: 'info',
+            text1: 'Please Login',
+            position: 'bottom'
+          });
          
         }
        
@@ -399,7 +490,7 @@ const { wishitems, status } = useSelector((state) => state.wishlist);
       : "Add to Wishlist"}</Text>
     </TouchableOpacity>
     <TouchableOpacity style={styles.addToCartButton}  onPress={() =>{ 
-     if(item.grades && item.grades.length > 0){
+     if(item.grades && item.grades.length > 0 || item.count && item.count.length > 0 || item.origin && item.origin.length > 0){
       // Navigate to ProductDetails for grade selection
       navigation.navigate("ProductDetails", { productId: item.product_id })
      }else{
@@ -467,7 +558,7 @@ const { wishitems, status } = useSelector((state) => state.wishlist);
       : "Add to Wishlist"}</Text>
     </TouchableOpacity>
     <TouchableOpacity style={styles.addToCartButton}  onPress={() =>{ 
-     if(item.grades && item.grades.length > 0){
+     if(item.grades && item.grades.length > 0 || item.count && item.count.length > 0 || item.origin && item.origin.length > 0){
       // Navigate to ProductDetails for grade selection
       navigation.navigate("ProductDetails", { productId: item.product_id })
      }else{
@@ -535,7 +626,7 @@ const { wishitems, status } = useSelector((state) => state.wishlist);
       : "Add to Wishlist"}</Text>
     </TouchableOpacity>
     <TouchableOpacity style={styles.addToCartButton}  onPress={() =>{ 
-     if(item.grades && item.grades.length > 0){
+    if(item.grades && item.grades.length > 0 || item.count && item.count.length > 0 || item.origin && item.origin.length > 0){
       // Navigate to ProductDetails for grade selection
       navigation.navigate("ProductDetails", { productId: item.product_id })
      } else{
@@ -603,7 +694,7 @@ const { wishitems, status } = useSelector((state) => state.wishlist);
       : "Add to Wishlist"}</Text>
     </TouchableOpacity>
     <TouchableOpacity style={styles.addToCartButton} onPress={() =>{ 
-     if(item.grades && item.grades.length > 0){
+      if(item.grades && item.grades.length > 0 || item.count && item.count.length > 0 || item.origin && item.origin.length > 0){
       // Navigate to ProductDetails for grade selection
       navigation.navigate("ProductDetails", { productId: item.product_id })
      } else{
@@ -771,3 +862,17 @@ addToCartText: {
 });
 
 export default Home;
+
+
+// <ScrollView style={{ flex: 1 }}>
+//   <View style={{ flex: 1 }}>
+//     <Snackbar
+//       visible={toastVisible}
+//       onDismiss={() => setToastVisible(false)}
+//       duration={3000}
+//       style={{ bottom: 0, left: 0, right: 0, zIndex: 1000, backgroundColor: '#1EB1C5' }}
+//     >
+//       {toastMessage}
+//     </Snackbar>
+//   </View>
+// </ScrollView>

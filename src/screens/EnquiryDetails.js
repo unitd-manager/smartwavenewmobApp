@@ -131,6 +131,7 @@ const EnquiryDetails = ({ route }) => {
     }
 
     const formData = new FormData();
+    formData.append("enq_code", enquiry.enquiry_code);
     formData.append("files", {
       uri: image.uri,
       type: image.type,
@@ -275,6 +276,7 @@ const handleUpload = async () => {
     }
    console.log('receiptFile',receiptFile);
     const formData = new FormData();
+    formData.append("enq_code", enquiry.enquiry_code);
     formData.append("files",{
   uri: receiptFile.uri,
   type: receiptFile.type,
@@ -331,6 +333,7 @@ const handleUpload = async () => {
     }
 console.log('receiptFileDoc',receiptFileDoc);
     const formData = new FormData();
+    formData.append("enq_code", enquiry.enquiry_code);
      formData.append("files",{
   uri: receiptFileDoc.uri,
   type: receiptFileDoc.type,
@@ -378,6 +381,7 @@ console.log('receiptFileDoc',receiptFileDoc);
 
 console.log('receiptArrival',receiptArrival);
     const formData = new FormData();
+    formData.append("enq_code", enquiry.enquiry_code);
      formData.append("files",{
   uri: receiptArrival.uri,
   type: receiptArrival.type,

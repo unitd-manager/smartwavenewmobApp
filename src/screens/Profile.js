@@ -31,6 +31,7 @@ const Profile = ({ navigation }) => {
       address_city: profile.address_city,
       address_state: profile.address_state,
       address_po_code: profile.address_po_code,
+address_country_code: profile.address_country_code,
     };
 
     api.post("/contact/editContactData", profile)
@@ -83,18 +84,23 @@ const Profile = ({ navigation }) => {
 
   return loading ? (
     <View style={styles.loaderContainer}>
-      <ActivityIndicator size="large" color="#007AFF" />
+      <ActivityIndicator size="large" color="#1E90FF" />
     </View>
   ) : (
     <ScrollView contentContainerStyle={styles.container}>
       <View style={styles.avatarContainer}>
-        <Avatar.Image size={100} source={{ uri: profile?.avatar || imageBase.defaultAvatar }} />
+        <Avatar.Icon 
+          size={100} 
+          icon={profile?.avatar ? "account" : "account-outline"}
+          source={profile?.avatar ? { uri: profile.avatar } : undefined}
+          backgroundColor={profile?.avatar ? "#fff" : "#e1e1e1"}
+        />
       </View>
 
       {editing ? (
         <>
           {renderInput('first_name', 'Name')}
-          {renderInput('bio', 'Bio')}
+          {/* {renderInput('bio', 'Bio')} */}
           {renderInput('email', 'Email', 'email-address')}
           {renderInput('mobile', 'Mobile', 'phone-pad')}
           {renderInput('gst', 'GST Number')}
@@ -109,6 +115,7 @@ const Profile = ({ navigation }) => {
           {renderInput('address_city', 'City')}
           {renderInput('address_state', 'State')}
           {renderInput('address_po_code', 'Postal Code', 'number-pad')}
+          {renderInput('address_country_code', 'Country Code')}
 
           <View style={styles.buttonGroup}>
             <Button mode="contained" onPress={updateContact} style={styles.button}>Save</Button>
@@ -119,7 +126,7 @@ const Profile = ({ navigation }) => {
         <>
           <View style={{ alignItems: 'center' }}>
   <Text style={styles.name}>{profile?.first_name}</Text>
-  <Text style={styles.bio}>{profile?.bio}</Text>
+  {/* <Text style={styles.bio}>{profile?.bio}</Text> */}
   <Text style={styles.text}>{profile?.email}</Text>
   <Text style={styles.text}>{profile?.mobile}</Text>
 

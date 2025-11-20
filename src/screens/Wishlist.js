@@ -35,7 +35,7 @@ import { AuthContext } from "../context/AuthContext";
 
 const clearCartItems=()=>{
     dispatch(clearWishlist(user)).then(()=>{
-        Alert.alert('Wishlist cleared')
+      
      dispatch(fetchWishlistItems(user));
                  })
                  .catch((error) => {
@@ -45,7 +45,7 @@ const clearCartItems=()=>{
 
   const handleDelete = (item) => {
     dispatch(deleteWishlistItem(item)).then(()=>{
-        Alert.alert('Item deleted')
+      
      dispatch(fetchWishlistItems(user));
                  })
                  .catch((error) => {

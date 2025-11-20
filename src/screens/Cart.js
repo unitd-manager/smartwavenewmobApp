@@ -15,14 +15,14 @@ import { AuthContext } from "../context/AuthContext";
   const [cartItems, setCartItems] = useState([]);
   const [loading, setLoading] = useState(false);
   const [remarks, setRemarks] = useState("");
-  //const [user, setUser] = useState();
+  const [userData, setUserData] = useState({});
 
 
   const { user, logout } = useContext(AuthContext);
 
   const dispatch = useDispatch();
   const { items, status } = useSelector((state) => state.cart);
-  
+  console.log('items',items);
   const [mailId, setmailId] = useState("");
   const getEmail = () => {
     api.get("/setting/getMailId").then((res) => {
@@ -55,34 +55,7 @@ const clearCartItems=()=>{
 
 //const cartItems = useSelector(state => state.cart.cartItems);
 console.log('cartpage',items)
-//   const fetchCartItems = () => {
-// 	console.log('cartpagefunction called')
-// 	api.post('/contact/getCartProductsByContactId',{contact_id:468})
-// 	.then((res) => {
-// 	  res.data.data.forEach(element => {
-// 		element.images=String(element.images).split(',')
-// 	  });
-// 	  console.log('respcart',res.data.data)
-// 	  setCartItems(res.data.data)
-// 	  setLoading(false);
-// 	  })
-// 	.catch((error) => {console.log('error',error)});
-//   };
 
-//   useEffect(() => {
-// 	console.log('useeffect running')
-// 	api.post('/contact/getCartProductsByContactId',{contact_id:468})
-// 	.then((res) => {
-// 	  res.data.data.forEach(element => {
-// 		element.images=String(element.images).split(',')
-// 	  });
-// 	  console.log('respcart',res.data.data)
-// 	  setCartItems(res.data.data)
-// 	  setLoading(false);
-// 	  })
-// 	.catch((error) => {});
-//     //fetchCartItems();
-//   }, []);
 const handleIncreaseQuantity = useCallback(
     (item) => {
       const updatedItem = { ...item, qty: item.qty + 1 };
@@ -101,136 +74,166 @@ const handleIncreaseQuantity = useCallback(
     [dispatch]
   );
 const generateCode = () => {
-    api
-      .post('/commonApi/getCodeValues', { type: 'enquiry' })
-      .then((res) => {
-        placeEnquiry(res.data.data);
-      })
-      .catch(() => {
-        placeEnquiry('');
-      });
-  };
+  api
+    .post("/commonApi/getCodeValues", { type: "enquiry" })
+    .then((res) => {
+      placeEnquiriesForAllProducts(res.data.data);
+    })
+    .catch(() => {
+      placeEnquiriesForAllProducts("");
+    });
+};
 
-  const placeEnquiry = (code) => {     
-    if (user) {
-      const enquiryDetails = {
-        contact_id : user.contact_id,
-        enquiry_date : new Date().toISOString().split('T')[0],
-        enquiry_type : 'Enquiry and order for Retail products.',
-        status : 'New',
-		email : user.email,
-		first_name : user.first_name,
-        title : 'Enquiry from ' + user.first_name,      
-        enquiry_code: code,
-        creation_date : new Date().toISOString().split('T')[0],
-        created_by: user.first_name,
-      };
-      api
-        .post("/enquiry/insertEnquiry", enquiryDetails)
-        .then((res) => {
-          const insertedId = res.data.data.insertId;
-          items.forEach((item) => {
-            const newItem = { ...item };
-            newItem.enquiry_id = insertedId;
-            newItem.quantity = newItem.qty;
-            newItem.product_id = newItem.product_id;
-            newItem.category_id = newItem.category_id;
-            newItem.created_by = user.first_name;
-            api
-              .post("/enquiry/insertQuoteItems", newItem)
-              .then(() => {
-                console.log("order placed");
-              })
-              .catch((err) => console.log(err));
-          });
-        }).then(() => {
-          console.log("cart user",user)
-          dispatch(clearCart(user));
-            // Make the API call
-      api
-      .post("/contact/clearCartItems", { contact_id: user.contact_id })
-       
-        })
-        .then(() => {
-          //alert("Enquiry Submitted Successfully");
-          navigation.navigate('Enquiry')
-        })
-        .catch((err) => console.log(err));
-    } else {
-      console.log("please login");
+const placeEnquiriesForAllProducts = async (code) => {
+  if (!user) return;
+
+  // 🔍 ADDRESS VALIDATION
+  const addressFields = [
+    userData.address1,
+    userData.address2,
+    userData.address_area,
+    userData.address_city,
+    userData.address_state,
+    userData.address_country_code,
+    userData.address_po_code
+  ];
+
+  const isAddressEmpty = addressFields.some(
+    (field) => !field || field.trim() === ""
+  );
+  const isFirstNameEmpty =
+    !userData.first_name || userData.first_name.trim() === "";
+
+  if (isAddressEmpty || isFirstNameEmpty) {
+    Alert.alert(
+      "Incomplete Profile",
+      "Please update your profile details including first name and full address.",
+      [
+        { text: "Cancel", style: "cancel" },
+        { text: "Go to Profile", onPress: () => navigation.navigate("MyAccount") }
+      ]
+    );
+    return;
+  }
+
+  // 🔥 GROUP CART ITEMS BY ORIGIN (Like your web version)
+  const groupedCartItems = items.reduce((acc, item) => {
+    if (!acc[item.origins]) {
+      acc[item.origins] = [];
     }
-    const orderDate = new Date();
-    const deliveryDate = new Date();
-    deliveryDate.setDate(orderDate.getDate() + 7);
+    acc[item.origins].push(item);
+    return acc;
+  }, {});
 
-    const formatDate = (date) => {
-      const day = String(date.getDate()).padStart(2, '0');
-      const month = String(date.getMonth() + 1).padStart(2, '0'); // Month is zero-based
-      const year = date.getFullYear();
-      return `${day}-${month}-${year}`;
+  // 🚀 LOOP GROUP-WISE AND CREATE ENQUIRY FOR EACH GROUP
+  for (const originKey in groupedCartItems) {
+    const productsInGroup = groupedCartItems[originKey];
+
+    const uniqueEnquiryCode = `${code}-${originKey}`;
+
+    const enquiryDetails = {
+      contact_id: user.contact_id,
+      enquiry_date: new Date().toISOString().split("T")[0],
+      enquiry_type: "Enquiry and order for Retail products.",
+      status: "New",
+      email: userData.email,
+      first_name: userData.first_name,
+      title:
+        `Enquiry for ${productsInGroup
+          .map((p) => p.title)
+          .join(", ")} from ` + userData.first_name,
+      enquiry_code: uniqueEnquiryCode,
+      creation_date: new Date().toISOString().split("T")[0],
+      created_by: userData.first_name,
+      shipping_address: [
+        userData.address || "",
+        userData.address1 || "",
+        userData.address2 || "",
+        userData.address_area || "",
+        userData.address_city || "",
+        userData.address_state || "",
+        userData.address_country_code || "",
+        userData.address_po_code || ""
+      ]
+        .filter(Boolean)
+        .join(", "),
     };
+
+    try {
+      // INSERT ENQUIRY
+      const res = await api.post("/enquiry/insertEnquiry", enquiryDetails);
+      const insertedId = res.data.data.insertId;
+
+      // INSERT QUOTE ITEMS
+      for (const item of productsInGroup) {
+        const quoteItem = {
+          enquiry_id: insertedId,
+          quantity: item.qty,
+          product_id: item.product_id,
+          category_id: item.category_id,
+          sub_category_id: item.sub_category_id,
+          created_by: userData.first_name,
+          first_name: userData.first_name,
+          email: userData.email,
+          grades: item.grade,
+          counts: item.counts,
+          origins: item.origins,
+          destination_port: item.destination_port,
+        };
+
+        await api.post("/enquiry/insertQuoteItems", quoteItem);
+      }
+    } catch (err) {
+      console.log("Enquiry Error", err);
+    }
+  }
+
+  // 🛒 CLEAR CART
+  dispatch(clearCart(user));
+  await api.post("/contact/clearCartItems", { contact_id: user.contact_id });
+
+  // 📧 SEND EMAIL
+  try {
+    await api.post("/commonApi/sendquoteMail", {
+      first_name: userData.first_name,
+      email: userData.email,
+      comments: `
+        New quote request from ${userData.first_name} (${userData.email}).
+
+        Products Requested:
+        ${items
+          .map((item) => `• ${item.title} (Qty: ${item.qty})`)
+          .join("\n")}
+      `,
+    });
+
+    Alert.alert("Success", "Your enquiry has been sent successfully.");
+  } catch (e) {
+    Alert.alert("Email Failed", "Unable to send enquiry email. Try again later.");
+  }
+
+  // 🎉 SUCCESS PAGE REDIRECT
+  navigation.navigate("EnquirySuccess");
+};
+
 
   
-    const to = mailId.email;
-    const toCustomer = user.email; // Customer's Email
-    const subject = "Smartwave Product Details";
-    
-    // Group all products into an array
-    const dynamic_template_data = {
-      first_name: items[0]?.first_name,
-      phone: items[0]?.phone, // Assuming same user for all products
-      address: items[0]?.address, // Assuming same user for all products
-      email: items[0]?.email, // Assuming same user for all products
-      // Assuming same user for all products
-      products: items.map((item) => ({
-        title: item.title,
-        qty: item.qty,
-      })),
-    };
-    // Send a single API request with all products
+const getUser = () => {
     api
-      .post("/commonApi/sendProductAdmin", { to, subject, dynamic_template_data })
+      .post("/contact/getContactsById", { contact_id: user.contact_id })
       .then((res) => {
-        console.log("Product admin email sent successfully.");
+        setUserData(res.data.data[0]);
       })
       .catch((err) => {
-        console.error("Error sending product admin email:", err);
+        console.log(err);
       });
-      
-  // Send Email to Customer (Customer Dynamic Template)
-api
-.post("/commonApi/sendProduct",{ toCustomer, subject, dynamic_template_data })
-.then((res) => {
-  console.log("Customer email sent successfully.");
-})
-.catch((err) => {
-  console.error("Error sending customer email:", err);
-});
-
-    {
-      
-      const to = user.email;
-      const dynamic_template_data= 
-      {
-     first_name:user.first_name,
-     order_date:formatDate(orderDate),
-     delivery_date:formatDate(deliveryDate),
-     order_status: "Paid"
-    };
-    api
-      .post('/commonApi/sendgmail',{to,dynamic_template_data})
-      .then(() => {
-        //Alert.alert("Send Mail Successfully")
-      })
-      .catch(() => {
-      //  Alert.alert("Mail not sent")
-      });
-    
-    };
-
   };
-
   
+   useEffect(() => {
+    if (user) {
+      getUser();
+    }
+  }, [ ]);
   useEffect(() => {
 	const initialize = async () => {
 	  try {
@@ -308,6 +311,11 @@ api
 								<Text style={styles.itemCategory}>
 									{item.product_type}
 								</Text>
+								{item.grade && <Text style={styles.itemDetailText}>Grade: {item.grade}</Text>}
+								{item.counts && <Text style={styles.itemDetailText}>Counts: {item.counts}</Text>}
+								{item.origins && <Text style={styles.itemDetailText}>Origins: {item.origins}</Text>}
+								{item.destination_port && <Text style={styles.itemDetailText}>Origins: {item.destination_port}</Text>}
+							
 							</TouchableOpacity>
 							<View style={styles.quantityContainer}>
 								<TouchableOpacity 
@@ -379,305 +387,7 @@ api
 		</SafeAreaView>
 	)
 }
-// const styles = StyleSheet.create({
-// 	container: {
-// 		flex: 1,
-// 		backgroundColor: "#FFFFFF",
-// 	},
-// 	box: {
-// 		width: 4,
-// 		height: 4,
-// 		backgroundColor: "#1EB1C5",
-// 	},
-// 	button: {
-// 		backgroundColor: "#FFFFFF",
-// 		borderColor: "#EEEFEE",
-// 		borderRadius: 10,
-// 		borderWidth: 1,
-// 		paddingVertical: 14,
-// 		paddingHorizontal: 18,
-// 		marginRight: 9,
-// 	},
-// 	button2: {
-// 		backgroundColor: "#FFFFFF",
-// 		borderColor: "#EEEFEE",
-// 		borderRadius: 10,
-// 		borderWidth: 1,
-// 		paddingVertical: 8,
-// 		paddingHorizontal: 15,
-// 		marginRight: 9,
-// 	},
-// 	button3: {
-// 		backgroundColor: "#FFFFFF",
-// 		borderColor: "#EEEFEE",
-// 		borderRadius: 10,
-// 		borderWidth: 1,
-// 		paddingVertical: 8,
-// 		paddingHorizontal: 17,
-// 		marginRight: 9,
-// 	},
-// 	button4: {
-// 		alignItems: "center",
-// 		backgroundColor: "#1EB1C5",
-// 		borderRadius: 10,
-// 		paddingVertical: 11,
-// 		marginHorizontal: 34,
-// 	},
-// 	column: {
-// 		alignItems: "flex-start",
-// 		marginRight: 21,
-// 	},
-// 	column2: {
-// 		alignItems: "center",
-// 		marginBottom: 8,
-// 	},
-// 	column3: {
-// 		alignItems: "flex-start",
-// 		marginRight: 43,
-// 	},
-// 	column4: {
-// 		alignItems: "flex-start",
-// 		marginRight: 48,
-// 	},
-// 	column5: {
-// 		alignItems: "center",
-// 		paddingVertical: 3,
-// 		paddingHorizontal: 4,
-// 		marginRight: 5,
-// 	},
-// 	column6: {
-// 		backgroundColor: "#FFFFFF",
-// 		borderColor: "#9CA7B7",
-// 		borderRadius: 10,
-// 		borderWidth: 1,
-// 		paddingVertical: 13,
-// 		marginBottom: 127,
-// 		marginHorizontal: 30,
-// 	},
-// 	image: {
-// 		width: 143,
-// 		height: 54,
-// 	},
-// 	image2: {
-// 		width: 24,
-// 		height: 24,
-// 		marginRight: 101,
-// 	},
-// 	image3: {
-// 		width: 80,
-// 		height: 80,
-// 		marginRight: 20,
-// 	},
-// 	image4: {
-// 		width: 12,
-// 		height: 1,
-// 		marginRight: 12,
-// 	},
-// 	image5: {
-// 		width: 12,
-// 		height: 12,
-// 	},
-// 	image6: {
-// 		width: 21,
-// 		height: 21,
-// 	},
-// 	image7: {
-// 		width: 80,
-// 		height: 80,
-// 		marginRight: 19,
-// 	},
-// 	image8: {
-// 		width: 12,
-// 		height: 8,
-// 		marginRight: 12,
-// 	},
-// 	image9: {
-// 		width: 80,
-// 		height: 80,
-// 		marginRight: 15,
-// 	},
-// 	image10: {
-// 		width: 8,
-// 		height: 1,
-// 	},
-// 	image11: {
-// 		width: 10,
-// 		height: 8,
-// 		marginRight: 4,
-// 	},
-// 	row: {
-// 		flexDirection: "row",
-// 		marginBottom: 8,
-// 	},
-// 	row2: {
-// 		flexDirection: "row",
-// 		alignItems: "center",
-// 		marginBottom: 18,
-// 		marginLeft: 30,
-// 	},
-// 	row3: {
-// 		flexDirection: "row",
-// 		alignItems: "center",
-// 		backgroundColor: "#FFFFFF",
-// 		paddingVertical: 15,
-// 		paddingHorizontal: 30,
-// 	},
-// 	row4: {
-// 		flexDirection: "row",
-// 		alignItems: "center",
-// 		paddingRight: 85,
-// 	},
-// 	row5: {
-// 		flexDirection: "row",
-// 		alignItems: "center",
-// 		paddingRight: 64,
-// 	},
-// 	row6: {
-// 		flexDirection: "row",
-// 		alignItems: "center",
-// 		backgroundColor: "#FFFFFF",
-// 		paddingVertical: 14,
-// 		paddingHorizontal: 30,
-// 		marginBottom: 57,
-// 	},
-// 	row7: {
-// 		flexDirection: "row",
-// 		alignItems: "center",
-// 		paddingRight: 67,
-// 	},
-// 	row8: {
-// 		flexDirection: "row",
-// 		alignItems: "center",
-// 		marginBottom: 12,
-// 		marginLeft: 31,
-// 	},
-// 	scrollView: {
-// 		flex: 1,
-// 		backgroundColor: "#FFFFFF",
-// 	},
-// 	text: {
-// 		color: "#000000",
-// 		fontSize: 17,
-// 		//fontWeight: "bold",
-// 		marginVertical: 18,
-// 		marginLeft: 31,
-// 		marginRight: 12,
-// 		fontFamily: 'Outfit-Regular',
-// 	},
-// 	text2: {
-// 		color: "#000000",
-// 		fontSize: 20,
-// 		margin: 10,
-// 		fontFamily: 'Outfit-Regular',
-// 	},
-// 	text3: {
-// 		color: "#000000",
-// 		fontSize: 14,
-// 		marginBottom: 8,
-// 		fontFamily: 'Outfit-Regular',
-// 	},
-// 	text4: {
-// 		color: "#9CA7B7",
-// 		fontSize: 12,
-// 		marginBottom: 1,
-// 		fontFamily: 'Outfit-Regular',
-// 	},
-// 	text5: {
-// 		color: "#000000",
-// 		fontSize: 16,
-// 		//fontWeight: "bold",
-// 		fontFamily: 'Outfit-Regular',
-// 	},
-// 	text6: {
-// 		color: "#9CA7B7",
-// 		fontSize: 12,
-// 		marginBottom: 9,
-// 		fontFamily: 'Outfit-Regular',
-// 	},
-// 	text7: {
-// 		color: "#000000",
-// 		fontSize: 14,
-// 		fontFamily: 'Outfit-Regular',
-// 	},
-// 	text8: {
-// 		color: "#9CA7B7",
-// 		fontSize: 11,
-// 		marginBottom: 75,
-// 		marginLeft: 16,
-// 		width: 163,
-// 		fontFamily: 'Outfit-Regular',
-// 	},
-// 	text9: {
-// 		color: "#FFFFFF",
-// 		fontSize: 16,
-// 		fontFamily: 'Outfit-Regular',
-// 	},
-// 	view: {
-// 		flex: 1,
-// 		alignItems: "flex-end",
-// 		marginRight: 12,
-// 	},
-// 	view2: {
-// 		alignItems: "flex-start",
-// 		paddingBottom: 11,
-// 		paddingHorizontal: 10,
-// 	},
-// 	view3: {
-// 		alignItems: "flex-end",
-// 	},
-// 	view4: {
-// 		backgroundColor: "#FFFFFF",
-// 		borderColor: "#DFF6FB",
-// 		borderTopLeftRadius: 15,
-// 		borderTopRightRadius: 15,
-// 		borderWidth: 1,
-// 		paddingVertical: 19,
-// 		shadowColor: "#959DA533",
-// 		shadowOpacity: 0.2,
-// 		shadowOffset: {
-// 		    width: 8,
-// 		    height: 0
-// 		},
-// 		shadowRadius: 24,
-// 		elevation: 24,
-// 	},
-// 	emptyContainer: {
-// 		flex: 1,
-// 		justifyContent: 'center',
-// 		alignItems: 'center',
-// 		marginTop: 50,
-// 	  },
-// 	  emptyText: {
-// 		fontSize: 18,
-// 		color: '#777',
-// 		marginBottom: 20,
-// 	  },
-// 	  homeButton: {
-// 		backgroundColor: "#1EB1C5",
-// 		paddingVertical: 12,
-// 		paddingHorizontal: 24,
-// 		borderRadius: 30,
-// 		elevation: 3,
-// 		shadowColor: "#000",
-// 		shadowOffset: { width: 0, height: 2 },
-// 		shadowOpacity: 0.2,
-// 		shadowRadius: 3,
-// 	  },
-	  
-// 	  homeButtonContent: {
-// 		flexDirection: "row",
-// 		alignItems: "center",
-// 		justifyContent: "center",
-// 	  },
-	  
-// 	  homeButtonText: {
-// 		color: "#fff",
-// 		fontSize: 16,
-// 		fontWeight: "bold",
-// 	  },
-	  
-	  
-// });
+
 const styles = StyleSheet.create({
 	container: {
 		flex: 1,
@@ -753,6 +463,12 @@ const styles = StyleSheet.create({
 		fontSize: 14,
 		color: "#666",
 		marginBottom: 8,
+		  fontFamily: 'Outfit-Regular',
+	},
+	itemDetailText: {
+		fontSize: 12,
+		color: "#888",
+		marginBottom: 2,
 		  fontFamily: 'Outfit-Regular',
 	},
 	quantityContainer: {

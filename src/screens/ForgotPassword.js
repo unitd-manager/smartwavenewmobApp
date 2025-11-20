@@ -85,9 +85,10 @@ useEffect(()=>{
         </Text>
 
         <Image
-          source={require('../assets/images/banner/forgot.png')} // Add your image to assets
+          source={require('../assets/images/banner/forgot.png')}
           style={styles.image}
           resizeMode="contain"
+          defaultSource={require('../assets/images/banner/forgot.png')}
         />
 
         {/* <View style={styles.inputBox}>

@@ -1,17 +1,14 @@
+import Icon from 'react-native-vector-icons/Ionicons';
 import React from "react";
 import { SafeAreaView, View, Text, Image, TouchableOpacity, StyleSheet } from "react-native";
  
-export default (props) => {
+export default ({navigation}) => {
 	return (
 		<SafeAreaView style={styles.container}>
 			<View style={styles.contentContainer}>
 				<View style={styles.mainContent}>
 					<View style={styles.view}>
-						<Image
-							source = {{uri: "https://storage.googleapis.com/tagjs-prod.appspot.com/pNd58t8xI9/4snqu74a.png"}} 
-							resizeMode = {"stretch"}
-							style={styles.image3}
-						/>
+						<Icon name="checkmark-circle-outline" size={150} color="#1EB1C5" />
 					</View>
 					<View style={styles.view2}>
 						<View style={styles.column}>
@@ -94,10 +91,7 @@ const styles = StyleSheet.create({
 		shadowRadius: 24,
 		elevation: 24,
 	},
-	image3: {
-		width: 187,
-		height: 187,
-	},
+
 	text3: {
 		color: "#000000",
 		fontSize: 26,

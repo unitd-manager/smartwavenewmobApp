@@ -14,12 +14,13 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import api from '../constants/api';
 import imageBase from '../constants/imageBase';
 import { useSelector, useDispatch } from 'react-redux';
-import { addToCart, fetchCartItems } from '../redux/slices/cartSlice';
+import { addToCart, fetchCartItems,updateCart } from '../redux/slices/cartSlice';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFocusEffect } from '@react-navigation/native';
 import { AuthContext } from '../context/AuthContext';
 import { addToWishlist, deleteWishlistItem, fetchWishlistItems } from '../redux/slices/wishlistSlice';
 //import BackButton from '../components/BackButton';
+import Toast from 'react-native-toast-message';
 
 const ProductListScreen = ({ route, navigation }) => {
   const { categoryId, categoryName, initialSubcategoryId, subcategoryName } = route.params || {};
@@ -38,11 +39,18 @@ const { user, logout } = useContext(AuthContext);
 
 const { wishitems, status } = useSelector((state) => state.wishlist);
 
+const { items: cartItems } = useSelector((state) => state.cart);
+
   const filteredProducts = products.filter((item) =>
     item.title?.toLowerCase().includes(searchQuery?.toLowerCase())
   );
    const [userData, setUser] = useState({});
-  
+//   const [toastVisible, setToastVisible] = useState(false);
+//   const [toastMessage, setToastMessage] = useState('');
+// const showToast = (message) => {
+//   setToastMessage(message);
+//   setToastVisible(true);
+// };
     const dispatch = useDispatch();
   // const addToCart = (id) => {
   //   // Implement cart logic
@@ -88,16 +96,20 @@ const { wishitems, status } = useSelector((state) => state.wishlist);
 
       if (existingCartItem) {
         // If it exists, update the quantity
-        const newQuantity = existingCartItem.quantity + 1;
+        const newQuantity = existingCartItem.qty + 1;
         dispatch(
           updateCart({
-            cart_id: existingCartItem.cart_id,
-            quantity: newQuantity,
+            basket_id: existingCartItem.basket_id,
+            qty: newQuantity,
             contact_id: user.contact_id,
           })
         )
           .then(() => {
-            Alert.alert('Item quantity updated in cart');
+            Toast.show({
+              type: 'success',
+              text1: `${date?.title} quantity updated in cart`,
+              position: 'bottom'
+            });
             dispatch(fetchCartItems(user));
           })
           .catch((error) => {
@@ -107,7 +119,11 @@ const { wishitems, status } = useSelector((state) => state.wishlist);
         // If it doesn't exist, add it as a new item
         dispatch(addToCart(updatedItem))
           .then(() => {
-            Alert.alert('Item added to cart');
+            Toast.show({
+              type: 'success',
+              text1: `${date?.title} added to cart`,
+              position: 'bottom'
+            });
             dispatch(fetchCartItems(user));
           })
           .catch((error) => {
@@ -122,7 +138,7 @@ const { wishitems, status } = useSelector((state) => state.wishlist);
  
   
      dispatch(deleteWishlistItem(data)) 
-             .then(() => { Alert.alert("Item removed from wishlist")
+             .then(() => {
                dispatch(fetchWishlistItems(user));
              })
              .catch((error) => {
@@ -140,7 +156,7 @@ const { wishitems, status } = useSelector((state) => state.wishlist);
       data.contact_id=user.contact_id
     
        dispatch(addToWishlist(data)) 
-               .then(() => { Alert.alert("Item added to wishlist")
+               .then(() => { 
                  dispatch(fetchWishlistItems(user));
                })
                .catch((error) => {
@@ -204,6 +220,30 @@ const { wishitems, status } = useSelector((state) => state.wishlist);
             res.data.data.forEach((element) => {
               element.tag = String(element.tag).split(",");
               element.images = String(element.images).split(",");
+               if (element.grades != null) {
+            element.grades = String(element.grades)
+              .split(",")
+              .map(grade => grade.trim())
+              .filter(el => el !== null && el !== '');
+          } else {
+            element.grades = [];
+          }
+           if (element.count != null) {
+            element.count = String(element.count)
+              .split(",")
+              .map(grade => grade.trim())
+              .filter(el => el !== null && el !== '');
+          } else {
+            element.count = [];
+          }
+           if (element.origin != null) {
+            element.origin = String(element.origin)
+              .split(",")
+              .map(grade => grade.trim())
+              .filter(el => el !== null && el !== '');
+          } else {
+            element.origin = [];
+          }
             });
             setProducts(res.data.data);
             setLoading(false)
@@ -222,6 +262,30 @@ const { wishitems, status } = useSelector((state) => state.wishlist);
           res.data.data.forEach((element) => {
             element.tag = String(element.tag).split(",");
             element.images = String(element.images).split(",");
+             if (element.grades != null) {
+            element.grades = String(element.grades)
+              .split(",")
+              .map(grade => grade.trim())
+              .filter(el => el !== null && el !== '');
+          } else {
+            element.grades = [];
+          }
+           if (element.count != null) {
+            element.count = String(element.count)
+              .split(",")
+              .map(grade => grade.trim())
+              .filter(el => el !== null && el !== '');
+          } else {
+            element.count = [];
+          }
+           if (element.origin != null) {
+            element.origin = String(element.origin)
+              .split(",")
+              .map(grade => grade.trim())
+              .filter(el => el !== null && el !== '');
+          } else {
+            element.origin = [];
+          }
           });
           setProducts(res.data.data);
           console.log('subcategoriespros',res.data.data);
@@ -238,6 +302,30 @@ const { wishitems, status } = useSelector((state) => state.wishlist);
         res.data.data.forEach((element) => {
           element.tag = String(element.tag).split(",");
           element.images = String(element.images).split(",");
+           if (element.grades != null) {
+            element.grades = String(element.grades)
+              .split(",")
+              .map(grade => grade.trim())
+              .filter(el => el !== null && el !== '');
+          } else {
+            element.grades = [];
+          }
+           if (element.count != null) {
+            element.count = String(element.count)
+              .split(",")
+              .map(grade => grade.trim())
+              .filter(el => el !== null && el !== '');
+          } else {
+            element.count = [];
+          }
+           if (element.origin != null) {
+            element.origin = String(element.origin)
+              .split(",")
+              .map(grade => grade.trim())
+              .filter(el => el !== null && el !== '');
+          } else {
+            element.origin = [];
+          }
         });
         setProducts(res.data.data);
       })
@@ -328,7 +416,7 @@ useEffect(()=>{
       </TouchableOpacity>
         <TouchableOpacity
           onPress={() =>{ 
-               if(item.grades && item.grades.length > 0){
+                if(item.grades && item.grades.length > 0 || item.count && item.count.length > 0 || item.origin && item.origin.length > 0){
                 // Navigate to ProductDetails for grade selection
                 navigation.navigate("ProductDetails", { productId: item.product_id })
                } else{

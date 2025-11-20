@@ -6,6 +6,7 @@ const ProductDetailsSection = ({ product }) => {
   const [showDetails, setShowDetails] = useState(false);
   const [showAdditional, setShowAdditional] = useState(false);
 const textWithoutTags = (product?.product_description || '').replace(/<[^>]*>/g, '');
+const desctextWithoutTags = (product?.description || '').replace(/<[^>]*>/g, '');
 
 const decodeHtmlEntities = (text) => {
   const entities = {
@@ -35,7 +36,8 @@ return (
         <Text style={styles.title}>Product Detail</Text>
       </View>
       <View style={styles.content}>
-        <Text style={styles.text}>{product?.description}</Text>
+         <Text style={styles.text}>{decodeHtmlEntities(desctextWithoutTags)}</Text>
+
       </View>
 
       {/* Additional Difference Section */}

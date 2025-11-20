@@ -22,9 +22,13 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import { AuthContext } from "../context/AuthContext";
 //import BackButton from "../components/BackButton";
 import GradeSelector from "../components/GradePicker";
+import CountSelector from "../components/CountPicker";
+import OriginSelector from "../components/OriginPicker";
 import ProductDetailsSection from "../components/ProductDetailsSection";
 import ProductImageGallery from "../components/ProductImageGallery";
 import Divider from "../components/Divider";
+import Toast from 'react-native-toast-message';
+import DestinationPortPicker from "../components/DestinationPortPicker";
 
 export default ({ route }) => {
   const { productId } = route.params || {};
@@ -34,10 +38,19 @@ export default ({ route }) => {
     product.variation ? product.variation[0].size[0].stock : product.qty_in_stock
   );
   const [quantityCount, setQuantityCount] = useState(1);
-  const [toastVisible, setToastVisible] = useState(false);
-  const [toastMessage, setToastMessage] = useState('');
+  // const [toastVisible, setToastVisible] = useState(false);
+  // const [toastMessage, setToastMessage] = useState('');
 
   const [selectedProductGrade, setSelectedProductGrade] = useState(
+   
+  );
+    const [selectedProductCount, setSelectedProductCount] = useState(
+   
+  );
+    const [selectedProductOrigin, setSelectedProductOrigin] = useState(
+   
+  );
+  const [selectedDestinationPort, setSelectedDestinationPort] = useState(
    
   );
 console.log('product',product);
@@ -51,15 +64,30 @@ const isInWishlist = () => {
   return wishitems?.some(item => item.product_id === product.product_id);
 };
 
-const showToast = (message) => {
-  setToastMessage(message);
-  setToastVisible(true);
-};
+// const showToast = (message) => {
+//   setToastMessage(message);
+//   setToastVisible(true);
+// };
 
 
   const addCart = (data) => {
  
     if(user){
+      // Check if any required option is missing
+      if (
+        (product.grades && product.grades.length > 0 && !selectedProductGrade) ||
+        (product.count && product.count.length > 0 && !selectedProductCount) ||
+        (product.origin && product.origin.length > 0 && !selectedProductOrigin)
+      ) {
+        let missing = [];
+        if (product.grades && product.grades.length > 0 && !selectedProductGrade) missing.push("grade");
+        if (product.count && product.count.length > 0 && !selectedProductCount) missing.push("count");
+        if (product.origin && product.origin.length > 0 && !selectedProductOrigin) missing.push("origin");
+        if (!selectedDestinationPort) missing.push("Destination Port");
+        Alert.alert("Alert", `Please select the ${missing.join(", ")} before add to cart`);
+        return; // Stop execution here
+      }
+
       const existingCartItem = cartItems.find(
         (item) =>
           item.product_id === data.product_id &&
@@ -71,51 +99,43 @@ const showToast = (message) => {
         const updatedQuantity = existingCartItem.qty + quantityCount;
         dispatch(updateCart({ ...existingCartItem, qty: updatedQuantity }))
           .then(() => {
-            showToast(`${data?.title} quantity updated in cart`);
+              Toast.show({
+              type: 'success',
+              text1: `${data?.title} quantity updated in cart`,
+              position: 'bottom'
+            });
             dispatch(fetchCartItems(user));
           })
           .catch((error) => {
             console.error('Failed to update cart item quantity:', error);
           });
       } else {
-        // Only require grade selection if product has valid grades
-        if(product.grades && product.grades.length > 0){
-          if(selectedProductGrade){
-          
-            data.contact_id=user.contact_id
-            data.grade=selectedProductGrade;
-            dispatch(addToCart(data)) 
-              .then(() => { 
-                showToast(`${data?.title} added to cart`);
-                dispatch(fetchCartItems(user));
-              })
-              .catch((error) => {
-                console.error('Failed to add to cart:', error);
-              });
-          } else{
-            Alert.alert(
-              "Alert",
-              "Please select the grade before add to cart"
-            )
-          }
-        } else {
-          // Product has no grades, add to cart directly
-          data.contact_id=user.contact_id;
-          dispatch(addToCart(data)) 
-            .then(() => { 
-              showToast(`${data?.title} added to cart`);
-              dispatch(fetchCartItems(user));
-            })
-            .catch((error) => {
-              console.error('Failed to add to cart:', error);
+        data.contact_id = user.contact_id;
+        if (selectedProductGrade) data.grade = selectedProductGrade;
+        if (selectedProductCount) data.counts = selectedProductCount;
+        if (selectedProductOrigin) data.origins = selectedProductOrigin;
+        
+         if (selectedDestinationPort) data.destination_port=selectedDestinationPort;
+        dispatch(addToCart(data))
+          .then(() => {
+            Toast.show({
+              type: 'success',
+              text1: `${data?.title} added to cart`,
+              position: 'bottom'
             });
-        }
+            dispatch(fetchCartItems(user));
+          })
+          .catch((error) => {
+            console.error('Failed to add to cart:', error);
+          });
       }
-    }
-    else{
-      Alert.alert("Please Login")
+    } else {
+      Alert.alert("Please Login");
     }
   };
+    
+  
+  
   const deleteWishlist = (data) => {
  
   
@@ -210,10 +230,21 @@ const showToast = (message) => {
     .map(grade => grade.trim())
     .filter(el => el !== null && el !== '');
 }
+if (data.count != null) {
+  data.count = String(data.count)
+    .split(",")
+    .map(grade => grade.trim())
+    .filter(el => el !== null && el !== '');
+}
+    if (data.origin != null) {
+  data.origin = String(data.origin)
+    .split(",")
+    .map(grade => grade.trim())
+    .filter(el => el !== null && el !== '');
+    }
         console.log('productdata',data);
         setProduct(data);
-      })
-      .catch((err) => {
+  }).catch((err) => {
         console.log(err);
       });
   }, []);
@@ -256,7 +287,10 @@ const showToast = (message) => {
 </View>
       <Divider width="90%" />
 <View style={styles.gradeview}>
-<GradeSelector product={product} selectedProductGrade={selectedProductGrade} setSelectedProductGrade={setSelectedProductGrade} setProductStock={setProductStock} setQuantityCount={setQuantityCount} />  
+{product?.grades?.length>0 && <GradeSelector product={product} selectedProductGrade={selectedProductGrade} setSelectedProductGrade={setSelectedProductGrade} setProductStock={setProductStock} setQuantityCount={setQuantityCount} />  }
+  {product?.count?.length>0 &&  <CountSelector product={product} selectedProductCount={selectedProductCount} setSelectedProductCount={setSelectedProductCount} setProductStock={setProductStock} setQuantityCount={setQuantityCount} />  }
+   {product?.origin?.length>0 && <OriginSelector product={product} selectedProductOrigin={selectedProductOrigin} setSelectedProductOrigin={setSelectedProductOrigin} setProductStock={setProductStock} setQuantityCount={setQuantityCount} /> } 
+    <DestinationPortPicker selectedDestinationPort={selectedDestinationPort} setSelectedDestinationPort={setSelectedDestinationPort}/>
     </View>
         <Image
           source={{
@@ -298,14 +332,14 @@ const showToast = (message) => {
           </TouchableOpacity>
         </View>
       </ScrollView>
-      <Snackbar
+      {/* <Snackbar
         visible={toastVisible}
         onDismiss={() => setToastVisible(false)}
         duration={3000}
         style={{ backgroundColor: '#1EB1C5' }}
       >
         {toastMessage}
-      </Snackbar>
+      </Snackbar> */}
     </SafeAreaView>
   );
 };
