@@ -4,7 +4,7 @@ buildscript {
         minSdkVersion = 24
         compileSdkVersion = 35
         targetSdkVersion = 35
-        ndkVersion = "23.1.7779620"
+        ndkVersion = "27.1.12297006"
         kotlinVersion = "2.0.21"
     }
     repositories {
@@ -19,3 +19,14 @@ buildscript {
 }
 
 apply plugin: "com.facebook.react.rootproject"
+
+allprojects {
+    repositories {
+        google()
+        mavenCentral()
+        // Explicit Google Maven URL as fallback
+        maven { url 'https://dl.google.com/dl/android/maven2/' }
+        // Local maven for some react-native modules (if needed)
+        maven { url("${rootDir}/../node_modules/react-native/android") }
+    }
+}
