@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { View, Text, Image, TouchableOpacity, StyleSheet, ScrollView, Alert } from 'react-native';
+import { View, Text, Image, TouchableOpacity, StyleSheet, ScrollView, Alert, useColorScheme } from 'react-native';
 import Icon from 'react-native-vector-icons/Feather';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import api from '../constants/api'; // your API setup
@@ -8,6 +8,8 @@ import { useDispatch } from 'react-redux';
 import { emptyCart } from '../redux/slices/cartSlice';
 
 const AccountScreen = ({ navigation }) => {
+  const isDarkMode = useColorScheme() === 'dark';
+  const styles = getStyles(isDarkMode);
   const [userData, setUserData] = useState(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 const dispatch=useDispatch();
@@ -149,8 +151,8 @@ const { user, logout } = useContext(AuthContext);
   );
 };
 
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#fff' },
+const getStyles = (isDarkMode) => StyleSheet.create({
+  container: { flex: 1, backgroundColor: isDarkMode ? '#1a1a1a' : '#fff' },
   backBtn: { margin: 20 },
   profileSection: {
     alignItems: 'center',
@@ -167,6 +169,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     marginTop: 10,
     fontFamily: 'Outfit-Regular',
+    color: isDarkMode ? '#fff' : '#000',
   },
   menu: {
     paddingHorizontal: 20,
@@ -188,6 +191,7 @@ const styles = StyleSheet.create({
   menuText: {
     fontSize: 16,
     fontFamily: 'Outfit-Regular',
+    color: isDarkMode ? '#fff' : '#000',
   },
   centered: {
     flex: 1,

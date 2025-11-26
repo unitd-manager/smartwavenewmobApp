@@ -1,12 +1,10 @@
 import React, { useState } from 'react';
-import DestinationPortPicker from './DestinationPortPicker';
 import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
 
 
 const ProductDetailsSection = ({ product }) => {
   const [showDetails, setShowDetails] = useState(false);
   const [showAdditional, setShowAdditional] = useState(false);
-  const [selectedDestinationPort, setSelectedDestinationPort] = useState(null);
 const textWithoutTags = (product?.product_description || '').replace(/<[^>]*>/g, '');
 const desctextWithoutTags = (product?.description || '').replace(/<[^>]*>/g, '');
 
@@ -41,11 +39,6 @@ return (
          <Text style={styles.text}>{decodeHtmlEntities(desctextWithoutTags)}</Text>
 
       </View>
-
-      <DestinationPortPicker
-        selectedDestinationPort={selectedDestinationPort}
-        setSelectedDestinationPort={setSelectedDestinationPort}
-      />
 
       {/* Additional Difference Section */}
       <TouchableOpacity style={styles.row} onPress={() => setShowAdditional(!showAdditional)}>

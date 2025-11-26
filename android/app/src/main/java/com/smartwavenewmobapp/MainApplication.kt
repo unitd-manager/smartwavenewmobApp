@@ -1,6 +1,8 @@
 package com.smartwave
 
 import android.app.Application
+import com.smartwavenewmobapp.BuildConfig
+import com.smartwavenewmobapp.R
 import com.facebook.react.PackageList
 import com.facebook.react.ReactApplication
 import com.facebook.react.ReactHost
@@ -21,6 +23,7 @@ class MainApplication : Application(), ReactApplication {
               // Packages that cannot be autolinked yet can be added manually here, for example:
               // add(MyReactNativePackage())
             }
+
 
         override fun getJSMainModuleName(): String = "index"
 

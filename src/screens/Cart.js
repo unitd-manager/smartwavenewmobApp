@@ -129,7 +129,14 @@ const placeEnquiriesForAllProducts = async (code) => {
   for (const originKey in groupedCartItems) {
     const productsInGroup = groupedCartItems[originKey];
 
-    const uniqueEnquiryCode = `${code}-${originKey}`;
+    let enquiryCode = "";
+    try {
+      const codeRes = await api.post("/commonApi/getCodeValues", { type: "enquiry" });
+      enquiryCode = codeRes.data.data;
+    } catch (codeErr) {
+      console.error("Error fetching enquiry code:", codeErr);
+      // Fallback or handle error appropriately, e.g., use a default or throw
+    }
 
     const enquiryDetails = {
       contact_id: user.contact_id,
@@ -142,7 +149,7 @@ const placeEnquiriesForAllProducts = async (code) => {
         `Enquiry for ${productsInGroup
           .map((p) => p.title)
           .join(", ")} from ` + userData.first_name,
-      enquiry_code: uniqueEnquiryCode,
+      enquiry_code: enquiryCode,
       creation_date: new Date().toISOString().split("T")[0],
       created_by: userData.first_name,
       shipping_address: [
@@ -178,7 +185,8 @@ const placeEnquiriesForAllProducts = async (code) => {
           grades: item.grade,
           counts: item.counts,
           origins: item.origins,
-          destination_port: item.destination_port,
+          destination_port: item.destination_port, // debug: destination_port value -> ${item.destination_port}
+            
         };
 
         await api.post("/enquiry/insertQuoteItems", quoteItem);
@@ -213,7 +221,7 @@ const placeEnquiriesForAllProducts = async (code) => {
   }
 
   // 🎉 SUCCESS PAGE REDIRECT
-  navigation.navigate("EnquirySuccess");
+  navigation.navigate("Enquiry");
 };
 
 
@@ -312,9 +320,9 @@ const getUser = () => {
 									{item.product_type}
 								</Text>
 								{item.grade && <Text style={styles.itemDetailText}>Grade: {item.grade}</Text>}
-								{item.counts && <Text style={styles.itemDetailText}>Counts: {item.counts}</Text>}
-								{item.origins && <Text style={styles.itemDetailText}>Origins: {item.origins}</Text>}
-								{item.destination_port && <Text style={styles.itemDetailText}>Origins: {item.destination_port}</Text>}
+								{item.counts && <Text style={styles.itemDetailText}>Count: {item.counts}</Text>}
+								{item.origins && <Text style={styles.itemDetailText}>Origin: {item.origins}</Text>}
+								{item.destination_port && <Text style={styles.itemDetailText}>DestinationPort: {item.destination_port}</Text>}
 							
 							</TouchableOpacity>
 							<View style={styles.quantityContainer}>
@@ -379,7 +387,7 @@ const getUser = () => {
 					</TouchableOpacity>
 					<TouchableOpacity style={styles.enquireButton} onPress={()=>generateCode()}>
 						<Text style={styles.enquireButtonText}>
-							{"Enquire Now"}
+							{"Request for Quote"}
 						</Text>
 					</TouchableOpacity>
 				</View>

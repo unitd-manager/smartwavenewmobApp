@@ -54,6 +54,7 @@ export default ({ route }) => {
    
   );
 console.log('product',product);
+console.log('selectedDestinationPort', selectedDestinationPort);
   const{user,logout}=useContext(AuthContext);
 
   const dispatch = useDispatch();
@@ -77,7 +78,8 @@ const isInWishlist = () => {
       if (
         (product.grades && product.grades.length > 0 && !selectedProductGrade) ||
         (product.count && product.count.length > 0 && !selectedProductCount) ||
-        (product.origin && product.origin.length > 0 && !selectedProductOrigin)
+        (product.origin && product.origin.length > 0 && !selectedProductOrigin) || 
+        (!selectedDestinationPort)
       ) {
         let missing = [];
         if (product.grades && product.grades.length > 0 && !selectedProductGrade) missing.push("grade");

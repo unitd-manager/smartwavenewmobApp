@@ -11,6 +11,7 @@ import {
   TextInput, // Added for searchable functionality
 } from 'react-native';
 import Modal from 'react-native-modal';
+import api from '../constants/api';
 
 const windowWidth = Dimensions.get('window').width;
 
@@ -51,13 +52,13 @@ const DestinationPortPicker = ({
   };
 
   const handleSelect = (port) => {
-    setSelectedDestinationPort(port);
+    setSelectedDestinationPort(port.destination_port);
     setModalVisible(false);
     setSearchText(''); // Clear search text on selection
   };
 
   const filteredPorts = destinationPorts.filter(port =>
-    port?.destination_port.toLowerCase().includes(searchText.toLowerCase())
+    port?.destination_port?.toLowerCase().includes(searchText?.toLowerCase())
   );
 
   return (
@@ -82,11 +83,6 @@ const DestinationPortPicker = ({
         <View
           style={[
             styles.dropdown,
-            {
-              top: dropdownTop,
-              left: dropdownLeft,
-              width: windowWidth - 64,
-            },
           ]}
         >
           <TextInput
@@ -109,7 +105,7 @@ const DestinationPortPicker = ({
                     item === '' && styles.placeholder,
                   ]}
                 >
-                  {item?.destination_port}
+                  {item?.destination_port},{item?.country}
                 </Text>
               </TouchableOpacity>
             )}
@@ -154,18 +150,19 @@ const styles = StyleSheet.create({
   },
   modal: {
     margin: 0,
-    justifyContent: 'flex-start',
+    justifyContent: 'center',
+    alignItems: 'center',
     fontFamily: 'Outfit-Regular',
   },
   dropdown: {
-    position: 'absolute',
     backgroundColor: '#fff',
     borderRadius: 8,
-    maxHeight: 200,
     paddingVertical: 8,
     elevation: 4,
     zIndex: 1000,
     fontFamily: 'Outfit-Regular',
+    width: windowWidth * 0.8, // Make it 80% of screen width
+    maxHeight: Dimensions.get('window').height * 0.7, // Max height 70% of screen height
   },
   searchInput: {
     height: 40,

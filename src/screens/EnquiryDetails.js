@@ -1,5 +1,6 @@
 import React, { useContext, useEffect,useState } from 'react';
 import { View, Text, StyleSheet, useColorScheme, TouchableOpacity,ScrollView, Alert,Image } from 'react-native';
+import Modal from 'react-native-modal';
 import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
 import AddressSelector from '../components/AddressSelector';
 import CarrierTrackingCard from '../components/CareerTrackingCard';
@@ -10,6 +11,7 @@ import { Button } from 'react-native-paper';
 import FilePickerPreview from '../components/FileUpload';
 import FileList from '../components/FileList';
 import { useNavigation } from '@react-navigation/native';
+import imageBase from '../constants/imageBase';
 
 const addresses = [
   {
@@ -54,6 +56,8 @@ const EnquiryDetails = ({ route }) => {
   const [profileImage, setProfileImage] = useState(null);
   
   const [deletion, setDeletion] = useState(false);
+
+  const [productModalVisible, setProductModalVisible] = useState(false);
 
   const [selectedAddressString, setSelectedAddressString] = useState('');
  const [file, setFile] = useState(null);
@@ -499,7 +503,8 @@ useEffect(()=>{
   .post(`/enquiry/getEnquiryProductsByEnquiryId`, { enquiry_id: enquiry.enquiry_id })
   .then((res) => {
     console.log('productslinked',res.data.data);
-    setProductsLinked(res.data.data);
+    console.log('First product image URI:', res.data.data.length > 0 ? `http://66.29.149.122:2013/storage/uploads/${res.data.data[0].image}` : 'No products');
+    setProductsLinked(res?.data?.data);
    
     
   })
@@ -595,6 +600,46 @@ const combinedAddressList = [profileAddress, ...addressList];
         <Text style={styles.label}>Address</Text>
         <Text style={styles.value}>{enquiry?.shipping_address}</Text>
       </View>
+
+      <TouchableOpacity
+        style={styles.viewProductsButton}
+        onPress={() => setProductModalVisible(true)}
+      >
+        <Text style={styles.viewProductsButtonText}>View Linked Products</Text>
+      </TouchableOpacity>
+      <Modal
+        isVisible={productModalVisible}
+        onBackdropPress={() => setProductModalVisible(false)}
+        backdropOpacity={0.3}
+        style={styles.modal}
+      >
+        <View style={[styles.modalContent, { backgroundColor: '#fff' }]}>
+          <Text style={[styles.modalTitle, { color: '#000' }]}>Linked Products</Text>
+          {productsLinked.length > 0 ? (
+            <ScrollView style={styles.productList}>
+              {productsLinked.map((item, index) => (
+                <View key={index} style={styles.tableRow}>
+                  <Text style={[styles.tableCell, { color: '#000' }]}>S.No: {index + 1}</Text>
+                  <Text style={[styles.tableCell, { color: '#000' }]}>Product: {item.product_title}</Text>
+                  <Text style={[styles.tableCell, { color: '#000' }]}>Grade: {item.grades}</Text>
+                  <Text style={[styles.tableCell, { color: '#000' }]}>Count: {item.counts}</Text>
+                  <Text style={[styles.tableCell, { color: '#000' }]}>Origin: {item.origins}</Text>
+                  <Text style={[styles.tableCell, { color: '#000' }]}>DestinationPort: {item.destination_port}</Text>
+                  <Text style={[styles.tableCell, { color: '#000' }]}>HSN: {item.hsn}</Text>
+                </View>
+              ))}
+            </ScrollView>
+          ) : (
+            <Text style={[styles.noProductsText, { color: '#666' }]}>No products linked to this enquiry.</Text>
+          )}
+          <TouchableOpacity
+            style={styles.closeButton}
+            onPress={() => setProductModalVisible(false)}
+          >
+            <Text style={styles.closeButtonText}>Close</Text>
+          </TouchableOpacity>
+        </View>
+      </Modal>
 
       <Text style={[styles.header, { textAlign: 'left', marginTop: 20, marginBottom: 10 }]}>Payment Receipt</Text>
  <FilePickerPreview title='Payment Receipt' setReceiptFile={setReceiptFile} updateFile={updateFile} setUpdateFile={setUpdateFile} receiptFile={receiptFile} handleUpload={handleUpload} />
@@ -788,6 +833,88 @@ const getStyles = (isDarkMode) =>
     },
      previewContainer: { marginTop: 20, flex: 1 },
       precontainer: { flex: 1, padding: 20 },
+    viewProductsButton: {
+      backgroundColor: '#007bff',
+      padding: 10,
+      borderRadius: 5,
+      marginTop: 20,
+      alignItems: 'center',
+    },
+    viewProductsButtonText: {
+      color: '#fff',
+      fontSize: 16,
+      fontWeight: 'bold',
+    },
+    modal: {
+      justifyContent: 'center',
+      alignItems: 'center',
+      margin: 0,
+    },
+    modalContent: {
+      backgroundColor: isDarkMode ? '#333' : '#fff',
+      padding: 20,
+      borderRadius: 10,
+      width: '80%',
+      maxHeight: '70%',
+    },
+    modalTitle: {
+      fontSize: 20,
+      fontWeight: 'bold',
+      marginBottom: 15,
+      color: isDarkMode ? '#fff' : '#333',
+      textAlign: 'center',
+    },
+    productList: {
+      flexGrow: 1,
+    },
+    productItem: {
+      flexDirection: 'row',
+      paddingVertical: 10,
+      borderBottomWidth: 1,
+      borderBottomColor: '#ccc',
+      alignItems: 'center',
+    },
+    productImage: {
+      width: 60,
+      height: 60,
+      borderRadius: 5,
+      marginRight: 10,
+    },
+    productDetails: {
+      flex: 1,
+    },
+    productName: {
+      fontSize: 16,
+      fontWeight: 'bold',
+      color: isDarkMode ? '#fff' : '#333',
+    },
+    productCategory: {
+      fontSize: 14,
+      color: isDarkMode ? '#ccc' : '#666',
+      marginBottom: 5,
+    },
+    productDetailText: {
+      fontSize: 12,
+      color: isDarkMode ? '#aaa' : '#555',
+    },
+    noProductsText: {
+      textAlign: 'center',
+      color: isDarkMode ? '#ccc' : '#666',
+      marginTop: 20,
+      fontSize: 16,
+    },
+    closeButton: {
+      backgroundColor: '#dc3545',
+      padding: 10,
+      borderRadius: 5,
+      marginTop: 20,
+      alignItems: 'center',
+    },
+    tableContainer: {
+      flex: 1,
+      fontSize: 16,
+      fontWeight: 'bold',
+    },
   });
 
 export default EnquiryDetails;

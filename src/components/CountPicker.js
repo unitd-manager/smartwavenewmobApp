@@ -75,11 +75,6 @@ const CountSelector = ({
           <View
             style={[
               styles.dropdown,
-              {
-                top: dropdownTop,
-                left: dropdownLeft,
-                width: windowWidth - 64,
-              },
             ]}
           >
             <FlatList
@@ -141,17 +136,18 @@ const styles = StyleSheet.create({
   },
   modal: {
     margin: 0,
-    justifyContent: 'flex-start',
+    justifyContent: 'center',
+    alignItems: 'center',
      fontFamily: 'Outfit-Regular',
   },
   dropdown: {
-    position: 'absolute',
     backgroundColor: '#fff',
     borderRadius: 8,
-    maxHeight: 200,
+    maxHeight: Dimensions.get('window').height * 0.7,
     paddingVertical: 8,
     elevation: 4,
     zIndex: 1000,
+    width: windowWidth * 0.8,
      fontFamily: 'Outfit-Regular',
   },
   option: {

@@ -1,5 +1,5 @@
 import React,{useState,useEffect, useContext} from 'react';
-import { View, Text, FlatList, StyleSheet,TouchableOpacity } from 'react-native';
+import { View, Text, FlatList, StyleSheet,TouchableOpacity, useColorScheme } from 'react-native';
 //import AsyncStorage from '@react-native-async-storage/async-storage';
 import { AuthContext } from '../context/AuthContext';
 import api from '../constants/api';
@@ -9,6 +9,8 @@ export default function EnquiryHistory({navigation}) {
 	const [enquiries, setEnquiries] = useState([]);
 	const [searchQuery, setSearchQuery] = useState(""); // Search state
    const [userData, setUser] = useState();
+   const isDarkMode = useColorScheme() === 'dark';
+   const styles = getStyles(isDarkMode);
 
 
    
@@ -114,20 +116,24 @@ export default function EnquiryHistory({navigation}) {
         data={enquiries}
         renderItem={renderItem}
         keyExtractor={(item, index) => `${item.enquiry_id}-${index}`}
+        getItemLayout={(data, index) => (
+          {length: 150, offset: 150 * index, index}
+        )}
         contentContainerStyle={{ paddingBottom: 20 }}
       />
     </View>
   );
 }
 
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f8f9fb', padding: 16,fontFamily: 'Outfit-Regular', },
+const getStyles = (isDarkMode) => StyleSheet.create({
+  container: { flex: 1, backgroundColor: isDarkMode ? '#1a1a1a' : '#f8f9fb', padding: 16,fontFamily: 'Outfit-Regular', },
   header: {
     fontSize: 20,
     fontWeight: '600',
     marginBottom: 16,
     textAlign: 'center',
     fontFamily: 'Outfit-Regular',
+    color: isDarkMode ? '#000' : '#000',
   },
   summaryContainer: {
     flexDirection: 'row',
@@ -136,19 +142,19 @@ const styles = StyleSheet.create({
     fontFamily: 'Outfit-Regular',
   },
   summaryCard: {
-    backgroundColor: '#fff',
+    backgroundColor: isDarkMode ? '#333' : '#fff',
     padding: 16,
     borderRadius: 12,
     width: '48%',
-    shadowColor: '#ccc',
+    shadowColor: isDarkMode ? '#000' : '#ccc',
     shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
+    shadowOpacity: isDarkMode ? 0.5 : 0.1,
     shadowRadius: 3,
     elevation: 3,
     fontFamily: 'Outfit-Regular',
   },
   summaryTitle: {
-    color: '#7b7b8b',
+    color: isDarkMode ? '#000' : '#7b7b8b',
     fontSize: 14,
     fontFamily: 'Outfit-Regular',
   },
@@ -157,9 +163,10 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginTop: 4,
     fontFamily: 'Outfit-Regular',
+    color: isDarkMode ? '#000' : '#000',
   },
   card: {
-    backgroundColor: '#fff',
+    backgroundColor: isDarkMode ? '#333' : '#fff',
     padding: 16,
     borderRadius: 12,
     marginBottom: 12,
@@ -170,15 +177,16 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '500',
     fontFamily: 'Outfit-Regular',
+    color: isDarkMode ? '#000' : '#000',
   },
   date: {
-    color: '#9a9a9a',
+    color: isDarkMode ? '#000' : '#9a9a9a',
     fontSize: 13,
     marginVertical: 4,
     fontFamily: 'Outfit-Regular',
   },
   label: {
-    color: '#3a3a3a',
+    color: isDarkMode ? '#000' : '#3a3a3a',
     fontSize: 14,
     fontFamily: 'Outfit-Regular',
   },
