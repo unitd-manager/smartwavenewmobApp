@@ -103,10 +103,10 @@ address_country_code: profile.address_country_code,
           {/* {renderInput('bio', 'Bio')} */}
           {renderInput('email', 'Email', 'email-address')}
           {renderInput('mobile', 'Mobile', 'phone-pad')}
-          {renderInput('gst', 'GST Number')}
+          {renderInput('gst', 'GST/Tax Registration Number')}
           {renderInput('fssai', 'FSSAI Number')}
-          {renderInput('iec', 'IEC Code')}
-          {renderInput('pan', 'PAN Number')}
+          {renderInput('iec', 'Import Export License')}
+          {renderInput('pan', 'PAN/BRC')}
 
           <Text style={styles.sectionHeader}>Address Details</Text>
           {renderInput('address1', 'Address Line 1')}
@@ -114,7 +114,7 @@ address_country_code: profile.address_country_code,
           {renderInput('address_area', 'Area')}
           {renderInput('address_city', 'City')}
           {renderInput('address_state', 'State')}
-          {renderInput('address_po_code', 'Postal Code', 'number-pad')}
+          {renderInput('address_po_code', 'Zip Code', 'number-pad')}
           {renderInput('address_country_code', 'Country Code')}
 
           <View style={styles.buttonGroup}>
