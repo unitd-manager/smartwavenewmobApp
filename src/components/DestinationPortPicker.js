@@ -85,12 +85,14 @@ const DestinationPortPicker = ({
             styles.dropdown,
           ]}
         >
-          <TextInput
-            style={styles.searchInput}
-            placeholder="Search ports..."
-            value={searchText}
-            onChangeText={setSearchText}
-          />
+         <TextInput
+  style={styles.searchInput}
+  placeholder="Search ports..."
+  placeholderTextColor="#888"  // 👈 ALWAYS visible
+  value={searchText}
+  onChangeText={setSearchText}
+/>
+
           <FlatList
             data={filteredPorts}
             keyExtractor={(item, index) => index.toString()}
@@ -164,16 +166,19 @@ const styles = StyleSheet.create({
     width: windowWidth * 0.8, // Make it 80% of screen width
     maxHeight: Dimensions.get('window').height * 0.7, // Max height 70% of screen height
   },
-  searchInput: {
-    height: 40,
-    borderColor: '#ccc',
-    borderWidth: 1,
-    borderRadius: 8,
-    marginHorizontal: 12,
-    marginBottom: 8,
-    paddingHorizontal: 10,
-    fontFamily: 'Outfit-Regular',
-  },
+ searchInput: {
+  height: 40,
+  borderColor: '#ccc',
+  borderWidth: 1,
+  borderRadius: 8,
+  marginHorizontal: 12,
+  marginBottom: 8,
+  paddingHorizontal: 10,
+  backgroundColor: '#fff',    // 👈 FORCE WHITE
+  color: '#000',              // 👈 FORCE BLACK TEXT
+  fontFamily: 'Outfit-Regular',
+},
+
   option: {
     paddingVertical: 12,
     paddingHorizontal: 16,
