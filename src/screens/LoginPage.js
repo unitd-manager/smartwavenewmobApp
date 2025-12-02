@@ -197,7 +197,7 @@ const SignInScreen = () => {
 
         {/* SIGN UP */}
         <View style={styles.footer}>
-          <Text>First time here </Text>
+          <Text style={styles.footertext}>First time here </Text>
           <TouchableOpacity onPress={() => navigation.navigate('Signup')}>
             <Text style={styles.highlight}>Sign Up</Text>
           </TouchableOpacity>
@@ -306,4 +306,7 @@ const styles = StyleSheet.create({
     color: '#000',
     marginTop: 10,
   },
+   footertext: {
+    color: '#000',
+  }
 });

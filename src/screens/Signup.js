@@ -242,7 +242,7 @@ const SignUpScreen = ({ navigation }) => {
 
         {/* FOOTER */}
         <View style={styles.footer}>
-          <Text>Already have an account?</Text>
+          <Text style={styles.footertext}>Already have an account?</Text>
           <TouchableOpacity onPress={() => navigation.navigate('LoginPage')}>
             <Text style={styles.loginLink}> Login</Text>
           </TouchableOpacity>
@@ -274,6 +274,9 @@ const styles = StyleSheet.create({
   },
   titleHighlight: {
     color: '#00B4D8',
+  },
+  footertext: {
+    color: '#000',
   },
   subtitle: {
     textAlign: 'center',
