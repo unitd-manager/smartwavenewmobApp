@@ -267,6 +267,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 26,
+    color:'#000',
     fontWeight: '600',
     textAlign: 'center',
     marginBottom: 8,
@@ -292,6 +293,7 @@ const styles = StyleSheet.create({
     padding: 12,
     backgroundColor: '#fafafa',
     fontSize: 14,
+    color: '#000',
     marginBottom: 4,
   },
   passwordContainer: {
@@ -331,6 +333,7 @@ const styles = StyleSheet.create({
   },
  footer: {
     marginTop: 20,
+    color: '#000',
     flexDirection: 'row',
     justifyContent: 'center',
   },
