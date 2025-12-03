@@ -1,4 +1,4 @@
-package com.smartwave
+package com.smartwavenewmobapp
 
 import android.app.Application
 import com.smartwavenewmobapp.BuildConfig
