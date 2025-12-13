@@ -1,4 +1,4 @@
-package com.smartwave
+package com.smartwavenewmobapp
 
 import com.facebook.react.ReactActivity
 import com.facebook.react.ReactActivityDelegate
