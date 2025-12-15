@@ -38,7 +38,7 @@ const getCommonHeaderOptions = (navigation) => ({
   },
   headerRight: () => (
     <NotificationIcon
-      onPress={() => navigation.navigate('NotificationList')}
+     onPress={() => navigation.navigate('Home', { screen: 'NotificationList' })}
       color="#fff"
     />
   ),
