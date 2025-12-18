@@ -257,6 +257,10 @@ const handleSearch = text => {
         handleChange('mobile_country_code', item.dial_code);
         setShowPicker(false);
       }}
+      search={search}
+      onSearch={handleSearch}
+      filteredCountries={filteredCountries}
+      styles={styles}
     />
 </View>
 
@@ -433,7 +437,8 @@ const styles = StyleSheet.create({
     borderColor: '#ced4da',
     borderRadius: 6,
     padding: 12,
-    marginBottom: 12
+    marginBottom: 12,
+    color: '#000',
   },
   countryRow: {
     flexDirection: 'row',
@@ -446,7 +451,9 @@ const styles = StyleSheet.create({
     marginRight: 12
   },
   countryText: {
-    fontSize: 14
+    fontSize: 14,
+    color: '#000',
+    fontFamily: 'Outfit-Regular',
   }
 
 });
