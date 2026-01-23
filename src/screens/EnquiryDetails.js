@@ -238,7 +238,21 @@ useEffect(() => {
   
     if (selectedAddr) {
       // Concatenate address fields
-      const fullAddress = `${selectedAddr.shipper_name}, ${selectedAddr.address_flat}, ${selectedAddr.address_street}, ${selectedAddr.address_city}, ${selectedAddr.address_town}, ${selectedAddr.address_state}, ${selectedAddr.address_country} - ${selectedAddr.address_po_code}${selectedAddr.phone ? `, Phone: ${selectedAddr.phone}` : ''}`;
+      const addressParts = [
+  selectedAddr.shipper_name,
+  selectedAddr.address_flat,
+  selectedAddr.address_street,
+  selectedAddr.address_city,
+  selectedAddr.address_town,
+  selectedAddr.address_state,
+  selectedAddr.address_country,
+].filter(Boolean); // removes null, undefined, ""
+
+const fullAddress =
+  `${addressParts.join(', ')}${selectedAddr.address_po_code ? ` - ${selectedAddr.address_po_code}` : ''}` +
+  `${selectedAddr.phone ? `, Phone: ${selectedAddr.phone}` : ''}`;
+
+      // const fullAddress = `${selectedAddr.shipper_name}, ${selectedAddr.address_flat}, ${selectedAddr.address_street}, ${selectedAddr.address_city}, ${selectedAddr.address_town}, ${selectedAddr.address_state}, ${selectedAddr.address_country} - ${selectedAddr.address_po_code}${selectedAddr.phone ? `, Phone: ${selectedAddr.phone}` : ''}`;
   
       // Set the formatted address string
       setSelectedAddressString(fullAddress);

@@ -17,6 +17,7 @@ import { AuthContext } from "../context/AuthContext";
   const [remarks, setRemarks] = useState("");
   const [userData, setUserData] = useState({});
 
+  const [container, setContainer] = useState("");
 
   const { user, logout } = useContext(AuthContext);
 
@@ -224,7 +225,20 @@ const placeEnquiriesForAllProducts = async (code) => {
   navigation.navigate("Enquiry");
 };
 
+const getContainer = () => {
+  api.get("/setting/getContainer").then((res) => {
 
+    if (res.data.data.length > 0) {
+      const value = res.data.data[0].value;
+      try {
+        const parsed = JSON.parse(value);
+        setContainer(parsed.map((v) => v.label).join(" / "));
+      } catch (e) {
+        setContainer(value);
+      }
+    }
+  });
+};
   
 const getUser = () => {
     api
@@ -240,6 +254,7 @@ const getUser = () => {
    useEffect(() => {
     if (user) {
       getUser();
+	  getContainer();
     }
   }, [ ]);
   useEffect(() => {
@@ -319,6 +334,8 @@ const getUser = () => {
 								<Text style={styles.itemCategory}>
 									{item.product_type}
 								</Text>
+								{container && <Text style={styles.itemDetailText}>Type of Containers: {container}</Text>}
+							
 								{item.grade && <Text style={styles.itemDetailText}>Grade: {item.grade}</Text>}
 								{item.counts && <Text style={styles.itemDetailText}>Count: {item.counts}</Text>}
 								{item.origins && <Text style={styles.itemDetailText}>Origin: {item.origins}</Text>}
