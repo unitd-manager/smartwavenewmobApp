@@ -5,8 +5,9 @@ class NotificationService {
   // Get user token from AsyncStorage
   async getAuthToken() {
     try {
-      const token = await AsyncStorage.getItem('userToken');
-      return token;
+      const token = await AsyncStorage.getItem('token');
+      // If token was stored as JSON string, parse it
+      return token ? JSON.parse(token) : null;
     } catch (error) {
       console.error('Error getting auth token:', error);
       return null;

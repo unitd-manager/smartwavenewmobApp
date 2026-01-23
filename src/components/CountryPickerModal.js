@@ -7,13 +7,22 @@ import {
   FlatList,
   Image
 } from 'react-native';
-const CountryPickerModal = ({ onSelect }) => (
-  <Modal visible={showPicker} animationType="slide">
+
+const CountryPickerModal = ({
+  visible,
+  onClose,
+  onSelect,
+  search = '',
+  onSearch = () => {},
+  filteredCountries = [],
+  styles = {}
+}) => (
+  <Modal visible={visible} animationType="slide" onRequestClose={onClose} transparent={false}>
     <View style={{ flex: 1, padding: 16 }}>
       <TextInput
         placeholder="Search country or code"
         value={search}
-        onChangeText={handleSearch}
+        onChangeText={onSearch}
         style={styles.searchInput}
       />
 
@@ -25,7 +34,7 @@ const CountryPickerModal = ({ onSelect }) => (
             style={styles.countryRow}
             onPress={() => {
               onSelect(item);
-              setShowPicker(false);
+              onClose && onClose();
             }}
           >
             <Image
@@ -43,4 +52,5 @@ const CountryPickerModal = ({ onSelect }) => (
     </View>
   </Modal>
 );
- export default CountryPickerModal;
+
+export default CountryPickerModal;

@@ -250,11 +250,18 @@ const handleSearch = text => {
     />
   </View>
 
-  <CountryPickerModal
-    onSelect={item => {
-      handleChange('mobile_country_code', item.dial_code);
-    }}
-  />
+ <CountryPickerModal
+      visible={showPicker}
+      onClose={() => setShowPicker(false)}
+      onSelect={item => {
+        handleChange('mobile_country_code', item.dial_code);
+        setShowPicker(false);
+      }}
+      search={search}
+      onSearch={handleSearch}
+      filteredCountries={filteredCountries}
+      styles={styles}
+    />
 </View>
 <CustomInput
           placeholder="Company Name"
@@ -269,7 +276,7 @@ const handleSearch = text => {
           multiline
           numberOfLines={4}
           error={errors.comments}
-          style={{ height: 100 }}
+          style={{ height: 100,color: '#000', textAlignVertical: 'top' }}
         />
 
         <Button
@@ -427,14 +434,16 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#ced4da',
     borderRadius: 6,
-    paddingHorizontal: 12
+    paddingHorizontal: 12,
+    color: '#000',
   },
   searchInput: {
     borderWidth: 1,
     borderColor: '#ced4da',
     borderRadius: 6,
     padding: 12,
-    marginBottom: 12
+    marginBottom: 12,
+    color: '#000',
   },
   countryRow: {
     flexDirection: 'row',
@@ -447,7 +456,9 @@ const styles = StyleSheet.create({
     marginRight: 12
   },
   countryText: {
-    fontSize: 14
+    fontSize: 14,
+    color: '#000',
+    fontFamily: 'Outfit-Regular',
   }
 
 });

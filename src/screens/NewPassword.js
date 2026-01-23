@@ -7,6 +7,9 @@ import {
   StyleSheet,
   Image,
   Alert,
+  ScrollView,
+  KeyboardAvoidingView,
+  Platform
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Feather'; // For eye icon
 import api from '../constants/api';
@@ -40,75 +43,86 @@ const NewPasswordScreen = ({ route,navigation }) => {
   };
 
   return (
-    <View style={styles.container}>
-      <TouchableOpacity style={styles.backBtn} onPress={() => navigation.goBack()}>
-        <Icon name="arrow-left" size={24} color="#000" />
-      </TouchableOpacity>
-
-      <Image
-        source={require('../assets/images/banner/newpass.png')} // Use your image here
-        style={styles.image}
-        resizeMode="contain"
-      />
-
-      <Text style={styles.title}>
-        Enter <Text style={styles.highlight}>New Password</Text>
-      </Text>
-      <Text style={styles.subtitle}>Please enter new password</Text>
-
-      <View style={styles.inputContainer}>
-        <Text style={styles.label}>Password</Text>
-        <View style={styles.passwordBox}>
-          <TextInput
-            style={styles.input}
-            secureTextEntry={!showPassword}
-            value={password}
-            onChangeText={setPassword}
-            placeholder="••••••"
-          />
-          <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
-            <Icon
-              name={showPassword ? 'eye' : 'eye-off'}
-              size={20}
-              color="#888"
-            />
-          </TouchableOpacity>
-        </View>
-      </View>
-
-      <View style={styles.inputContainer}>
-        <Text style={styles.label}>Confirm Password</Text>
-        <View style={styles.passwordBox}>
-          <TextInput
-            style={styles.input}
-            secureTextEntry={!showConfirmPassword}
-            value={confirmPassword}
-            onChangeText={setConfirmPassword}
-            placeholder="••••••"
-          />
-          <TouchableOpacity onPress={() => setShowConfirmPassword(!showConfirmPassword)}>
-            <Icon
-              name={showConfirmPassword ? 'eye' : 'eye-off'}
-              size={20}
-              color="#888"
-            />
-          </TouchableOpacity>
-        </View>
-      </View>
-
-      <TouchableOpacity style={styles.signUpBtn} onPress={handleSignUp}>
-        <Text style={styles.signUpText}>Submit</Text>
-      </TouchableOpacity>
-
-      <View style={styles.loginFooter}>
-        <Text style={styles.footerText}>Already have an account? </Text>
-        <TouchableOpacity onPress={() => navigation.navigate('Login')}>
-          <Text style={styles.loginLink}>Login</Text>
+    <KeyboardAvoidingView
+      style={{ flex: 1 }}
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      keyboardVerticalOffset={Platform.OS === 'ios' ? 40 : 0}
+    >
+      <ScrollView
+        contentContainerStyle={styles.container}
+        keyboardShouldPersistTaps="handled"
+      >
+        <TouchableOpacity style={styles.backBtn} onPress={() => navigation.goBack()}>
+          <Icon name="arrow-left" size={24} color="#000" />
         </TouchableOpacity>
-      </View>
-	   <PasswordUpdateModal visible={modalVisible} onClose={() => {setModalVisible(false); Navigation.navigate('LoginPage')}} />
-    
-    </View>
+
+        <Image
+          source={require('../assets/images/banner/newpass.png')} // Use your image here
+          style={styles.image}
+          resizeMode="contain"
+        />
+
+        <Text style={styles.title}>
+          Enter <Text style={styles.highlight}>New Password</Text>
+        </Text>
+        <Text style={styles.subtitle}>Please enter new password</Text>
+
+        <View style={styles.inputContainer}>
+          <Text style={styles.label}>Password</Text>
+          <View style={styles.passwordBox}>
+            <TextInput
+              style={styles.input}
+              secureTextEntry={!showPassword}
+              value={password}
+              onChangeText={setPassword}
+              placeholder="••••••"
+            />
+            <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
+              <Icon
+                name={showPassword ? 'eye' : 'eye-off'}
+                size={20}
+                color="#888"
+              />
+            </TouchableOpacity>
+          </View>
+        </View>
+
+        <View style={styles.inputContainer}>
+          <Text style={styles.label}>Confirm Password</Text>
+          <View style={styles.passwordBox}>
+            <TextInput
+              style={[styles.input, {paddingRight: 32}]}
+              secureTextEntry={!showConfirmPassword}
+              value={confirmPassword}
+              onChangeText={setConfirmPassword}
+              placeholder="••••••"
+            />
+            <TouchableOpacity
+              style={{position: 'absolute', right: 10, height: '100%', justifyContent: 'center'}}
+              onPress={() => setShowConfirmPassword(!showConfirmPassword)}
+            >
+              <Icon
+                name={showConfirmPassword ? 'eye' : 'eye-off'}
+                size={20}
+                color="#888"
+              />
+            </TouchableOpacity>
+          </View>
+        </View>
+
+        <TouchableOpacity style={styles.signUpBtn} onPress={handleSignUp}>
+          <Text style={styles.signUpText}>Submit</Text>
+        </TouchableOpacity>
+
+        <View style={styles.loginFooter}>
+          <Text style={styles.footerText}>Already have an account? </Text>
+          <TouchableOpacity onPress={() => navigation.navigate('Login')}>
+            <Text style={styles.loginLink}>Login</Text>
+          </TouchableOpacity>
+        </View>
+        <PasswordUpdateModal visible={modalVisible} onClose={() => {setModalVisible(false); Navigation.navigate('LoginPage')}} />
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 };
 

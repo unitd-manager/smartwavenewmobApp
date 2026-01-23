@@ -1,16 +1,29 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { View, Text, TextInput, FlatList, TouchableOpacity, Alert, StyleSheet, Modal, ScrollView } from 'react-native';
+import { View, Text, TextInput, FlatList, TouchableOpacity, Alert, StyleSheet, Modal, ScrollView, useColorScheme } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome'; // ✅ Import icons
 import api from '../constants/api';
 import { AuthContext } from '../context/AuthContext';
 
+const buttonStyles = StyleSheet.create({
+  curvedButton: {
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 10,
+    alignItems: 'center',
+    marginVertical: 5,
+  },
+  curvedButtonText: { color: '#fff', fontSize: 16, fontFamily: 'Outfit-Regular' },
+});
+
 const CurvedButton = ({ title, onPress, color = '#00B4D8' }) => (
-  <TouchableOpacity onPress={onPress} style={[styles.curvedButton, { backgroundColor: color }]}>
-    <Text style={styles.curvedButtonText}>{title}</Text>
+  <TouchableOpacity onPress={onPress} style={[buttonStyles.curvedButton, { backgroundColor: color }]}>
+    <Text style={buttonStyles.curvedButtonText}>{title}</Text>
   </TouchableOpacity>
 );
 
 const ShippingAddress = () => {
+  const colorScheme = useColorScheme();
+  const isDarkMode = colorScheme === 'dark';
   const [enquiries, setEnquiries] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
   const [editMode, setEditMode] = useState(false);
@@ -114,6 +127,8 @@ const ShippingAddress = () => {
     ]);
   };
 
+  const styles = getStyles(isDarkMode);
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Shipping Address</Text>
@@ -126,8 +141,8 @@ const ShippingAddress = () => {
             <View style={styles.cardHeader}>
               <View style={{ flex: 1 }}>
                 <Text style={styles.cardTitle}>{item.shipper_name}</Text>
-                <Text>{item.address_flat}, {item.address_street}, {item.address_town}</Text>
-                <Text>{item.address_state}, {item.address_country} {item.address_po_code}</Text>
+                <Text style={styles.cardText}>{item.address_flat}, {item.address_street}, {item.address_town}</Text>
+                <Text style={styles.cardText}>{item.address_state}, {item.address_country} {item.address_po_code}</Text>
               </View>
 
               {/* Icons on right side */}
@@ -209,18 +224,19 @@ const ShippingAddress = () => {
 
 export default ShippingAddress;
 
-const styles = StyleSheet.create({
+const getStyles = (isDarkMode) => StyleSheet.create({
   container: { padding: 20, flex: 1, fontFamily: 'Outfit-Regular' },
-  title: { fontSize: 22, fontWeight: 'bold', textAlign: 'center', marginBottom: 20, fontFamily: 'Outfit-Regular' },
-  card: { borderBottomWidth:0.3, backgroundColor: '#f0f0f0', padding: 15, borderRadius: 8, marginBottom: 15, fontFamily: 'Outfit-Regular' },
+  title: { fontSize: 22, fontWeight: 'bold', textAlign: 'center', marginBottom: 20, color: isDarkMode ? '#000' : '#000', fontFamily: 'Outfit-Regular' },
+  card: { borderBottomWidth:0.3, padding: 15, borderRadius: 8, marginBottom: 15, fontFamily: 'Outfit-Regular' },
   cardHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  cardTitle: { fontWeight: 'bold', fontSize: 16, fontFamily: 'Outfit-Regular' },
+  cardTitle: { fontWeight: 'bold', fontSize: 16, color: isDarkMode ? '#000' : '#000', fontFamily: 'Outfit-Regular' },
+  cardText: { color: isDarkMode ? '#333' : '#333', fontFamily: 'Outfit-Regular' },
   iconRow: { flexDirection: 'row', alignItems: 'center' },
   iconButton: { marginLeft: 12 },
   modalContent: { padding: 20, fontFamily: 'Outfit-Regular' },
-  modalTitle: { fontSize: 18, fontWeight: 'bold', marginBottom: 15, fontFamily: 'Outfit-Regular' },
+  modalTitle: { fontSize: 18, fontWeight: 'bold', marginBottom: 15, color: isDarkMode ? '#000' : '#000', fontFamily: 'Outfit-Regular' },
   inputGroup: { marginBottom: 10, fontFamily: 'Outfit-Regular' },
-  input: { borderWidth: 1, borderColor: '#ccc', borderRadius: 5, padding: 10, fontFamily: 'Outfit-Regular' },
+  input: { borderWidth: 1, borderColor: '#ccc', borderRadius: 5, padding: 10, fontFamily: 'Outfit-Regular',color:'#000' },
   errorText: { color: 'red', fontSize: 12, fontFamily: 'Outfit-Regular' },
   customButton: {
     backgroundColor: '#00B4D8',
@@ -232,7 +248,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Outfit-Regular',
   },
   customButtonText: { color: '#fff', fontFamily: 'Outfit-Regular' },
-  inputLabel: { fontSize: 14, marginBottom: 5, fontFamily: 'Outfit-Regular' },
+  inputLabel: { fontSize: 14, marginBottom: 5, color: isDarkMode ? '#000' : '#000', fontFamily: 'Outfit-Regular' },
   buttonRow: { marginVertical: 8 },
   editButtonWrapper: { marginTop: 30, fontFamily: 'Outfit-Regular' },
   curvedButton: {
