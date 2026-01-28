@@ -263,7 +263,12 @@ const handleSearch = text => {
       styles={styles}
     />
 </View>
-
+<CustomInput
+          placeholder="Company Name"
+          value={user.company_name}
+          onChangeText={(text) => handleChange('company_name', text)}
+          error={errors.company_name}
+        />
         <CustomInput
           placeholder="Message"
           value={user.comments}

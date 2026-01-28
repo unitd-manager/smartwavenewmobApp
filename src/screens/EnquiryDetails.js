@@ -238,7 +238,21 @@ useEffect(() => {
   
     if (selectedAddr) {
       // Concatenate address fields
-      const fullAddress = `${selectedAddr.shipper_name}, ${selectedAddr.address_flat}, ${selectedAddr.address_street}, ${selectedAddr.address_city}, ${selectedAddr.address_town}, ${selectedAddr.address_state}, ${selectedAddr.address_country} - ${selectedAddr.address_po_code}${selectedAddr.phone ? `, Phone: ${selectedAddr.phone}` : ''}`;
+      const addressParts = [
+  selectedAddr.shipper_name,
+  selectedAddr.address_flat,
+  selectedAddr.address_street,
+  selectedAddr.address_city,
+  selectedAddr.address_town,
+  selectedAddr.address_state,
+  selectedAddr.address_country,
+].filter(Boolean); // removes null, undefined, ""
+
+const fullAddress =
+  `${addressParts.join(', ')}${selectedAddr.address_po_code ? ` - ${selectedAddr.address_po_code}` : ''}` +
+  `${selectedAddr.phone ? `, Phone: ${selectedAddr.phone}` : ''}`;
+
+      // const fullAddress = `${selectedAddr.shipper_name}, ${selectedAddr.address_flat}, ${selectedAddr.address_street}, ${selectedAddr.address_city}, ${selectedAddr.address_town}, ${selectedAddr.address_state}, ${selectedAddr.address_country} - ${selectedAddr.address_po_code}${selectedAddr.phone ? `, Phone: ${selectedAddr.phone}` : ''}`;
   
       // Set the formatted address string
       setSelectedAddressString(fullAddress);
@@ -641,20 +655,20 @@ const combinedAddressList = [profileAddress, ...addressList];
         </View>
       </Modal>
 
-      <Text style={[styles.header, { textAlign: 'left', marginTop: 20, marginBottom: 10 }]}>Payment Receipt</Text>
- <FilePickerPreview title='Payment Receipt' setReceiptFile={setReceiptFile} updateFile={updateFile} setUpdateFile={setUpdateFile} receiptFile={receiptFile} handleUpload={handleUpload} />
+      <Text style={[styles.header, { textAlign: 'left', marginTop: 20, marginBottom: 10 }]}>Proforma Invoice</Text>
+ <FilePickerPreview title='Proforma Invoice' setReceiptFile={setReceiptFile} updateFile={updateFile} setUpdateFile={setUpdateFile} receiptFile={receiptFile} handleUpload={handleUpload} />
      <FileList
       receiptUrl={receiptUrl} 
       deleteFile={deleteFile} 
       />
-{enquiry?.after_arrival != 1 &&<Text style={[styles.header, { marginTop: 20 }]}>On documents payment</Text>}
- {enquiry?.on_document === 1 && <FilePickerPreview title='On documents payment' setReceiptFile={setReceiptFileDoc} receiptFile={receiptFileDoc} updateFile={updateFile} setUpdateFile={setUpdateFile} handleUpload={handleUploadOnDoc} />}
+{enquiry?.after_arrival != 1 &&<Text style={[styles.header, { marginTop: 20 }]}>Advance payment</Text>}
+ {enquiry?.on_document === 1 && <FilePickerPreview title='Advance payment' setReceiptFile={setReceiptFileDoc} receiptFile={receiptFileDoc} updateFile={updateFile} setUpdateFile={setUpdateFile} handleUpload={handleUploadOnDoc} />}
     {enquiry?.on_document === 1 &&  <FileList
       receiptUrl={receiptUrl1} 
        deleteFile={deleteFile} 
       />}
-      {enquiry?.after_arrival != 1 &&<Text style={[styles.header, { marginTop: 20 }]}>After Arrival</Text>}
-{enquiry?.after_arrival === 1 &&<FilePickerPreview title='After Arrival' setReceiptFile={setReceiptArrival} receiptFile={receiptArrival} updateFile={updateFile} setUpdateFile={setUpdateFile} handleUpload={handleUploadArrival} />}
+      {enquiry?.after_arrival != 1 &&<Text style={[styles.header, { marginTop: 20 }]}> On Documents Payment</Text>}
+{enquiry?.after_arrival === 1 &&<FilePickerPreview title='on documents payment' setReceiptFile={setReceiptArrival} receiptFile={receiptArrival} updateFile={updateFile} setUpdateFile={setUpdateFile} handleUpload={handleUploadArrival} />}
     {enquiry?.after_arrival === 1 && <FileList
       receiptUrl={receiptUrl2} 
        deleteFile={deleteFile} 

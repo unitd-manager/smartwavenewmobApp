@@ -746,6 +746,8 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 18,
     //fontWeight: 'bold',
+     fontWeight: '500',
+  color: '#333',
     fontFamily: 'Outfit-Regular',
   },
   
@@ -776,7 +778,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#E6F8FA',
     borderRadius: 15,
   },
-  categoryText: { fontSize: 12, fontFamily: 'Outfit-Regular', },
+  categoryText: { fontSize: 12,
+  color: '#333',fontFamily: 'Outfit-Regular', },
 
 rowBottom: {
   flexDirection: 'row',

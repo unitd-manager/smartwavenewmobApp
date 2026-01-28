@@ -14,12 +14,14 @@ import api from '../constants/api';
 import Icon from 'react-native-vector-icons/Ionicons';
 
 const SignUpScreen = ({ navigation }) => {
-  const [signupData, setSignupData] = useState({
-    first_name: '',
-    mobile: '',
-    email: '',
-    password: '',
-  });
+ const [signupData, setSignupData] = useState({
+  first_name: '',
+  mobile: '',
+  email: '',
+  password: '',
+  user_type: 'customer', // default
+});
+
 
   const [formErrors, setFormErrors] = useState({});
   const [passwordVisible, setPasswordVisible] = useState(false);
@@ -234,6 +236,32 @@ const SignUpScreen = ({ navigation }) => {
         {formErrors.password && (
           <Text style={styles.errorText}>{formErrors.password}</Text>
         )}
+{/* USER TYPE */}
+<Text style={styles.label}>Register As</Text>
+
+<View style={styles.radioContainer}>
+  {/* CUSTOMER */}
+  <TouchableOpacity
+    style={styles.radioOption}
+    onPress={() => setSignupData({ ...signupData, user_type: 'customer' })}
+  >
+    <View style={styles.radioCircle}>
+      {signupData.user_type === 'customer' && <View style={styles.radioChecked} />}
+    </View>
+    <Text style={styles.radioText}>Customer</Text>
+  </TouchableOpacity>
+
+  {/* SUPPLIER */}
+  <TouchableOpacity
+    style={styles.radioOption}
+    onPress={() => setSignupData({ ...signupData, user_type: 'supplier' })}
+  >
+    <View style={styles.radioCircle}>
+      {signupData.user_type === 'supplier' && <View style={styles.radioChecked} />}
+    </View>
+    <Text style={styles.radioText}>Supplier</Text>
+  </TouchableOpacity>
+</View>
 
         {/* SIGNUP BUTTON */}
         <TouchableOpacity style={styles.button} onPress={handleSignup}>
@@ -343,4 +371,38 @@ const styles = StyleSheet.create({
   loginLink: {
     color: '#00B4D8',
   },
+  radioContainer: {
+  flexDirection: 'row',
+  justifyContent: 'space-between',
+  marginTop: 8,
+  marginBottom: 10,
+},
+
+radioOption: {
+  flexDirection: 'row',
+  alignItems: 'center',
+  gap: 8,
+},
+
+radioCircle: {
+  width: 18,
+  height: 18,
+  borderRadius: 9,
+  borderWidth: 2,
+  borderColor: '#00B4D8',
+  justifyContent: 'center',
+  alignItems: 'center',
+},
+
+radioChecked: {
+  width: 10,
+  height: 10,
+  borderRadius: 5,
+  backgroundColor: '#00B4D8',
+},
+
+radioText: {
+  fontSize: 14,
+  color: '#000',
+}
 });
