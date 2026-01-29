@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, TextInput, ScrollView, Alert, ActivityIndicator } from 'react-native';
 import { Text, Avatar, Button } from 'react-native-paper';
+import { Picker } from '@react-native-picker/picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import api from '../constants/api';
 import imageBase from '../constants/imageBase';
@@ -12,6 +13,9 @@ const Profile = ({ navigation }) => {
   const [user, setUser] = useState({});
   const [profile, setProfile] = useState({});
   const [originalProfile, setOriginalProfile] = useState({});
+const [countryCode, setCountryCode] = useState('IN');
+const [callingCode, setCallingCode] = useState('91');
+const [allCountries, setAllCountries] = useState([]);
 
   const getUser = () => {
     api.post("/contact/getContactsById", { contact_id: user.contact_id })
@@ -21,6 +25,11 @@ const Profile = ({ navigation }) => {
       })
       .catch((err) => console.log(err));
   };
+useEffect(() => {
+  api.get('/commonApi/getCountry')
+    .then(res => setAllCountries(res.data.data))
+    .catch(err => console.log(err));
+}, []);
 
   const updateContact = () => {
     const Address = {
@@ -101,6 +110,8 @@ address_country_code: profile.address_country_code,
         <>
           {renderInput('first_name', 'Name')}
           {/* {renderInput('bio', 'Bio')} */}
+          {renderInput('company_name', 'Company Name')}
+
           {renderInput('email', 'Email', 'email-address')}
           {renderInput('mobile', 'Mobile', 'phone-pad')}
           {renderInput('gst', 'GST/Tax Registration Number')}
@@ -115,7 +126,27 @@ address_country_code: profile.address_country_code,
           {renderInput('address_city', 'City')}
           {renderInput('address_state', 'State')}
           {renderInput('address_po_code', 'Zip Code', 'number-pad')}
-          {renderInput('address_country_code', 'Country Code')}
+         <View style={{ marginBottom: 15 }}>
+  <Text style={{ color: '#000', marginBottom: 5 }}>Country</Text>
+
+  <View style={{ borderBottomWidth: 1, borderBottomColor: '#999' }}>
+    <Picker
+      selectedValue={profile?.address_country_code}
+      onValueChange={(value) => handleChange('address_country_code', value)}
+      style={{ color: '#000' }}
+    >
+      <Picker.Item label="Please Select" value="" />
+
+      {allCountries.map((country) => (
+        <Picker.Item
+          key={country.country_code}
+          label={country.name}
+          value={country.country_code}
+        />
+      ))}
+    </Picker>
+  </View>
+</View>
 
           <View style={styles.buttonGroup}>
             <Button mode="contained" onPress={updateContact} style={styles.button}>Save</Button>
@@ -127,8 +158,33 @@ address_country_code: profile.address_country_code,
           <View style={{ alignItems: 'center' }}>
   <Text style={styles.name}>{profile?.first_name}</Text>
   {/* <Text style={styles.bio}>{profile?.bio}</Text> */}
+  <Text style={styles.text}>{profile?.company_name}</Text>
+
   <Text style={styles.text}>{profile?.email}</Text>
-  <Text style={styles.text}>{profile?.mobile}</Text>
+  <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+  
+  <CountryPicker
+    countryCode={countryCode}
+    withFilter
+    withCallingCode
+    onSelect={(country) => {
+      setCountryCode(country.cca2);
+      setCallingCode(country.callingCode[0]);
+      handleChange('mobile_country_code', `+${country.callingCode[0]}`);
+    }}
+  />
+
+  <TextInput
+    style={[styles.input, { flex: 1, marginLeft: 10 }]}
+    placeholder="Mobile Number"
+    keyboardType="phone-pad"
+    value={profile?.mobile || ''}
+    onChangeText={(text) => handleChange('mobile', text)}
+  />
+
+</View>
+{/* 
+  <Text style={styles.text}>{profile?.mobile}</Text> */}
 
   <AddressSection profile={profile} />
 </View>

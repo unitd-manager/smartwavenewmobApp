@@ -269,6 +269,15 @@ const handleSearch = text => {
           onChangeText={(text) => handleChange('company_name', text)}
           error={errors.company_name}
         />
+         <CustomInput
+          placeholder="Company Address"
+          value={user.company_address}
+          onChangeText={(text) => handleChange('company_address', text)}
+          multiline
+          numberOfLines={4}
+          error={errors.company_address}
+          style={{ height: 100,color: '#000', textAlignVertical: 'top' }}
+        />
         <CustomInput
           placeholder="Message"
           value={user.comments}

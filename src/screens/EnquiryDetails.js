@@ -50,6 +50,7 @@ const EnquiryDetails = ({ route }) => {
   const [receiptUrl1, setReceiptUrl1] = useState("");
   const [receiptUrl2, setReceiptUrl2] = useState("");
   const [receiptUrl3, setReceiptUrl3] = useState("");
+  const [receiptUrl4, setReceiptUrl4] = useState("");
   const [addressList, setAddressList] = useState([]);
   const [productsLinked, setProductsLinked] = useState([]);
   const [selectedAddress, setSelectedAddress] = useState(null);
@@ -317,7 +318,7 @@ const handleUpload = async () => {
     //   setUploaded( Math.round((filedata.loaded/filedata.total)*100))                 
     // }}
   ).then(()=>{setUpdateFile(!updateFile);
-     api.post('/file/getListOfFiles', { record_id: enquiry.enquiry_id, room_name: 'PaymentReceipt' }).then((res) => {
+     api.post('/file/getListOfFiles', { record_id: enquiry.enquiry_id, room_name: 'EnquiryQuotation' }).then((res) => {
   setReceiptUrl(res.data);
 });
       Alert.alert("Files Uploaded Successfully")
@@ -491,6 +492,7 @@ useEffect(()=>{
 },[updateFile])
 
 useEffect(()=>{
+   
   api.post('/file/getListOfFiles', { record_id: enquiry.enquiry_id, room_name: 'PaymentReceipt' }).then((res) => {
   setReceiptUrl(res.data);
 });
@@ -503,6 +505,9 @@ useEffect(()=>{
     api.post('/file/getListOfFiles', { record_id: enquiry.enquiry_id, room_name: 'Enquiry' }).then((res) => {
       setReceiptUrl3(res.data);
     });
+     api.post('/file/getListOfFiles', { record_id: enquiry.enquiry_id, room_name: 'EnquiryQuotation' }).then((res) => {
+          setReceiptUrl4(res.data);
+        });
 },[deletion])
 
 useEffect(()=>{
@@ -535,6 +540,9 @@ api.post('/file/getListOfFiles', { record_id: enquiry.enquiry_id, room_name: 'Pa
     });
     api.post('/file/getListOfFiles', { record_id: enquiry.enquiry_id, room_name: 'Enquiry' }).then((res) => {
       setReceiptUrl3(res.data);
+    });
+     api.post('/file/getListOfFiles', { record_id: enquiry.enquiry_id, room_name: 'EnquiryQuotation' }).then((res) => {
+      setReceiptUrl4(res.data);
     });
 if(user){
 api
@@ -654,30 +662,36 @@ const combinedAddressList = [profileAddress, ...addressList];
           </TouchableOpacity>
         </View>
       </Modal>
+<Text style={[styles.header, { textAlign: 'left', marginTop: 20, marginBottom: 10 }]}>Proforma Invoice</Text>
 
-      <Text style={[styles.header, { textAlign: 'left', marginTop: 20, marginBottom: 10 }]}>Proforma Invoice</Text>
- <FilePickerPreview title='Proforma Invoice' setReceiptFile={setReceiptFile} updateFile={updateFile} setUpdateFile={setUpdateFile} receiptFile={receiptFile} handleUpload={handleUpload} />
+     <FileList
+      receiptUrl={receiptUrl4} 
+      deleteFile={deleteFile} 
+      />
+      <Text style={[styles.header, { textAlign: 'left', marginTop: 20, marginBottom: 10 }]}>Advance Payment</Text>
+ <FilePickerPreview title='Advance Payment' setReceiptFile={setReceiptFile} updateFile={updateFile} setUpdateFile={setUpdateFile} receiptFile={receiptFile} handleUpload={handleUpload} />
      <FileList
       receiptUrl={receiptUrl} 
       deleteFile={deleteFile} 
       />
-{enquiry?.after_arrival != 1 &&<Text style={[styles.header, { marginTop: 20 }]}>Advance payment</Text>}
- {enquiry?.on_document === 1 && <FilePickerPreview title='Advance payment' setReceiptFile={setReceiptFileDoc} receiptFile={receiptFileDoc} updateFile={updateFile} setUpdateFile={setUpdateFile} handleUpload={handleUploadOnDoc} />}
+{enquiry?.after_arrival != 1 &&<Text style={[styles.header, { marginTop: 20 }]}>On Documents payment</Text>}
+ {enquiry?.on_document === 1 && <FilePickerPreview title='OnDocPayment' setReceiptFile={setReceiptFileDoc} receiptFile={receiptFileDoc} updateFile={updateFile} setUpdateFile={setUpdateFile} handleUpload={handleUploadOnDoc} />}
     {enquiry?.on_document === 1 &&  <FileList
       receiptUrl={receiptUrl1} 
        deleteFile={deleteFile} 
       />}
-      {enquiry?.after_arrival != 1 &&<Text style={[styles.header, { marginTop: 20 }]}> On Documents Payment</Text>}
+      {enquiry?.after_arrival != 1 &&<Text style={[styles.header, { marginTop: 20 }]}>Address Details</Text>}
 {enquiry?.after_arrival === 1 &&<FilePickerPreview title='on documents payment' setReceiptFile={setReceiptArrival} receiptFile={receiptArrival} updateFile={updateFile} setUpdateFile={setUpdateFile} handleUpload={handleUploadArrival} />}
     {enquiry?.after_arrival === 1 && <FileList
       receiptUrl={receiptUrl2} 
        deleteFile={deleteFile} 
       />}
-      {/* <FilePickerPreview title='Buisness Document' setReceiptFile={setReceiptArrival1} receiptFile={receiptArrival1} handleUpload={handleUpload} />
+      <Text style={[styles.header, { textAlign: 'left', marginTop: 20, marginBottom: 10 }]}>Business Document</Text>
+     
      <FileList
       receiptUrl={receiptUrl3} 
-      // deleteFile={deleteFile} 
-      /> */}
+       deleteFile={deleteFile} 
+      />
       <AddressSelector addresses={combinedAddressList} onSelect={handleSelect} />
       <View style={styles.editButtonWrapper}>
             <Button mode="contained" onPress={generateOrder} style={styles.button} >Save Address</Button>

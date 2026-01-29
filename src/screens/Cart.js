@@ -19,6 +19,7 @@ import { AuthContext } from "../context/AuthContext";
 
   const [container, setContainer] = useState("");
 
+  const [containercount, setContainerCount] = useState("");
   const { user, logout } = useContext(AuthContext);
 
   const dispatch = useDispatch();
@@ -118,17 +119,26 @@ const placeEnquiriesForAllProducts = async (code) => {
   }
 
   // 🔥 GROUP CART ITEMS BY ORIGIN (Like your web version)
-  const groupedCartItems = items.reduce((acc, item) => {
-    if (!acc[item.origins]) {
-      acc[item.origins] = [];
-    }
-    acc[item.origins].push(item);
-    return acc;
-  }, {});
+const groupedCartItems = items.reduce((acc, item) => {
+  const key = `${item.origins || "NA"}_${item.destination_port || "NA"}`;
+
+  if (!acc[key]) {
+    acc[key] = [];
+  }
+
+  acc[key].push(item);
+  return acc;
+}, {});
+
 
   // 🚀 LOOP GROUP-WISE AND CREATE ENQUIRY FOR EACH GROUP
-  for (const originKey in groupedCartItems) {
-    const productsInGroup = groupedCartItems[originKey];
+for (const groupKey in groupedCartItems) {
+  const productsInGroup = groupedCartItems[groupKey];
+
+  const firstItem = productsInGroup[0];
+  const origin = firstItem.origins;
+  const destination = firstItem.destination_port;
+
 
     let enquiryCode = "";
     try {
@@ -140,32 +150,27 @@ const placeEnquiriesForAllProducts = async (code) => {
     }
 
     const enquiryDetails = {
-      contact_id: user.contact_id,
-      enquiry_date: new Date().toISOString().split("T")[0],
-      enquiry_type: "Enquiry and order for Retail products.",
-      status: "New",
-      email: userData.email,
-      first_name: userData.first_name,
-      title:
-        `Enquiry for ${productsInGroup
-          .map((p) => p.title)
-          .join(", ")} from ` + userData.first_name,
-      enquiry_code: enquiryCode,
-      creation_date: new Date().toISOString().split("T")[0],
-      created_by: userData.first_name,
-      shipping_address: [
-        userData.address || "",
-        userData.address1 || "",
-        userData.address2 || "",
-        userData.address_area || "",
-        userData.address_city || "",
-        userData.address_state || "",
-        userData.address_country_code || "",
-        userData.address_po_code || ""
-      ]
-        .filter(Boolean)
-        .join(", "),
-    };
+  contact_id: user.contact_id,
+  enquiry_date: new Date().toISOString().split("T")[0],
+  enquiry_type: "Enquiry and order for Retail products.",
+  status: "New",
+  email: userData.email,
+  first_name: userData.first_name,
+  title: `Enquiry for ${productsInGroup.map(p => p.title).join(", ")} | Origin: ${origin} | Destination: ${destination}`,
+  enquiry_code: enquiryCode,
+  creation_date: new Date().toISOString().split("T")[0],
+  created_by: userData.first_name,
+  shipping_address: [
+    userData.address1,
+    userData.address2,
+    userData.address_area,
+    userData.address_city,
+    userData.address_state,
+    userData.address_country_code,
+    userData.address_po_code
+  ].filter(Boolean).join(", "),
+};
+
 
     try {
       // INSERT ENQUIRY
@@ -174,21 +179,21 @@ const placeEnquiriesForAllProducts = async (code) => {
 
       // INSERT QUOTE ITEMS
       for (const item of productsInGroup) {
-        const quoteItem = {
-          enquiry_id: insertedId,
-          quantity: item.qty,
-          product_id: item.product_id,
-          category_id: item.category_id,
-          sub_category_id: item.sub_category_id,
-          created_by: userData.first_name,
-          first_name: userData.first_name,
-          email: userData.email,
-          grades: item.grade,
-          counts: item.counts,
-          origins: item.origins,
-          destination_port: item.destination_port, // debug: destination_port value -> ${item.destination_port}
-            
-        };
+      const quoteItem = {
+  enquiry_id: insertedId,
+  quantity: item.qty,
+  product_id: item.product_id,
+  category_id: item.category_id,
+  sub_category_id: item.sub_category_id,
+  created_by: userData.first_name,
+  first_name: userData.first_name,
+  email: userData.email,
+  grades: item.grade,
+  counts: item.counts,
+  origins: item.origins,
+  destination_port: item.destination_port,
+};
+
 
         await api.post("/enquiry/insertQuoteItems", quoteItem);
       }
@@ -342,23 +347,30 @@ const getUser = () => {
 								{item.destination_port && <Text style={styles.itemDetailText}>DestinationPort: {item.destination_port}</Text>}
 							
 							</TouchableOpacity>
-							<View style={styles.quantityContainer}>
-								<TouchableOpacity 
-									style={styles.quantityButton}
-									onPress={() => handleDecreaseQuantity(item)}
-								>
-									<Icon name="remove-circle-outline" size={15} color="#1EB1C5" />
-								</TouchableOpacity>
-								<Text style={styles.quantityText}>
-									{item?.qty}
-								</Text>
-								<TouchableOpacity 
-									style={styles.quantityButton}
-									onPress={() => handleIncreaseQuantity(item)}
-								>
-									<Icon name="add-circle-outline" size={15} color="#1EB1C5" />
-								</TouchableOpacity>
-							</View>
+							<View style={{ flexDirection: 'row', alignItems: 'center' }}>
+  
+  <Text style={styles.labelInline}>No of Containers:</Text>
+
+  <View style={styles.quantityContainer}>
+    <TouchableOpacity 
+      style={styles.quantityButton}
+      onPress={() => handleDecreaseQuantity(item)}
+    >
+      <Icon name="remove-circle-outline" size={15} color="#1EB1C5" />
+    </TouchableOpacity>
+
+    <Text style={styles.quantityText}>{item?.qty}</Text>
+
+    <TouchableOpacity 
+      style={styles.quantityButton}
+      onPress={() => handleIncreaseQuantity(item)}
+    >
+      <Icon name="add-circle-outline" size={15} color="#1EB1C5" />
+    </TouchableOpacity>
+  </View>
+
+</View>
+
 						</View>
 						<TouchableOpacity 
 							style={styles.deleteButton}
@@ -676,6 +688,40 @@ const styles = StyleSheet.create({
 	  textAlign: 'center',
 	    fontFamily: 'Outfit-Regular',
 	},
+	label: {
+  fontSize: 14,
+  fontWeight: '600',
+  color: '#000',
+  marginBottom: 4,
+},
+
+labelInline: {
+  fontSize: 14,
+  fontWeight: '600',
+  color: '#000',
+  marginRight: 8,
+},
+
+quantityContainer: {
+  flexDirection: 'row',
+  alignItems: 'center',
+  borderWidth: 1,
+  borderColor: '#1EB1C5',
+  borderRadius: 6,
+  paddingHorizontal: 8,
+  paddingVertical: 2,
+},
+
+quantityButton: {
+  padding: 4,
+},
+
+quantityText: {
+  marginHorizontal: 8,
+  fontSize: 14,
+  fontWeight: '600',
+  color: '#000',
+}
   });
 
 export default CartScreen;

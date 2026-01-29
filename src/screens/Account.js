@@ -41,7 +41,7 @@ const AccountScreen = ({ navigation }) => {
 
   const menuItems = [
     { icon: 'user', label: 'Your Profile', screen: 'Profile' },
-    { icon: 'info', label: 'About Us', screen: 'AboutUs' },
+    // { icon: 'info', label: 'About Us', screen: 'AboutUs' },
     { icon: 'phone', label: 'Contact Us', screen: 'ContactUs' },
     { icon: 'file-text', label: 'Enquiry History', screen: 'EnquiryHistory' },
     { icon: 'heart', label: 'Wishlist', screen: 'WishlistScreen' },
@@ -50,7 +50,7 @@ const AccountScreen = ({ navigation }) => {
   ];
 
   const userlessmenuItems = [
-    { icon: 'info', label: 'About Us', screen: 'AboutUs' },
+    // { icon: 'info', label: 'About Us', screen: 'AboutUs' },
     { icon: 'phone-call', label: 'Contact Us', screen: 'ContactUs' },
     { icon: 'log-in', label: 'Sign In', screen: 'LoginPage' },
     { icon: 'user-plus', label: 'Register', screen: 'Signup' },
