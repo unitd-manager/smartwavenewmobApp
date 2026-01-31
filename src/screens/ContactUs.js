@@ -35,7 +35,7 @@ const ContactUs = () => {
     }
   };
 
-  const [contact, setContact] = useState();
+  const [contact, setContact] = useState([]);
   const [contacts, setContacts] = useState();
   const [email, setEmail] = useState();
   const [website, setWebsite] = useState(); 
@@ -86,7 +86,7 @@ const handleSearch = text => {
   };
   const getContact = () => {
     api.get("/contact/getContacts").then((res) => {
-      setContact(res.data.data[0]);
+      setContact(res.data.data);
     });
   };
 
@@ -302,7 +302,12 @@ const handleSearch = text => {
         <Icon name="phone" size={20} color="#000" />
         <Text style={styles.label}> Phone:</Text>
       </View>
-      <Text style={styles.info}>{contact && contact.mobile}</Text>
+      {contact?.map((c, index) => (
+  <Text key={index} style={styles.info}>
+    {c.mobile}
+  </Text>
+))}
+
 
       <View style={styles.row}>
         <Icon name="envelope" size={20} color="#000" />

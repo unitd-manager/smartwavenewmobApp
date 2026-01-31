@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect,useRef } from 'react';
 import { View, StyleSheet, TextInput, ScrollView, Alert, ActivityIndicator } from 'react-native';
 import { Text, Avatar, Button } from 'react-native-paper';
 import { Picker } from '@react-native-picker/picker';
@@ -6,6 +6,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import api from '../constants/api';
 import imageBase from '../constants/imageBase';
 import AddressSection from '../components/AddressSection';
+import CountryPicker from 'react-native-country-picker-modal';
 
 const Profile = ({ navigation }) => {
   const [loading, setLoading] = useState(true);
@@ -17,6 +18,7 @@ const [countryCode, setCountryCode] = useState('IN');
 const [callingCode, setCallingCode] = useState('91');
 const [allCountries, setAllCountries] = useState([]);
 
+const countryPickerRef = useRef(null);
   const getUser = () => {
     api.post("/contact/getContactsById", { contact_id: user.contact_id })
       .then((res) => {
@@ -113,7 +115,54 @@ address_country_code: profile.address_country_code,
           {renderInput('company_name', 'Company Name')}
 
           {renderInput('email', 'Email', 'email-address')}
-          {renderInput('mobile', 'Mobile', 'phone-pad')}
+          {/* {renderInput('mobile', 'Mobile', 'phone-pad')} */}
+       <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+
+  {/* 🔥 HIDDEN Country Picker (logic only) */}
+  <CountryPicker
+    ref={countryPickerRef}
+    countryCode={countryCode}
+    withFilter
+    withFlag={false}
+    withEmoji={false}
+    withCallingCode={false}
+    withCallingCodeButton={false}
+    visible={false}
+    onSelect={(country) => {
+      setCountryCode(country.cca2);
+      setCallingCode(country.callingCode[0]);
+      handleChange('mobile_country_code', `+${country.callingCode[0]}`);
+    }}
+  />
+
+  {/* ✅ CLICKABLE +91 */}
+  <TouchableOpacity
+    onPress={() => countryPickerRef.current?.open()}
+    style={{
+      borderBottomWidth: 1,
+      borderBottomColor: '#999',
+      paddingVertical: 10,
+      paddingHorizontal: 8,
+      marginRight: 10,
+      minWidth: 55,
+      alignItems: 'center',
+    }}
+  >
+    <Text style={{ fontSize: 16, color: '#000' }}>
+      +{callingCode}
+    </Text>
+  </TouchableOpacity>
+
+  {/* 📞 MOBILE INPUT */}
+  <TextInput
+    style={[styles.input, { flex: 1 }]}
+    placeholder="Mobile Number"
+    keyboardType="phone-pad"
+    value={profile?.mobile || ''}
+    onChangeText={(text) => handleChange('mobile', text)}
+  />
+</View>
+
           {renderInput('gst', 'GST/Tax Registration Number')}
           {renderInput('fssai', 'FSSAI Number')}
           {renderInput('iec', 'Import Export License')}
@@ -161,28 +210,7 @@ address_country_code: profile.address_country_code,
   <Text style={styles.text}>{profile?.company_name}</Text>
 
   <Text style={styles.text}>{profile?.email}</Text>
-  <View style={{ flexDirection: 'row', alignItems: 'center' }}>
   
-  <CountryPicker
-    countryCode={countryCode}
-    withFilter
-    withCallingCode
-    onSelect={(country) => {
-      setCountryCode(country.cca2);
-      setCallingCode(country.callingCode[0]);
-      handleChange('mobile_country_code', `+${country.callingCode[0]}`);
-    }}
-  />
-
-  <TextInput
-    style={[styles.input, { flex: 1, marginLeft: 10 }]}
-    placeholder="Mobile Number"
-    keyboardType="phone-pad"
-    value={profile?.mobile || ''}
-    onChangeText={(text) => handleChange('mobile', text)}
-  />
-
-</View>
 {/* 
   <Text style={styles.text}>{profile?.mobile}</Text> */}
 
