@@ -680,12 +680,12 @@ const combinedAddressList = [profileAddress, ...addressList];
       receiptUrl={receiptUrl1} 
        deleteFile={deleteFile} 
       />}
-      {enquiry?.after_arrival != 1 &&<Text style={[styles.header, { marginTop: 20 }]}>Address Details</Text>}
+      {/* {enquiry?.after_arrival != 1 &&<Text style={[styles.header, { marginTop: 20 }]}>After Arrival</Text>}
 {enquiry?.after_arrival === 1 &&<FilePickerPreview title='on documents payment' setReceiptFile={setReceiptArrival} receiptFile={receiptArrival} updateFile={updateFile} setUpdateFile={setUpdateFile} handleUpload={handleUploadArrival} />}
     {enquiry?.after_arrival === 1 && <FileList
       receiptUrl={receiptUrl2} 
        deleteFile={deleteFile} 
-      />}
+      />} */}
       <Text style={[styles.header, { textAlign: 'left', marginTop: 20, marginBottom: 10 }]}>Business Document</Text>
      
      <FileList

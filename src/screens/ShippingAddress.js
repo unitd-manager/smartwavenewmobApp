@@ -1,6 +1,7 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { View, Text, TextInput, FlatList, TouchableOpacity, Alert, StyleSheet, Modal, ScrollView, useColorScheme } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome'; // ✅ Import icons
+import { Picker } from '@react-native-picker/picker';
 import api from '../constants/api';
 import { AuthContext } from '../context/AuthContext';
 
@@ -204,11 +205,25 @@ const ShippingAddress = () => {
             </View>
           ))}
 
-          <TextInput
-            style={styles.input}
-            value={newAddress.address_type}
-            editable={false}
-          />
+        <View style={styles.inputGroup}>
+  <Text style={styles.inputLabel}>Address Type</Text>
+
+  <View style={styles.pickerWrapper}>
+    <Picker
+      selectedValue={newAddress.address_type}
+      onValueChange={(value) =>
+        handleInputChange('address_type', value)
+      }
+      style={{ color: '#000', backgroundColor: '#fff' }}
+      dropdownIconColor="#000"
+    >
+      <Picker.Item label="Shipping" value="Shipping" />
+      <Picker.Item label="Delivery" value="Delivery" />
+    </Picker>
+  </View>
+</View>
+
+
 
           <View style={styles.editButtonWrapper}>
             <CurvedButton title={editMode ? 'Update Address' : 'Save Address'} onPress={handleSaveAddress} />

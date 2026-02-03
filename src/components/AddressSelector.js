@@ -40,13 +40,17 @@ const AddressSelector = ({ addresses = [], onSelect }) => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Shipping Address</Text>
-      <FlatList
-        data={addresses}
-        renderItem={renderItem}
-        keyExtractor={(item) => item.customer_address_id.toString()}
-        contentContainerStyle={styles.listContainer}
-      />
+      {/* <Text style={styles.title}>Shipping Address</Text> */}
+     <FlatList
+  data={addresses}
+  renderItem={renderItem}
+  keyExtractor={(item) => item.customer_address_id.toString()}
+  contentContainerStyle={styles.listContainer}
+  ListHeaderComponent={
+    <Text style={styles.title}> Address Details</Text>
+  }
+/>
+
     </View>
   );
 };
@@ -58,12 +62,13 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     fontFamily: 'Outfit-Regular',
   },
-  title: {
-    fontSize: 18,
-    //fontWeight: 'bold',
-    marginBottom: 12,
-    fontFamily: 'Outfit-Regular',
-  },
+ title: {
+  fontSize: 18,
+  marginBottom: 12,
+  color: '#111',
+  fontWeight: '600',
+  fontFamily: 'Outfit-Regular',
+},
   listContainer: {
     paddingBottom: 20,
     fontFamily: 'Outfit-Regular',

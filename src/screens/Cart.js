@@ -112,7 +112,7 @@ const placeEnquiriesForAllProducts = async (code) => {
       "Please update your profile details including first name and full address.",
       [
         { text: "Cancel", style: "cancel" },
-        { text: "Go to Profile", onPress: () => navigation.navigate("MyAccount") }
+        { text: "Go to Profile", onPress: () => navigation.navigate("Profile") }
       ]
     );
     return;
