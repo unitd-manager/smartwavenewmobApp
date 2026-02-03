@@ -1,4 +1,4 @@
 <resources>
-    <string name="app_name">SmartWave</string>
+    <string name="app_name">SmartWaveApp</string>
     <string name="react_native_url">http://10.0.2.2:8083/index.bundle?platform=android&amp;dev=true&amp;minify=false</string>
 </resources>
