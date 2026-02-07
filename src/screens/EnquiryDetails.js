@@ -620,7 +620,9 @@ const combinedAddressList = [profileAddress, ...addressList];
 
       <View style={styles.row}>
         <Text style={styles.label}>Address</Text>
-        <Text style={styles.value}>{enquiry?.shipping_address}</Text>
+        <View style={styles.valueContainer}>
+          <Text style={styles.value}>{enquiry?.shipping_address}</Text>
+        </View>
       </View>
 
       <TouchableOpacity
@@ -758,7 +760,7 @@ const getStyles = (isDarkMode) =>
     row: {
       flexDirection: 'row',
       justifyContent: 'space-between',
-      alignItems: 'center',
+      alignItems: 'flex-start',
       paddingVertical: 12,
       borderBottomWidth: 1,
       borderBottomColor: '#f0f0f0',
@@ -772,6 +774,14 @@ const getStyles = (isDarkMode) =>
       fontSize: 14,
       color: '#222',
       fontFamily: 'Outfit-Regular',
+      textAlign: 'right',
+      flexShrink: 1,
+    },
+    valueContainer: {
+      flex: 1,
+      paddingLeft: 12,
+      paddingRight: 12,
+      alignItems: 'flex-end',
     },
     enquiryId: {
       fontSize: 15,

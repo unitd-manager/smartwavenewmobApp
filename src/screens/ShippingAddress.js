@@ -43,10 +43,18 @@ const ShippingAddress = () => {
     address_po_code: '',
   });
 
+  const [countries, setCountries] = useState([]);
+
   const [errors, setErrors] = useState({});
 
   useEffect(() => {
     fetchAddresses();
+  }, []);
+
+  useEffect(() => {
+    api.get('/commonApi/getCountry')
+      .then(res => setCountries(res.data.data || []))
+      .catch(err => console.log('Country fetch error', err));
   }, []);
 
   const fetchAddresses = async () => {
@@ -190,18 +198,36 @@ const ShippingAddress = () => {
             { name: 'address_street', label: 'Street', placeholder: 'Enter street' },
             { name: 'address_town', label: 'Town/City', placeholder: 'Enter town or city' },
             { name: 'address_state', label: 'State', placeholder: 'Enter state' },
-            { name: 'address_country', label: 'Country', placeholder: 'Enter country' },
+            { name: 'address_country', label: 'Country', placeholder: 'Select country' },
             { name: 'address_po_code', label: 'Postal Code', placeholder: 'Enter postal code' },
           ].map(({ name, label, placeholder }) => (
             <View key={name} style={styles.inputGroup}>
               <Text style={styles.inputLabel}>{label}</Text>
-              <TextInput
-                style={styles.input}
-                placeholder={placeholder}
-                value={newAddress[name]}
-                onChangeText={(text) => handleInputChange(name, text)}
-              />
-              {errors[name] && <Text style={styles.errorText}>{errors[name]}</Text>}
+              {name === 'address_country' ? (
+                <View style={styles.pickerWrapper}>
+                  <Picker
+                    selectedValue={newAddress.address_country}
+                    onValueChange={(value) => handleInputChange('address_country', value)}
+                    style={styles.picker}
+                    dropdownIconColor={isDarkMode ? '#fff' : '#000'}
+                  >
+                    <Picker.Item label="Please select" value="" />
+                    {countries.map((c) => (
+                      <Picker.Item key={c.country_code} label={c.name} value={c.country_code} />
+                    ))}
+                  </Picker>
+                </View>
+              ) : (
+                <>
+                  <TextInput
+                    style={styles.input}
+                    placeholder={placeholder}
+                    value={newAddress[name]}
+                    onChangeText={(text) => handleInputChange(name, text)}
+                  />
+                  {errors[name] && <Text style={styles.errorText}>{errors[name]}</Text>}
+                </>
+              )}
             </View>
           ))}
 
@@ -252,6 +278,8 @@ const getStyles = (isDarkMode) => StyleSheet.create({
   modalTitle: { fontSize: 18, fontWeight: 'bold', marginBottom: 15, color: isDarkMode ? '#000' : '#000', fontFamily: 'Outfit-Regular' },
   inputGroup: { marginBottom: 10, fontFamily: 'Outfit-Regular' },
   input: { borderWidth: 1, borderColor: '#ccc', borderRadius: 5, padding: 10, fontFamily: 'Outfit-Regular',color:'#000' },
+  pickerWrapper: { borderWidth: 1, borderColor: '#ccc', borderRadius: 5, backgroundColor: '#fff' },
+  picker: { color: '#000', height: 50 },
   errorText: { color: 'red', fontSize: 12, fontFamily: 'Outfit-Regular' },
   customButton: {
     backgroundColor: '#00B4D8',

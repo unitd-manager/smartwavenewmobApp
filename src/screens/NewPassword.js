@@ -9,9 +9,12 @@ import {
   Alert,
   ScrollView,
   KeyboardAvoidingView,
-  Platform
+  Platform,
+  TouchableWithoutFeedback,
+  Keyboard,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Feather'; // For eye icon
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import api from '../constants/api';
 import PasswordUpdateModal from '../components/PasswordUpdateModal';
 
@@ -43,15 +46,17 @@ const NewPasswordScreen = ({ route,navigation }) => {
   };
 
   return (
-    <KeyboardAvoidingView
+      <KeyboardAvoidingView
       style={{ flex: 1 }}
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-      keyboardVerticalOffset={Platform.OS === 'ios' ? 40 : 0}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
-      <ScrollView
-        contentContainerStyle={styles.container}
-        keyboardShouldPersistTaps="handled"
-      >
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+        <KeyboardAwareScrollView
+          enableOnAndroid
+          keyboardShouldPersistTaps="handled"
+          contentContainerStyle={[styles.container, { paddingBottom: 40 }]}
+          extraScrollHeight={20}
+        >
         <TouchableOpacity style={styles.backBtn} onPress={() => navigation.goBack()}>
           <Icon name="arrow-left" size={24} color="#000" />
         </TouchableOpacity>
@@ -120,8 +125,9 @@ const NewPasswordScreen = ({ route,navigation }) => {
             <Text style={styles.loginLink}>Login</Text>
           </TouchableOpacity>
         </View>
-        <PasswordUpdateModal visible={modalVisible} onClose={() => {setModalVisible(false); Navigation.navigate('LoginPage')}} />
-      </ScrollView>
+        <PasswordUpdateModal visible={modalVisible} onClose={() => { setModalVisible(false); navigation.navigate('LoginPage'); }} />
+       </KeyboardAwareScrollView>
+      </TouchableWithoutFeedback>
     </KeyboardAvoidingView>
   );
 };

@@ -164,7 +164,8 @@ const styles = StyleSheet.create({
     fontSize: 24,
     marginBottom: 8,
   },
-  titleBold: {},
+  titleBold: {
+    color: '#000'},
   titleBlue: {
     color: '#00B4D8',
   },

@@ -132,7 +132,7 @@ const handleIncreaseQuantity = useCallback(
                     <View style={styles.view}>
                         <View style={styles.column}>
                         <TouchableOpacity
-      onPress={() => navigation.navigate("ProductDetails", { productId: item.product_id })}
+      onPress={() => navigation.navigate('MainApp', { screen: 'Home', params: { screen: 'ProductDetails', params: { productId: item.product_id } } })}
     >
                             <View style={styles.column2}  >
                                 <Text style={styles.text3}>

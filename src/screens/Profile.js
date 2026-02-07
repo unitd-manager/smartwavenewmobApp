@@ -1,5 +1,5 @@
 import React, { useState, useEffect,useRef } from 'react';
-import { View, StyleSheet, TextInput, ScrollView, Alert, ActivityIndicator,TouchableOpacity } from 'react-native';
+import { View, StyleSheet, TextInput, ScrollView, Alert, ActivityIndicator,TouchableOpacity, KeyboardAvoidingView, Platform, Keyboard, TouchableWithoutFeedback } from 'react-native';
 import { Text, Avatar, Button } from 'react-native-paper';
 import { Picker } from '@react-native-picker/picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -33,19 +33,47 @@ useEffect(() => {
     .catch(err => console.log(err));
 }, []);
 
-  const updateContact = () => {
-    const Address = {
-      contact_id: profile.contact_id,
-      address1: profile.address1,
-      address2: profile.address2,
-      address_area: profile.address_area,
-      address_city: profile.address_city,
-      address_state: profile.address_state,
-      address_po_code: profile.address_po_code,
-address_country_code: profile.address_country_code,
+    // Validation helpers
+    const validatePAN = (pan) => {
+      if (!pan) return true; // allow empty
+      const panRegex = /^[A-Z]{5}[0-9]{4}[A-Z]$/i;
+      return panRegex.test(pan.trim());
     };
 
-    api.post("/contact/editContactData", profile)
+    const validateFSSAI = (fssai) => {
+      if (!fssai) return true; // allow empty
+      const fssaiRegex = /^\d{14}$/;
+      return fssaiRegex.test(fssai.trim());
+    };
+
+  const updateContact = () => {
+    // Validate PAN
+    if (!validatePAN(profile?.pan)) {
+      Alert.alert('Invalid PAN', 'Please enter a valid PAN (e.g. ABCDE1234F)');
+      return;
+    }
+
+    // Validate FSSAI (14 digits)
+    if (!validateFSSAI(profile?.fssai)) {
+      Alert.alert('Invalid FSSAI', 'Please enter a valid 14-digit FSSAI number');
+      return;
+    }
+
+    // Prepare payload (uppercase PAN)
+    const payload = { ...profile, pan: profile?.pan ? profile.pan.toUpperCase().trim() : profile?.pan };
+
+    const Address = {
+      contact_id: payload.contact_id,
+      address1: payload.address1,
+      address2: payload.address2,
+      address_area: payload.address_area,
+      address_city: payload.address_city,
+      address_state: payload.address_state,
+      address_po_code: payload.address_po_code,
+      address_country_code: payload.address_country_code,
+    };
+
+    api.post("/contact/editContactData", payload)
       .then(() => api.post("/contact/editContactAddress", Address))
       .then(() => {
         Alert.alert("Account Info Updated successfully");
@@ -98,7 +126,17 @@ address_country_code: profile.address_country_code,
       <ActivityIndicator size="large" color="#1E90FF" />
     </View>
   ) : (
-    <ScrollView contentContainerStyle={styles.container}>
+    <KeyboardAvoidingView
+      style={{ flex: 1 }}
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 40 : 0}
+    >
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+        <ScrollView
+          contentContainerStyle={[styles.container, { flexGrow: 1, paddingBottom: 200 }]}
+          keyboardShouldPersistTaps="handled"
+          keyboardDismissMode="on-drag"
+        >
       <View style={styles.avatarContainer}>
         <Avatar.Icon 
           size={100} 
@@ -138,24 +176,14 @@ address_country_code: profile.address_country_code,
   {/* ✅ CLICKABLE +91 */}
   <TouchableOpacity
     onPress={() => countryPickerRef.current?.open()}
-    style={{
-      borderBottomWidth: 1,
-      borderBottomColor: '#999',
-      paddingVertical: 10,
-      paddingHorizontal: 8,
-      marginRight: 10,
-      minWidth: 55,
-      alignItems: 'center',
-    }}
+    style={styles.countryCodeButton}
   >
-    <Text style={{ fontSize: 16, color: '#000' }}>
-      +{callingCode}
-    </Text>
+    <Text style={styles.countryCodeText}>+{callingCode}</Text>
   </TouchableOpacity>
 
   {/* 📞 MOBILE INPUT */}
   <TextInput
-    style={[styles.input, { flex: 1 }]}
+    style={[styles.input, styles.mobileInput, { flex: 1 }]}
     placeholder="Mobile Number"
     keyboardType="phone-pad"
     value={profile?.mobile || ''}
@@ -222,7 +250,9 @@ address_country_code: profile.address_country_code,
           </View>
         </>
       )}
-    </ScrollView>
+        </ScrollView>
+      </TouchableWithoutFeedback>
+    </KeyboardAvoidingView>
   );
 
   function renderInput(key, placeholder, keyboardType = 'default') {
@@ -266,6 +296,28 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     color: '#000',
     fontFamily: 'Outfit-Regular',
+  },
+  countryCodeButton: {
+    borderBottomWidth: 1,
+    borderBottomColor: '#999',
+    paddingHorizontal: 12,
+    marginRight: 10,
+    minWidth: 60,
+    height: 44,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  countryCodeText: {
+    fontSize: 16,
+    color: '#000',
+    lineHeight: 44,
+    textAlign: 'center',
+  },
+  mobileInput: {
+    height: 44,
+    paddingVertical: 0,
+    textAlignVertical: 'center',
+    marginBottom: 0,
   },
   sectionHeader: {
     fontSize: 18,

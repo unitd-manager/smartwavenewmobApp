@@ -88,35 +88,47 @@ const generateCode = () => {
 
 const placeEnquiriesForAllProducts = async (code) => {
   if (!user) return;
+	// 🔍 REFRESH USER PROFILE THEN VALIDATE ADDRESS
+	let freshUser = userData;
+	try {
+		const res = await api.post("/contact/getContactsById", { contact_id: user.contact_id });
+		if (res?.data?.data && res.data.data[0]) {
+			freshUser = res.data.data[0];
+			setUserData(freshUser);
+		}
+	} catch (e) {
+		console.log("Failed to refresh user data before enquiry", e);
+	}
 
-  // 🔍 ADDRESS VALIDATION
-  const addressFields = [
-    userData.address1,
-    userData.address2,
-    userData.address_area,
-    userData.address_city,
-    userData.address_state,
-    userData.address_country_code,
-    userData.address_po_code
-  ];
+	const addressFields = [
+		freshUser?.address1,
+		freshUser?.address2,
+		freshUser?.address_area,
+		freshUser?.address_city,
+		freshUser?.address_state,
+		freshUser?.address_country_code,
+		freshUser?.address_po_code,
+	];
 
-  const isAddressEmpty = addressFields.some(
-    (field) => !field || field.trim() === ""
-  );
-  const isFirstNameEmpty =
-    !userData.first_name || userData.first_name.trim() === "";
+	const isAddressEmpty = addressFields.some((field) => {
+		if (field === null || field === undefined) return true;
+		if (typeof field === 'string') return field.trim() === "";
+		return false;
+	});
 
-  if (isAddressEmpty || isFirstNameEmpty) {
-    Alert.alert(
-      "Incomplete Profile",
-      "Please update your profile details including first name and full address.",
-      [
-        { text: "Cancel", style: "cancel" },
-        { text: "Go to Profile", onPress: () => navigation.navigate("Profile") }
-      ]
-    );
-    return;
-  }
+	const isFirstNameEmpty = !freshUser?.first_name || (typeof freshUser.first_name === 'string' && freshUser.first_name.trim() === "");
+
+	if (isAddressEmpty || isFirstNameEmpty) {
+		Alert.alert(
+			"Incomplete Profile",
+			"Please update your profile details including first name and full address.",
+			[
+				{ text: "Cancel", style: "cancel" },
+				{ text: "Go to Profile", onPress: () => navigation.navigate("Profile") }
+			]
+		);
+		return;
+	}
 
   // 🔥 GROUP CART ITEMS BY ORIGIN (Like your web version)
 const groupedCartItems = items.reduce((acc, item) => {
